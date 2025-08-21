@@ -29,11 +29,30 @@ class App extends StatelessWidget {
             themeMode: ThemeMode.system,
             theme: ThemeData(),
             darkTheme: ThemeData.dark(),
-            home: Scaffold(
-                backgroundColor: Color.fromARGB(100, 74, 78, 90),
-                body: SplashPage(),
-            ),
+            home: SplashScreenWrapper(),
         );
+    }
+}
+
+class SplashScreenWrapper extends StatefulWidget {
+    const SplashScreenWrapper({super.key});
+
+    @override
+    State<SplashScreenWrapper> createState() => _SplashScreenWrapperState();
+}
+
+class _SplashScreenWrapperState extends State<SplashScreenWrapper> {
+    @override
+    void initState() {
+        super.initState();
+        Future.delayed(const Duration(seconds: 2), () {
+            Navigator.of(context).pushReplacementNamed('/editor');
+        });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return SplashPage();
     }
 }
 
