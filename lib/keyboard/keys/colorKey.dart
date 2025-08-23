@@ -7,6 +7,7 @@ class Colorkey extends StatelessWidget {
     final Color? bgColor;
     final Color? color;
     final VoidCallback? onPressed;
+    final double? fontSize;
 
     const Colorkey({
         super.key,
@@ -14,6 +15,7 @@ class Colorkey extends StatelessWidget {
         this.bgColor,
         this.color,
         this.onPressed,
+        this.fontSize = 14,
     });
 
     @override
@@ -25,7 +27,7 @@ class Colorkey extends StatelessWidget {
                 data,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 14,
+                    fontSize: fontSize,
                     color: color ?? Colors.black,
                     fontFamily: 'NotoSansTamil',
                     height: 1,

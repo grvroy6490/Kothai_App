@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kothai_app/pages/SplashPage.dart';
 import 'package:kothai_app/pages/auth/AuthCommon.dart';
+import 'package:kothai_app/provider/StartStopPracticeModel.dart';
+import 'package:kothai_app/provider/theme_provider.dart';
 import 'package:kothai_app/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kothai_app/theme/theme_manager.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,15 +28,27 @@ class App extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return MaterialApp(
-            routes: Routes.routes,
-            themeMode: ThemeMode.system,
-            theme: ThemeData(),
-            darkTheme: ThemeData.dark(),
-            home: SplashScreenWrapper(),
+        return MultiProvider(
+            providers: [
+                ChangeNotifierProvider(create: (_) => ThemeProvider()),
+                ChangeNotifierProvider(create: (_) => StartStopPracticeModel()),
+            ],
+            child: Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                    return MaterialApp(
+                        routes: Routes.routes,
+                        debugShowCheckedModeBanner: false,
+                        themeMode: themeProvider.themeMode,
+                        theme: getTheme(true),
+                        darkTheme: getTheme(false),
+                        home: SplashScreenWrapper(),
+                    );
+                },
+            ),
         );
     }
 }
+
 
 class SplashScreenWrapper extends StatefulWidget {
     const SplashScreenWrapper({super.key});
@@ -85,3 +101,22 @@ class OpenPopupButton extends StatelessWidget {
         );
     }
 }
+
+
+// final mode = Provider.of<ThemeProvider>(context).themeMode;
+// print(mode); // ThemeMode.system, ThemeMode.light, or ThemeMode.dark
+// final isDark = Provider.of<ThemeProvider>(context).isDark;
+//
+
+// ✅ Direct ThemeExtension access:
+// final cc = Theme.of(context).extension<CustomColors>()!;
+// final bg = cc['Surfaces/Surface 2'];
+//
+//
+// // ✅ Helper usage (recommended):
+// final primary = getFigmaColor(context, 'Schemes/Primary');
+// final label = getFigmaColor(context, 'State Layers/Pressed/Surface');
+//
+//
+// // ✅ Safe fallback:
+// final outline = getFigmaColor(context, 'Schemes/Outline', fallback: Colors.grey);

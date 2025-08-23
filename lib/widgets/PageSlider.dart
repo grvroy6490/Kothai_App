@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kothai_app/provider/theme_provider.dart';
+import 'package:kothai_app/theme/figma_color.dart';
+import 'package:kothai_app/theme/theme_manager.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PageSlider extends StatefulWidget {
@@ -45,7 +49,7 @@ class _PageSliderState extends State<PageSlider> {
         return Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(color: Color.fromARGB(255, 64, 68, 76)),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface ),
             child: Column(
                 children: [
                     Expanded(
@@ -58,7 +62,7 @@ class _PageSliderState extends State<PageSlider> {
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: LoadingAnimationWidget.progressiveDots(
-                            color: Colors.white,
+                            color: getFigmaColor(context, 'Schemes/Primary'),
                             size: 80,
                         ),
                     ),
@@ -70,9 +74,8 @@ class _PageSliderState extends State<PageSlider> {
                                 Flexible(
                                     child: Text(
                                         'உங்கள் தட்டச்சு பயணத்தை தயாரிக்கிறோம்...',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color.fromARGB(255, 182, 186, 195),
+                                        style: AppTypography.bodyMedium.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                         ),
                                         textAlign: TextAlign.center,
                                         softWrap: true,

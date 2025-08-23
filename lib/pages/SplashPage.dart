@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kothai_app/pages/auth/AuthCommon.dart';
+import 'package:kothai_app/theme/figma_color.dart';
+import 'package:kothai_app/theme/theme_manager.dart';
 import 'package:kothai_app/widgets/PageSlider.dart';
+import 'package:kothai_app/widgets/SwitchThemeMode.dart';
 
 class SplashPage extends StatelessWidget {
     const SplashPage({super.key});
@@ -27,6 +30,7 @@ class SplashPage extends StatelessWidget {
                         width: double.infinity,
                         child: Column(
                             children: [
+                                SwitchThemeMode(),
                                 Expanded(
                                     flex: 8,
                                     child: Container(
@@ -34,32 +38,27 @@ class SplashPage extends StatelessWidget {
                                         child: Image.asset(
                                             'assets/images/Kothai_logo.png',
                                             fit: BoxFit.contain,
-                                            width: 150,
+                                            width: 100,
                                         ),
                                     ),
                                 ),
                                 Container(
                                     child: Text(
                                         "வணக்கம்!",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'NotoSansTamil',
+                                        style: AppTypography.headlineSmall.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/Primary'),
+                                            fontWeight: FontWeight.w600
                                         ),
                                         textAlign: TextAlign.center,
                                     ),
                                 ),
                                 Flexible(
                                     child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                                        padding: const EdgeInsets.symmetric(horizontal: 50),
                                         child: Text(
                                             "கோதை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white,
-                                                fontFamily: 'NotoSansTamil',
-                                                decoration: TextDecoration.none
+                                            style: AppTypography.bodyMedium.copyWith(
+                                                color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                             ),
                                             textAlign: TextAlign.center,
                                         ),
