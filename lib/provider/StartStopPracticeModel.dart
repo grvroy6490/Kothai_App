@@ -7,7 +7,6 @@ class StartStopPracticeModel with ChangeNotifier {
 
     void startPractice() {
         _isPracticeRunning = true;
-        print(_isPracticeRunning);
         notifyListeners();
     }
 
@@ -16,3 +15,5 @@ class StartStopPracticeModel with ChangeNotifier {
         notifyListeners();
     }
 }
+
+

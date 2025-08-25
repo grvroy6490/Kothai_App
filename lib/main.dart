@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kothai_app/pages/SplashPage.dart';
 import 'package:kothai_app/pages/auth/AuthCommon.dart';
+import 'package:kothai_app/provider/HoldingKeyModel.dart';
 import 'package:kothai_app/provider/StartStopPracticeModel.dart';
 import 'package:kothai_app/provider/theme_provider.dart';
 import 'package:kothai_app/routes/routes.dart';
@@ -19,7 +20,9 @@ void main() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((
             fn,
         ) {
-            runApp(const App());
+            runApp(const App()
+                // ProviderScope(child:  App())
+            );
         });
 }
 
@@ -32,6 +35,7 @@ class App extends StatelessWidget {
             providers: [
                 ChangeNotifierProvider(create: (_) => ThemeProvider()),
                 ChangeNotifierProvider(create: (_) => StartStopPracticeModel()),
+                ChangeNotifierProvider(create: (_) => HoldKeyModel())
             ],
             child: Consumer<ThemeProvider>(
                 builder: (context, themeProvider, child) {

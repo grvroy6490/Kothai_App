@@ -18,4 +18,5 @@ class Letters {
     static List<String> rightDiacritic = [
         'ி', 'ீ', 'ு', 'ூ', '்', 'ா'
     ];
+
 }

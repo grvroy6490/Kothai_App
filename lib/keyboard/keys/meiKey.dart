@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kothai_app/keyboard/keys/kothaiKey.dart';
+import 'package:kothai_app/theme/figma_color.dart';
 
 class Meikey extends StatelessWidget {
     final String label;
@@ -11,7 +12,7 @@ class Meikey extends StatelessWidget {
     Widget build(BuildContext context) {
         return KothaiKey(
             onPressed: onPressed,
-            background: Color.fromARGB(255, 159, 170, 188),
+            background: getFigmaColor(context, 'Schemes/Surface Dim'),
             child: Text(
                 label,
                 style: const TextStyle(

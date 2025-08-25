@@ -6,7 +6,8 @@ import 'package:kothai_app/widgets/CircularIconButton.dart';
 import 'package:kothai_app/widgets/DifficultySegmentedButton.dart';
 
 class PracticeSettingsWidget extends StatefulWidget {
-    const PracticeSettingsWidget({super.key});
+    final void Function(Difficulty) updateDifficulty;
+    const PracticeSettingsWidget({super.key, required this.updateDifficulty});
 
     @override
     State<PracticeSettingsWidget> createState() => _PracticeSettingsWidgetState();
@@ -15,11 +16,12 @@ class PracticeSettingsWidget extends StatefulWidget {
 class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
     Difficulty _selected = Difficulty.easy;
 
-    void _updateDifficulty(Difficulty newValue) {
-        setState(() {
-                _selected = newValue;
-            });
-    }
+    // void _updateDifficulty(Difficulty newValue) {
+    //     setState(() {
+    //             _selected = newValue;
+    //             widget.updateDifficulty?.call(newValue);
+    //         });
+    // }
 
     @override
     Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                     Container(
-                        padding: const EdgeInsets.only(left: 14, right: 8, top: 5, bottom: 5),
+                        padding: const EdgeInsets.only(left: 10, right: 8, top: 5, bottom: 5),
                         decoration: BoxDecoration(
                             color: bgColor,
                             borderRadius: BorderRadius.circular(24),
@@ -48,7 +50,7 @@ class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
                             children: [
                                 Text(
                                     'Difficulty',
-                                    style: AppTypography.bodyMedium.copyWith(
+                                    style: AppTypography.bodySmall.copyWith(
                                         color: onSurfaceVariant,
                                         fontWeight: FontWeight.w500,
                                     ),
@@ -66,7 +68,12 @@ class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
                                                 return Padding(
                                                     padding: const EdgeInsets.symmetric(horizontal: 0),
                                                     child: ElevatedButton(
-                                                        onPressed: () => _updateDifficulty(difficulty),
+                                                        onPressed: () => {
+                                                            setState(() {
+                                                              _selected = difficulty;
+                                                            }),
+                                                            widget.updateDifficulty.call(difficulty)
+                                                        },
                                                         style: ButtonStyle(
                                                             elevation: MaterialStateProperty.all(isActive ? 3 : 0),
                                                             backgroundColor: MaterialStateProperty.all(
@@ -76,8 +83,8 @@ class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
                                                             ),
                                                             padding: MaterialStateProperty.all(
                                                                 isActive
-                                                                    ? const EdgeInsets.symmetric(horizontal: 12, vertical: 12)
-                                                                    : const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                                                    ? const EdgeInsets.symmetric(horizontal: 8, vertical: 12)
+                                                                    : const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                                                             ),
                                                             minimumSize: MaterialStateProperty.all(Size.zero),
                                                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -90,7 +97,7 @@ class _PracticeSettingsWidgetState extends State<PracticeSettingsWidget> {
                                                         ),
                                                         child: Text(
                                                             difficulty.label,
-                                                            style: AppTypography.bodyMedium.copyWith(
+                                                            style: AppTypography.bodySmall.copyWith(
                                                                 color: isActive
                                                                     ? bgColor
                                                                     : onSurfaceVariant,

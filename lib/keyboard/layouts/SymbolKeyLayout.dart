@@ -238,7 +238,7 @@ Widget BuildSymbolKeysLayout(
                     Expanded(flex: 4, child: Symbolickey(
                             label: ' ',
                             onPressed: () => {
-                                onKeyPressed?.call(' ')
+                                onKeyPressed?.call('space')
                             },
                         ),),
                     Expanded(flex: 1, child: FunctionalKey(
@@ -254,7 +254,7 @@ Widget BuildSymbolKeysLayout(
                             bgColor: Color.fromARGB(255, 26, 115, 223),
                             color: Colors.white,
                             onPressed: () => {
-                                onKeyPressed?.call('search')
+                                onKeyPressed?.call('enter')
                             },
                         ),
                     ),

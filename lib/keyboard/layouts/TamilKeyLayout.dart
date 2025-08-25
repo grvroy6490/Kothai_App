@@ -8,6 +8,8 @@ import 'package:kothai_app/keyboard/keys/meiKey.dart';
 import 'package:kothai_app/keyboard/keys/specialKey.dart';
 import 'package:kothai_app/keyboard/keys/symbolicKey.dart';
 import 'package:kothai_app/keyboard/keys/uyirKey.dart';
+import 'package:kothai_app/provider/HoldingKeyModel.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -16,6 +18,8 @@ Widget BuildTamilKeysLayout(
     void Function(String)? onKeyPressed,
     void Function(KeyboardType)? changeKeyboardLayout,
 ){
+    final holdKey = context.watch<HoldKeyModel>().hold;
+
     return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -96,9 +100,10 @@ Widget BuildTamilKeysLayout(
                 children: [
                     Expanded(child: Diacritickey(
                             label: 'ெ',
+                            isActive: holdKey == 'ெ',
                             onPressed: () => {
                                 onKeyPressed?.call('ெ')
-                            },
+                            }
                         )),
                     Expanded(child: Meikey(
                             label: 'ம',
@@ -165,6 +170,7 @@ Widget BuildTamilKeysLayout(
                 children: [
                     Expanded(child: Diacritickey(
                             label: 'ே',
+                            isActive: holdKey == 'ே',
                             onPressed: () => {
                                 onKeyPressed?.call('ே')
                             },
@@ -234,6 +240,7 @@ Widget BuildTamilKeysLayout(
                     Expanded(child: SizedBox()),
                     Expanded(child: Diacritickey(
                             label: 'ை',
+                            isActive: holdKey == 'ை',
                             onPressed: () => {
                                 onKeyPressed?.call('ை')
                             },
@@ -360,7 +367,7 @@ Widget BuildTamilKeysLayout(
                     Expanded(flex: 1, child: FunctionalKey(
                             iconOrText: FontAwesomeIcons.globe,
                             onPressed: () => {
-                                onKeyPressed?.call('switchToEnglish')
+                                onKeyPressed?.call('lang')
                             },
                         )),
                     Expanded(flex: 4, child: Symbolickey(
@@ -377,11 +384,11 @@ Widget BuildTamilKeysLayout(
                         )),
                     Expanded(flex: 2,
                         child: Colorkey(
-                            data: FontAwesomeIcons.magnifyingGlass,
+                            data: Icons.keyboard_return,
                             bgColor: Color.fromARGB(255, 26, 115, 223),
                             color: Colors.white,
                             onPressed: () => {
-                                onKeyPressed?.call('search')
+                                onKeyPressed?.call('enter')
                             },
                         ),
                     ),

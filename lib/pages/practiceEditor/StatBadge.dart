@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kothai_app/theme/figma_color.dart';
 import 'package:kothai_app/theme/theme_manager.dart';
 
-Widget InfoBadge({
+Widget StatBadge({
     required BuildContext context,
     required String label,
     required String value,
@@ -27,23 +27,23 @@ Widget InfoBadge({
                         Icon(
                             icon,
                             size: 14,
-                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                            color: getFigmaColor(context, 'Schemes/Primary'),
                         ),
-                        SizedBox(width: 5),
+                        SizedBox(width: 3),
                         Text(label,
                             style: AppTypography.labelMedium.copyWith(
-                                color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                color: getFigmaColor(context, 'Schemes/Primary'),
                             )
                         ),
                     ],
                 ),
-                SizedBox(height: 3),
+                SizedBox(height: 5),
                 FittedBox(
                     fit: BoxFit.fill,
                     child: Text(value,
-                        style: AppTypography.labelLarge.copyWith(
-                            color: getFigmaColor(context, 'Schemes/On Surface'),
-                            fontWeight: FontWeight.bold,
+                        style: AppTypography.labelMedium.copyWith(
+                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                            fontWeight: FontWeight.w600,
                         )
                     ),
                 )

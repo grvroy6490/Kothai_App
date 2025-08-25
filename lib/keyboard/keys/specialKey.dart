@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kothai_app/keyboard/keys/kothaiKey.dart';
+import 'package:kothai_app/theme/figma_color.dart';
 
 class Specialkeys extends StatelessWidget {
     final String label;
@@ -11,7 +12,7 @@ class Specialkeys extends StatelessWidget {
     Widget build(BuildContext context) {
         return KothaiKey(
             onPressed: onPressed,
-            background: Color.fromARGB(255, 189, 202, 221),
+            background: getFigmaColor(context, 'State Layers/Inverse Surface/Opacity-16'),
             child: Text(
                 label,
                 style: const TextStyle(

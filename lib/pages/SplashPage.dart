@@ -30,7 +30,7 @@ class SplashPage extends StatelessWidget {
                         width: double.infinity,
                         child: Column(
                             children: [
-                                SwitchThemeMode(),
+                                // SwitchThemeMode(),
                                 Expanded(
                                     flex: 8,
                                     child: Container(
