@@ -23,6 +23,7 @@ class _LevelXP_BadgeState extends State<LevelXP_Badge> {
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(width: 1.0, color: getFigmaColor(context, 'State Layers/On Surface/Opacity-10'))
             ),
+            clipBehavior: Clip.hardEdge,
             child: Stack(
                 children: [
                     //Background Progress Bar
@@ -31,7 +32,7 @@ class _LevelXP_BadgeState extends State<LevelXP_Badge> {
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: FractionallySizedBox(
-                                widthFactor: 0.6, // 60% progress, adjust as needed
+                                widthFactor: 0.01, // 60% progress, adjust as needed
                                 child: Container(
                                     height: 35,
                                     decoration: BoxDecoration(
@@ -77,7 +78,7 @@ class _LevelXP_BadgeState extends State<LevelXP_Badge> {
                                     )
                                 ),
 
-                                Text('Level 8',
+                                Text('Level 1',
                                     style: AppTypography.labelLarge.copyWith(
                                         color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                     )
@@ -87,7 +88,7 @@ class _LevelXP_BadgeState extends State<LevelXP_Badge> {
                                     size: 5,
                                     color: Colors.white,
                                 ),
-                                Text('2450 XP',
+                                Text('0 XP',
                                     style: AppTypography.labelLarge.copyWith(
                                         color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                     )

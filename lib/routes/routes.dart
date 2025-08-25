@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:kothai_app/pages/practiceEditor/PracticeEditor.dart';
+import 'package:kothai_app/pages/PracticeEditor.dart';
 import 'package:kothai_app/pages/SplashPage.dart';
 
 class Routes {

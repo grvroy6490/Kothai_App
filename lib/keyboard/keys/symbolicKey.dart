@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kothai_app/keyboard/keys/kothaiKey.dart';
+import 'package:kothai_app/theme/figma_color.dart';
 
 class Symbolickey extends StatelessWidget {
     final String label;
@@ -12,7 +13,7 @@ class Symbolickey extends StatelessWidget {
     Widget build(BuildContext context) {
         return KothaiKey(
             onPressed: onPressed,
-            background: Color.fromARGB(255, 255, 255, 255),
+            background: getFigmaColor(context, 'State Layers/On Surface/Opacity-08'),
             child: Text(
                 label,
                 style: const TextStyle(

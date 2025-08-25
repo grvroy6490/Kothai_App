@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kothai_app/provider/StartStopPracticeModel.dart';
+import 'package:kothai_app/widgets/DifficultySegmentedButton.dart';
 import 'package:provider/provider.dart';
 import 'package:kothai_app/pages/practiceEditor/FooterNavigation/FooterNav.dart';
 import 'package:kothai_app/pages/practiceEditor/FooterNavigation/PracticeSettingsWidget.dart';
@@ -7,7 +8,9 @@ import 'package:kothai_app/theme/figma_color.dart';
 import 'package:kothai_app/theme/theme_manager.dart';
 
 class FooterNavigationBar extends StatefulWidget {
-    const FooterNavigationBar({super.key});
+
+    final void Function(Difficulty) updateDifficulty;
+    const FooterNavigationBar({super.key, required this.updateDifficulty});
 
     @override
     State<FooterNavigationBar> createState() => _FooterNavigationBarState();
@@ -21,6 +24,7 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> with TickerPr
     late Animation<Offset> _slideAnimation;
 
     bool _isVisible = true;
+
 
     @override
     void initState() {
@@ -48,10 +52,10 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> with TickerPr
     @override
     void didChangeDependencies() {
         super.didChangeDependencies();
-        final isRunning = Provider.of<StartStopPracticeModel>(context).isPracticeRunning;
-        if (isRunning && !_fadeController.isCompleted) {
+        final isPracticeRunning = Provider.of<StartStopPracticeModel>(context).isPracticeRunning;
+        if (isPracticeRunning && !_fadeController.isCompleted) {
             _triggerAnimations();
-        } else if (!isRunning && _fadeController.isCompleted) {
+        } else if (!isPracticeRunning && _fadeController.isCompleted) {
             _fadeController.reverse();
             _slideController.reverse();
             setState(() {
@@ -63,7 +67,7 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> with TickerPr
     Future<void> _triggerAnimations() async {
         await _fadeController.forward();
         await _slideController.forward();
-        await Future.delayed(const Duration(milliseconds: 300));
+        // await Future.delayed(const Duration(milliseconds: 300));
         setState(() {
                 _isVisible = false;
             });
@@ -181,7 +185,7 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> with TickerPr
                                             child: Column(
                                                 children: [
                                                     Image.asset('assets/images/start_icon_purple.png', width: 60),
-                                                    const SizedBox(height: 10),
+                                                    const SizedBox(height: 5),
                                                     Text(
                                                         'Start Practice',
                                                         style: AppTypography.headlineSmall.copyWith(
@@ -192,8 +196,8 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> with TickerPr
                                                 ],
                                             ),
                                         ),
-                                        const SizedBox(height: 10),
-                                        const PracticeSettingsWidget()
+                                        const SizedBox(height: 0),
+                                        PracticeSettingsWidget(updateDifficulty: widget.updateDifficulty)
                                     ],
                                 ),
                             ),

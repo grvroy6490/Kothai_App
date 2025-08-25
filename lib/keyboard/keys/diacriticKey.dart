@@ -1,23 +1,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:kothai_app/keyboard/keys/kothaiKey.dart';
+import 'package:kothai_app/theme/figma_color.dart';
 
 class Diacritickey extends StatelessWidget {
     final String label;
     final VoidCallback? onPressed;
-    const Diacritickey({super.key, required this.label, this.onPressed});
+    final bool isActive;
+
+    const Diacritickey({super.key, required this.label, this.onPressed, this.isActive = false});
 
     @override
     Widget build(BuildContext context) {
         return KothaiKey(
-            background: Color.fromARGB(255, 157, 174, 202),
+            background: isActive ? Color.fromARGB(255, 26, 115, 233) : getFigmaColor(context, 'Schemes/Surface Dim').withValues(
+                red: 0,
+                green: 0,
+                blue: 0
+            ).withAlpha(40),
             onPressed: onPressed,
             child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 14,
                     fontFamily: 'NotoSansTamil',
-                    color: Colors.black,
+                    color: isActive ? Colors.white : Colors.black,
                 ),
             ),
         );

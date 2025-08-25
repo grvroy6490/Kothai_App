@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kothai_app/theme/figma_color.dart';
 
 class KothaiKey extends StatelessWidget {
     final Widget child;
@@ -21,7 +22,7 @@ class KothaiKey extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
         final bgColor = background ??
-            (isFunction ? const Color(0xFFCBCED7) : const Color(0xFF40444C));
+            (isFunction ? getFigmaColor(context, 'State Layers/On Background/Opacity-08') : const Color(0xFF40444C));
 
         return SizedBox(
             height: height,
