@@ -1,0 +1,40 @@
+name: kothai_ui
+description: Shared UI components and themes for Kothai
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: NotoSansTamil
+      fonts:
+        - asset: assets/fonts/NotoSansTamil-Regular.ttf
+        - asset: assets/fonts/NotoSansTamil-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansTamil-Black.ttf
+          weight: 900
+        - asset: assets/fonts/NotoSansTamil-Medium.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansTamil-SemiBold.ttf
+          weight: 300
+          
+    - family: Inter
+      fonts:
+        - asset: 'assets/fonts/Inter-VariableFont.ttf'
+
+

@@ -1,0 +1,26 @@
+name: feature_keyboard
+description: Keyboard feature module
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  kothai_ui:
+    path: ../../ui/kothai_ui
+  kothai_domain:
+    path: ../../domain/kothai_domain
+  kothai_data:
+    path: ../../data/kothai_data
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+

@@ -1,0 +1,45 @@
+name: kothai_workspace
+
+# Using Dart workspace in pubspec.yaml for package discovery.
+# This file holds reusable scripts.
+
+packages:
+  - apps/**
+  - packages/**
+
+scripts:
+  bootstrap:
+    run: melos bootstrap
+    description: Link local packages and run pub get
+
+  deps:get:
+    run: |
+      melos exec --no-private -- flutter pub get || true
+      melos exec --no-private -- dart pub get || true
+    description: Get dependencies for all packages (Flutter and Dart)
+
+  deps:get:flutter:
+    run: melos exec --no-private --flutter -- flutter pub get
+    description: Get dependencies for Flutter packages only
+
+  deps:get:dart:
+    run: melos exec --no-private --no-flutter -- dart pub get
+    description: Get dependencies for pure Dart packages only
+
+  analyze:
+    run: melos exec -- flutter analyze
+    description: Run analyzer in all packages
+
+  format:
+    run: melos exec -- dart format .
+    description: Format all packages
+
+  test:
+    run: melos exec -- flutter test
+    description: Run Flutter tests in all packages
+
+  clean:
+    run: melos exec -- flutter clean
+    description: Clean Flutter build artifacts in all packages
+
+

@@ -1,0 +1,17 @@
+name: kothai_domain
+description: Domain entities and use cases for Kothai
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  kothai_core:
+    path: ../../core/kothai_core
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+

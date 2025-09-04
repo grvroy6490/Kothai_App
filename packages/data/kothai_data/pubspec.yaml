@@ -1,0 +1,17 @@
+name: kothai_data
+description: Data layer for Kothai (repositories, sources)
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  kothai_domain:
+    path: ../../domain/kothai_domain
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+

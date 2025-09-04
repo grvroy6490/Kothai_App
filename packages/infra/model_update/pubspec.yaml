@@ -1,0 +1,17 @@
+name: infra_model_update
+description: Model and content update client
+version: 0.1.0
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  kothai_core:
+    path: ../../core/kothai_core
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+
