@@ -1,0 +1,79 @@
+name: kothai_app
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  smooth_page_indicator: ^1.2.1
+  carousel_slider: ^5.1.1
+  flutter_svg: ^2.2.0
+  font_awesome_flutter: ^10.10.0
+  dotted_line: ^3.2.3
+  loading_animation_widget: ^1.3.0
+  cupertino_icons: ^1.0.8
+  riverpod: ^2.6.1
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  json_annotation: ^4.9.0
+  shared_preferences: ^2.5.3
+  flutter_hooks: ^0.21.3+1
+  freezed_annotation: ^3.1.0
+  uuid: ^4.5.1
+  dio: ^5.9.0
+  flutter_launcher_icons: ^0.14.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^5.0.0
+  build_runner: ^2.5.4
+  json_serializable: ^6.9.5
+  riverpod_generator: ^2.6.5
+  freezed: ^3.1.0
+  riverpod_lint: ^2.6.5
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Kothai_logo.png"
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/dummy_content.json
+    - assets/images/
+
+  fonts:
+    - family: NotoSansTamil
+      fonts:
+        - asset: assets/fonts/NotoSansTamil-Regular.ttf
+        - asset: assets/fonts/NotoSansTamil-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansTamil-Black.ttf
+          weight: 900
+        - asset: assets/fonts/NotoSansTamil-Medium.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansTamil-SemiBold.ttf
+          weight: 300
+
+    - family: Inter
+      fonts:
+        - asset: 'assets/fonts/Inter-VariableFont.ttf'
