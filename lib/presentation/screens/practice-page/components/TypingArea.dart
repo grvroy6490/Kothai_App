@@ -1,20 +1,35 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
+import 'package:vibration/vibration.dart';
 
-class TypingArea extends StatefulWidget {
+class TypingArea extends ConsumerStatefulWidget {
     final String paragraph;
     final String input;
 
     const TypingArea({super.key, required this.paragraph, required this.input});
 
     @override
-    State<TypingArea> createState() => _TypingAreaState();
+    ConsumerState<TypingArea> createState() => _TypingAreaState();
 }
 
-class _TypingAreaState extends State<TypingArea> {
+class _TypingAreaState extends ConsumerState<TypingArea> {
     @override
     Widget build(BuildContext context) {
+
+        ref.listen<int>(
+            sessionStateProvider.select((s) => s.errors),
+            (prev, next) async {
+                if (prev != null && next > prev) {
+                    if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+                        Vibration.vibrate(duration: 200);
+                    }
+                }
+            },
+        );
+
         return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
                 horizontal: 14,

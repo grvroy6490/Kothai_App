@@ -32,7 +32,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                     _settingsModalOpen = false;
                     // keep provider in sync if user swipes to dismiss
                     final notifier = ref.read(practiceSettingsVisibilityProvider.notifier);
-                    if (notifier.state) notifier.hideSetting();
+                    if (notifier.mounted) notifier.hideSetting();
                 });
     }
 

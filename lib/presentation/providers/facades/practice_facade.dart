@@ -2,6 +2,8 @@
 
 import 'package:kothai_app/data/models/session/difficulty.dart';
 import 'package:kothai_app/enums/SessionMode.dart';
+import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/presentation/providers/session/difficulty_provider.dart';
 import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
 import 'package:kothai_app/presentation/providers/session/typing_session_provider.dart';
@@ -38,6 +40,8 @@ class PracticeFacade extends _$PracticeFacade {
     void endSession() {
         ref.read(sessionStateProvider.notifier).stop();
         ref.read(typingSessionNotifierProvider.notifier).endSession();
+        ref.read(practiceStatusProvider.notifier).stopPractice();
+        ref.read(keyboardProvider.notifier).hideKeyboard();
     }
 
 

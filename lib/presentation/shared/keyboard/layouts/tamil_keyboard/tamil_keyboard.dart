@@ -70,12 +70,24 @@ class TamilKeyboard extends KeyboardController {
         }
 
         // Handle special keys - clear hold
-        if ([' ', '\n', 'delete'].contains(value)) {
+        if (value == ' ' || value == '\n') {
             if (_heldLeftDiacritic != null) {
                 _heldLeftDiacritic = null;
                 _ref?.read(holdKeyProvider.notifier).clear();
             }
             _insertText(value);
+            // Count spaces/newlines toward progress
+            for (var ch in value.characters) {
+              _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+            }
+            return;
+        }
+        if (value == 'delete') {
+            if (_heldLeftDiacritic != null) {
+                _heldLeftDiacritic = null;
+                _ref?.read(holdKeyProvider.notifier).clear();
+            }
+            // Do not insert literal 'delete' text; actual backspaces handled elsewhere
             return;
         }
 
@@ -86,12 +98,20 @@ class TamilKeyboard extends KeyboardController {
                 _heldLeftDiacritic = null;
                 _ref?.read(holdKeyProvider.notifier).clear();
                 _insertText(combinedValue);
+                // Update session state for each committed character
+                for (var ch in combinedValue.characters) {
+                  _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                }
                 return;
             } else {
                 // Not mei: clear hold and insert the pressed key without diacritic
                 _heldLeftDiacritic = null;
                 _ref?.read(holdKeyProvider.notifier).clear();
                 _insertText(value);
+                // Update session state for each committed character
+                for (var ch in value.characters) {
+                  _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                }
                 return;
             }
         }
@@ -109,8 +129,35 @@ class TamilKeyboard extends KeyboardController {
             }
         }
 
+        // If a right diacritic is pressed, merge it with the previous grapheme and
+        // update session as a single committed character (avoid double-advancing cursor)
+        if (Letters.rightDiacriticLetters.contains(value) && text.text.isNotEmpty) {
+            final lastGrapheme = text.text.characters.last;
+            if (!Letters.uyirLetters.contains(lastGrapheme)) {
+                final combinedValue = lastGrapheme + value;
+
+                // Replace the last grapheme in the text with the combined cluster
+                final prefix = text.text.substring(0, text.text.length - lastGrapheme.length);
+                final newText = prefix + combinedValue;
+                text.value = TextEditingValue(
+                    text: newText,
+                    selection: TextSelection.collapsed(offset: newText.length),
+                );
+
+                // Adjust session regardless of allowTakeBacks: undo previous base commit, then commit combined cluster
+                _ref?.read(sessionStateProvider.notifier).composeBackspace();
+                for (var ch in combinedValue.characters) {
+                  _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                }
+                return;
+            }
+        }
+
+        // For normal character insertions, update session state
         _insertText(value);
-        _ref?.read(sessionStateProvider.notifier).typeChar(value);
+        for (var ch in value.characters) {
+          _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+        }
     }
 
     void _insertText(String value) {

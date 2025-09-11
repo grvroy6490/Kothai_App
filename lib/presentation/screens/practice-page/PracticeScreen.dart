@@ -18,6 +18,11 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
     final FocusNode _focusNode = FocusNode();
 
     @override
+    void initState() {
+        super.initState();
+    }
+
+    @override
     void dispose() {
         _controller.dispose();
         _focusNode.dispose();
@@ -34,7 +39,9 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             keyboardControllerProvider(controller),
         );
 
-        final keyboardRenderer = ref.watch(keyboardRendererProvider); //TamilKeyboard
+        final keyboardRenderer = ref.watch(
+            keyboardRendererProvider,
+        ); //TamilKeyboard
 
 
         return Scaffold(
@@ -42,10 +49,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             body: Stack(
                 children: [
                     // PRACTICE MAIN SCREEN
-                    PracticePage(
-                        controller: controller,
-                        focusNode: focusNode,
-                    ),
+                    PracticePage(controller: controller, focusNode: focusNode),
 
                     // KEYBOARD SLIDE-IN
                     AnimatedSlide(
@@ -59,17 +63,18 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                                 children: [
                                     PracticeResetPauseSettings(),
                                     Container(
-                                        constraints: BoxConstraints(
-                                            minHeight: 150,
-                                        ),
+                                        constraints: BoxConstraints(minHeight: 150),
                                         child: Material(
-                                            color: getFigmaColor(context, 'Schemes/Surface Container'),
+                                            color: getFigmaColor(
+                                                context,
+                                                'Schemes/Surface Container',
+                                            ),
                                             child: Padding(
                                                 padding: const EdgeInsets.only(
                                                     bottom: 30,
                                                     right: 12,
                                                     left: 12,
-                                                    top: 12
+                                                    top: 12,
                                                 ),
                                                 child: Keyboard(
                                                     controller: keyboardController,
@@ -79,13 +84,13 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
                                         ),
                                     ),
                                 ],
-                            )
+                            ),
                         ),
                     ),
+
+                    // Pause handled via popup dialog (see initState listener)
                 ],
             ),
         );
     }
 }
-
-

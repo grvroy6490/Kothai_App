@@ -6,17 +6,20 @@ import 'package:kothai_app/presentation/providers/session/session_state_provider
 import 'package:kothai_app/presentation/shared/keyboard/key_model.dart';
 import 'package:kothai_app/presentation/theme/figma_color.dart';
 import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
+import 'dart:async';
 
 class KeyButton extends ConsumerWidget {
     final KeyModel keyModel;
     final KeyboardController controller;
     final Color? bgColor;
+    final void Function(KeyboardController)? longTap;
 
     const KeyButton({
         super.key,
         required this.keyModel,
         required this.controller,
         this.bgColor,
+        this.longTap,
     });
 
     @override
@@ -52,6 +55,24 @@ class KeyButton extends ConsumerWidget {
             onTap: keyModel.onTap == null ? null : () => {
                     keyModel.onTap!(controller),
                     sessionState.isPaused ? ref.read(sessionStateProvider.notifier).resume() : null,
+                },
+            onLongPress: (longTap == null || !(keyModel.label.toLowerCase() == 'backspace' || keyModel.icon == Icons.backspace))
+                ? null
+                : () {
+                    longTap!(controller);
+                    if (keyModel.label.toLowerCase() == 'backspace' || keyModel.icon == Icons.backspace) {
+                        // Continue erasing while the key is held down
+                        Timer.periodic(const Duration(milliseconds: 100), (timer) {
+                            if (!controller.isKeyPressed) {
+                                timer.cancel();
+                            } else {
+                                longTap!(controller);
+                            }
+                        });
+                    }
+                    if (sessionState.isPaused) {
+                        ref.read(sessionStateProvider.notifier).resume();
+                    }
                 },
             child: Container(
                 constraints: const BoxConstraints(minWidth: 20),

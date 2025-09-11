@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kothai_app/enums/ContentLength.dart';
 import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
 import 'package:kothai_app/enums/ModeEnum.dart';
 import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
@@ -19,12 +20,14 @@ class PracticeSettings extends ConsumerStatefulWidget {
 class _PracticeSettingsState extends ConsumerState<PracticeSettings> {
     late DifficultyEnum _selectedDifficulty;
     late PracticeMode _selectedMode;
+    late ContentLength _selectedContentLength;
 
     @override
     void initState() {
         super.initState();
         _selectedDifficulty = ref.read(practiceConfigurationProvider).difficulty;
         _selectedMode = ref.read(practiceConfigurationProvider).mode;
+        _selectedContentLength = ref.read(practiceConfigurationProvider).contentLength;
     }
 
     @override
@@ -41,6 +44,14 @@ class _PracticeSettingsState extends ConsumerState<PracticeSettings> {
         ref.listen<PracticeMode>( practiceConfigurationProvider.select((s) => s.mode), (prev, next) {
                 if (mounted) {
                     setState(() => _selectedMode = next);
+                }
+            },
+        );
+
+        // Content Length
+        ref.listen<ContentLength>( practiceConfigurationProvider.select((s) => s.contentLength), (prev, next) {
+                if (mounted) {
+                    setState(() => _selectedContentLength = next);
                 }
             },
         );
@@ -266,6 +277,58 @@ class _PracticeSettingsState extends ConsumerState<PracticeSettings> {
                                     ),
                                 ],
                             ),
+                        ),
+                    ),
+
+                    // TEXT LENGTH
+                    Container(
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: getFigmaColor(
+                                        context,
+                                        'State Layers/Outline/Opacity-16',
+                                    ),
+                                    width: 1,
+                                ),
+                            ),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                                Text(
+                                    'Text Length',
+                                    style: AppTypography.bodyMedium.copyWith(
+                                        color: onSurfaceVariant,
+                                        fontWeight: FontWeight.w500,
+                                    ),
+                                ),
+                                const SizedBox(width: 7),
+                                CustomSegmentedButtons<ContentLength>(
+                                    items: ContentLength.values,
+                                    selected: _selectedContentLength,
+                                    onChanged: (d) {
+                                        ref.read(practiceConfigurationProvider.notifier).setContentLength(d);
+                                    },
+                                    labelBuilder: (d) =>
+                                    '${d.name[0].toUpperCase()}${d.name.substring(1).toLowerCase()} words',
+                                    radius: 10,
+                                    activeRadius: 14,
+                                    padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                    activePadding: EdgeInsets.symmetric(
+                                        horizontal: 22,
+                                        vertical: 18,
+                                    ),
+                                    inactivePadding: EdgeInsets.symmetric(
+                                        horizontal: 22,
+                                        vertical: 18,
+                                    ),
+                                    elevationWhenActive: 2,
+                                    spacing: 0,
+                                ),
+
+                            ],
                         ),
                     ),
                 ],

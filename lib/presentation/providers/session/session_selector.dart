@@ -6,9 +6,9 @@ import 'package:kothai_app/presentation/providers/session/session_state_provider
 final sessionElapsedProvider = Provider<Duration>(
       (ref) => ref.watch(sessionStateProvider.select((s) => s.elapsed)),
 );
-final sessionProgressProvider = Provider<double>(
-    (ref) => ref.watch(sessionStateProvider.select((s) => s.progress)),
-);
+// final sessionProgressProvider = Provider<double>(
+//     (ref) => ref.watch(sessionStateProvider.select((s) => s.progress)),
+// );
 
 final sessionAccuracyProvider = Provider<double>(
     (ref) => ref.watch(sessionStateProvider.select((s) => s.accuracy)),
@@ -17,3 +17,4 @@ final sessionAccuracyProvider = Provider<double>(
 final sessionWpmProvider = Provider<double>(
     (ref) => ref.watch(sessionStateProvider.select((s) => s.wpm)),
 );
+

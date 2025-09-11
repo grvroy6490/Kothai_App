@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/enums/PracticeStatusEnum.dart';
 import 'package:kothai_app/presentation/providers/content/text_provider.dart';
 import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/presentation/providers/session/session_progress_provider.dart';
+import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
 import 'package:kothai_app/presentation/screens/practice-page/components/AnimatedContentBoard.dart';
 import 'package:kothai_app/presentation/screens/practice-page/components/PracticeInfoBox.dart';
 import 'package:kothai_app/presentation/screens/practice-page/components/PracticeStartWidget.dart';
@@ -35,6 +37,8 @@ class _EditorAreaState extends ConsumerState<EditorArea>
     PracticeStatus? _lastStatus;
     late VoidCallback _controllerListener;
 
+    double _lastProgress = -1;
+
     @override
     void initState() {
         super.initState();
@@ -62,8 +66,8 @@ class _EditorAreaState extends ConsumerState<EditorArea>
     @override
     void dispose() {
         widget.controller.removeListener(_controllerListener);
-        widget.controller.dispose();
-        widget.focusNode.dispose();
+        // widget.controller.dispose();
+        // widget.focusNode.dispose();
         _animationController.dispose();
         super.dispose();
     }
@@ -87,6 +91,7 @@ class _EditorAreaState extends ConsumerState<EditorArea>
                     setState(() {
                             widget.controller.clear();
                             userInput = '';
+                            _lastProgress = -1;
                         });
                 }
             }
@@ -94,19 +99,45 @@ class _EditorAreaState extends ConsumerState<EditorArea>
         }
     }
 
+    void _scheduleProgressUpdate(double next) {
+        if ((_lastProgress - next).abs() < 1e-9) return; // no change, skip
+        _lastProgress = next;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                ref.read(sessionProgressProvider.notifier).updateProgress(next);
+            });
+    }
+
     @override
     Widget build(BuildContext context) {
         final practiseStatus = ref.watch(practiceStatusProvider);
 
         final fetchContent = ref.watch(textContentProvider);
-        if(fetchContent != null){
-            paragraph = "1234567890987654321";
+        if (fetchContent != null) {
+            // Use the actual content being practiced so typed chars match expectations
+            paragraph = fetchContent.content;
         } else {
             paragraph = placeholderText;
         }
         // Handle fade animation on status change
         WidgetsBinding.instance.addPostFrameCallback((_) {
                 _handlePracticeStatusChange(practiseStatus);
+            });
+
+       double rawProgress = paragraph.isEmpty ? 0.0 : (userInput.characters.length / paragraph.characters.length).clamp(0.0, 1.0);
+       const double _smoothingFactor = 0.12; // smaller = slower progress changes
+       double progress = _lastProgress < 0 ? rawProgress : (_lastProgress * (1 - _smoothingFactor) + rawProgress * _smoothingFactor);
+       _scheduleProgressUpdate(progress);
+        // print(progress);
+
+        ref.listen(sessionStateProvider, (prev, next) {
+                if(mounted){
+                    if(next.isReset){
+                        setState(() {
+                                userInput = '';
+                            });
+                    }
+                }
             });
 
         return Container(
@@ -120,7 +151,7 @@ class _EditorAreaState extends ConsumerState<EditorArea>
                         top: -3,
                         left: 0,
                         right: 0,
-                        child: TypingProgressBar(width: 0.5),
+                        child: TypingProgressBar(width: progress.toDouble()),
                     ),
 
                     // BACKGROUND
@@ -173,7 +204,8 @@ class _EditorAreaState extends ConsumerState<EditorArea>
                                         ignoring: true, // <- key change: don't intercept taps/scrolls
                                         child: Opacity(
                                             opacity: 0.0,
-                                            child: TextField(
+                                            child: TextFormField(
+                                                maxLines: null,
                                                 controller: widget.controller,
                                                 focusNode: widget.focusNode,
                                                 readOnly: true,

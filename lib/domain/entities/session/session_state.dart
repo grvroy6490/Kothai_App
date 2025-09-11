@@ -1,5 +1,8 @@
+// lib/domain/entities/session/session_state.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// NEW: for .characters used below
+import 'package:characters/characters.dart';
 
 @immutable
 class SessionState {
@@ -11,6 +14,7 @@ class SessionState {
     final Duration elapsed;         // net elapsed (excludes paused time)
     final bool isRunning;
     final bool isPaused;
+    final bool isReset;
     final DateTime? _startedAt;     // internal: current run start (null when paused/stopped)
 
     const SessionState({
@@ -22,6 +26,7 @@ class SessionState {
         required this.elapsed,
         required this.isRunning,
         required this.isPaused,
+        required this.isReset,
         required DateTime? startedAt,
     }) : _startedAt = startedAt;
 
@@ -34,6 +39,7 @@ class SessionState {
         elapsed: Duration.zero,
         isRunning: false,
         isPaused: false,
+        isReset: true,
         startedAt: null,
     );
 
@@ -43,7 +49,7 @@ class SessionState {
         return '${minutes}m ${seconds}s';
     }
 
-
+    // progress based on grapheme clusters (unchanged logic; now ensured correct by provider)
     double get progress =>
     target.isEmpty ? 0 : (cursor / target.characters.length).clamp(0.0, 1.0);
 
@@ -54,10 +60,8 @@ class SessionState {
         final secs = elapsed.inMilliseconds / 1000.0;
         if (secs <= 0) return 0;
         final minutes = secs / 60.0;
-        return (correct / 5.0) / minutes;
+        return (typed / 5.0) / minutes;
     }
-
-
 
     DateTime? get startedAt => _startedAt;
 
@@ -70,6 +74,7 @@ class SessionState {
         Duration? elapsed,
         bool? isRunning,
         bool? isPaused,
+        bool? isReset,
         DateTime? startedAt,
     }) {
         return SessionState(
@@ -81,14 +86,15 @@ class SessionState {
             elapsed: elapsed ?? this.elapsed,
             isRunning: isRunning ?? this.isRunning,
             isPaused: isPaused ?? this.isPaused,
+            isReset: isReset ?? this.isReset,
             startedAt: startedAt ?? this._startedAt,
         );
     }
 }
-extension SessionStateMetrics on SessionState {
-  double get accuracyPercent =>
-      typed == 0 ? 100.0 : (correct / typed) * 100.0;
 
-  String get formattedAccuracy =>
-      '${accuracyPercent.toStringAsFixed(0)}%';
+extension SessionStateMetrics on SessionState {
+    double get accuracyPercent =>
+    typed == 0 ? 100.0 : (correct / typed) * 100.0;
+
+    String get formattedAccuracy => '${accuracyPercent.toStringAsFixed(0)}%';
 }

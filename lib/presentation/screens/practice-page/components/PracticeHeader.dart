@@ -45,7 +45,6 @@ class _PracticeHeaderState extends ConsumerState<PracticeHeader> {
                             color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                         ),
                     ),
-                    SwitchThemeMode(),
                     Row(
                         spacing: 4,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

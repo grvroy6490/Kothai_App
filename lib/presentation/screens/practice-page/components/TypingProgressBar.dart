@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/enums/PracticeStatusEnum.dart';
 import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/presentation/providers/session/session_selector.dart';
 import 'package:kothai_app/presentation/theme/figma_color.dart';
 
 class TypingProgressBar extends ConsumerStatefulWidget {

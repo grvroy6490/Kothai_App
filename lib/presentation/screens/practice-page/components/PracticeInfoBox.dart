@@ -71,9 +71,7 @@ class _PracticeInfoBoxState extends ConsumerState<PracticeInfoBox> {
                 }
             });
 
-        final s = ref.watch(sessionAccuracyProvider);
-        final accuracy = s.toStringAsFixed(2) + '%';
-        print(accuracy);
+        final s = ref.watch(sessionStateProvider);
         final wpmValue = ref.watch(sessionWpmProvider);
 
         return Container(
@@ -101,8 +99,8 @@ class _PracticeInfoBoxState extends ConsumerState<PracticeInfoBox> {
                                 spacing: 5,
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                    Expanded(child: StatBadge(context: context, label: '45', value: 'WPM')),
-                                    Expanded(child: StatBadge(context: context, label: accuracy, value: 'Accuracy', icon: Icons.my_location )),
+                                    Expanded(child: StatBadge(context: context, label: wpmValue.toStringAsFixed(0), value: 'WPM')),
+                                    Expanded(child: StatBadge(context: context, label: '${s.accuracy.toStringAsFixed(2)}%', value: 'Accuracy', icon: Icons.my_location )),
                                     Expanded(child: StatBadge(context: context, label: sessionState.formattedElapsed, value: 'Time', icon: Icons.schedule)),
                                 ],
                             ),

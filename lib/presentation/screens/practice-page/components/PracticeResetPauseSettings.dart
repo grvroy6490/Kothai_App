@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
+import 'package:kothai_app/presentation/screens/practice-page/PausePracticeScreen.dart';
+import 'package:kothai_app/presentation/screens/practice-page/ResetPracticeScreen.dart';
 import 'package:kothai_app/presentation/theme/app_typography.dart';
 import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:get/get.dart';
 
 class PracticeResetPauseSettings extends ConsumerWidget {
     const PracticeResetPauseSettings({super.key});
@@ -37,8 +41,9 @@ class PracticeResetPauseSettings extends ConsumerWidget {
                         icon: FontAwesomeIcons.clockRotateLeft,
                         label: 'Reset',
                         handlePressed: () => {
-                            //TODO: Reset the practice session
-                            print('working'),
+                            // ref.read(sessionStateProvider.notifier).reset(),
+                          Get.to(() => const ResetPauseScreen(), transition: Transition.fadeIn),
+
                         }
                     ),
                     _buildResetPauseButtons(
@@ -49,6 +54,7 @@ class PracticeResetPauseSettings extends ConsumerWidget {
                         flip: true,
                         handlePressed: () => {
                             ref.read(sessionStateProvider.notifier).pause(),
+                            Get.to(() => const PracticePauseScreen(), transition: Transition.fadeIn)
                         }
                     ),
                 ],

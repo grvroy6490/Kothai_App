@@ -10,6 +10,7 @@ import 'package:kothai_app/presentation/screens/practice-page/PracticeScreen.dar
 import 'package:kothai_app/presentation/theme/figma_color.dart';
 import 'package:kothai_app/presentation/theme/theme_manager.dart';
 import 'presentation/screens/SplashPage.dart';
+import 'package:get/get.dart';
 
 void main() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +53,7 @@ class App extends ConsumerWidget {
                     home = const SplashScreenWrapper();
                 }
 
-                return MaterialApp(
+                return GetMaterialApp(
                     routes: Routes.routes,
                     debugShowCheckedModeBanner: false,
                     themeMode: themeMode,

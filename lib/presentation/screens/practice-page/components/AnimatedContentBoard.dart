@@ -20,9 +20,13 @@ class AnimatedContentBoard extends ConsumerStatefulWidget {
 }
 
 class _AnimatedContentBoardState extends ConsumerState<AnimatedContentBoard> {
+
     @override
     Widget build(BuildContext context) {
         final practiseStatus = ref.watch(practiceStatusProvider);
+
+
+
         return AnimatedSize(
             duration: Duration(milliseconds: 400),
             curve: Curves.easeInOut,

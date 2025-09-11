@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/domain/entities/session/session_state.dart';
 import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
-
-
+// NEW: grapheme-safe splitting
+import 'package:characters/characters.dart';
 
 class SessionStateNotifier extends StateNotifier<SessionState> {
     final Ref _ref;
@@ -25,6 +25,7 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
             elapsed: Duration.zero,
             isRunning: true,
             isPaused: false,
+            isReset: false,
             startedAt: DateTime.now(),
         );
         _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
@@ -40,6 +41,7 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
         state = state.copyWith(
             elapsed: state.elapsed + delta,
             isPaused: true,
+            isReset: false,
             startedAt: null,
         );
     }
@@ -50,6 +52,7 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
         if (!state.isRunning || !state.isPaused || !allowPauses) return;
         state = state.copyWith(
             isPaused: false,
+            isReset: false,
             startedAt: DateTime.now(),
         );
     }
@@ -58,14 +61,24 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
         if (!state.isRunning) return;
         // push any final elapsed
         final now = DateTime.now();
-        final extra = state.startedAt == null ? Duration.zero : now.difference(state.startedAt!);
+        final extra =
+            state.startedAt == null ? Duration.zero : now.difference(state.startedAt!);
         state = state.copyWith(
             elapsed: state.elapsed + extra,
             isRunning: false,
             isPaused: false,
+            isReset: false,
             startedAt: null,
         );
         _cancelTicker();
+    }
+
+    /// Reset the session back to the idle state
+    /// Clears timers and typing history.
+    void reset() {
+        _cancelTicker();
+        _history.clear();
+        state = SessionState.idle();
     }
 
     @override
@@ -92,29 +105,47 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
 
     final List<bool> _history = [];
 
-    // ---------- typing input ----------
-    /// Call this for every committed character the user types.
-    /// Handles correctness vs expected char; advances cursor on commit.
-    void typeChar(String ch) {
-        if (!state.isRunning || state.isPaused || state.cursor >= state.target.characters.length) return;
+    // ---------- NEW: tiny helpers to ensure 1 commit == 1 grapheme ----------
+    void _commitGrapheme(String g) {
+        if (!state.isRunning || state.isPaused) return;
+        final total = state.target.characters.length;
+        if (state.cursor >= total) return;
 
         final expected = state.target.characters.elementAt(state.cursor);
-        final isCorrect = ch == expected;
+        final isCorrect = g == expected;
 
         _history.add(isCorrect);
         state = state.copyWith(
-            cursor: (state.cursor + 1).clamp(0, state.target.characters.length),
+            cursor: (state.cursor + 1).clamp(0, total),
             typed: state.typed + 1,
             correct: state.correct + (isCorrect ? 1 : 0),
             errors: state.errors + (isCorrect ? 0 : 1),
         );
 
-        if (state.cursor >= state.target.characters.length) stop();
+        if (state.cursor >= total) stop();
+    }
+
+    /// Accepts any string, splits into grapheme clusters, and commits each.
+    void typeCommit(String text) {
+        if (text.isEmpty) return;
+        for (final g in text.characters) {
+            _commitGrapheme(g);
+            if (!state.isRunning) break; // stop when finished exactly
+        }
+    }
+
+    // ---------- typing input ----------
+    /// Call this for every committed character the user types.
+    /// Handles correctness vs expected char; advances cursor on commit.
+    /// (kept for compatibility; now delegates to typeCommit to be grapheme-safe)
+    void typeChar(String ch) {
+        typeCommit(ch);
     }
 
     /// Handle backspace (if allowed). Rewinds cursor and re-accounts metrics.
     void backspace() {
-        final allowTakeBacks = _ref.read(practiceConfigurationProvider).allowTakeBacks;
+        final allowTakeBacks =
+            _ref.read(practiceConfigurationProvider).allowTakeBacks;
         if (!allowTakeBacks || !state.isRunning || state.isPaused) return;
         if (state.cursor == 0 || _history.isEmpty) return;
 
@@ -126,8 +157,22 @@ class SessionStateNotifier extends StateNotifier<SessionState> {
             errors: state.errors - (last ? 0 : 1),
         );
     }
-}
 
+    /// Internal: step back one character for IME-style composition
+    /// Ignores user settings like allowTakeBacks, but still maintains history.
+    void composeBackspace() {
+        if (!state.isRunning || state.isPaused) return;
+        if (state.cursor == 0 || _history.isEmpty) return;
+
+        final last = _history.removeLast();
+        state = state.copyWith(
+            cursor: state.cursor - 1,
+            typed: state.typed - 1,
+            correct: state.correct - (last ? 1 : 0),
+            errors: state.errors - (last ? 0 : 1),
+        );
+    }
+}
 
 final sessionStateProvider =
     StateNotifierProvider<SessionStateNotifier, SessionState>(
