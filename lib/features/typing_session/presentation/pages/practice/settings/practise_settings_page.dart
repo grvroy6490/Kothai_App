@@ -17,7 +17,11 @@ import 'package:kothai_app/features/typing_session/presentation/widgets/practice
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/switch_setting_card.dart';
 
 class PracticeSettingsPage extends ConsumerStatefulWidget {
+<<<<<<< HEAD
     PracticeSettingsPage({super.key});
+=======
+    const PracticeSettingsPage({super.key});
+>>>>>>> 12fa72b (updated IOS build)
 
     @override
     ConsumerState<PracticeSettingsPage> createState() => _PracticeSettingsPageState();

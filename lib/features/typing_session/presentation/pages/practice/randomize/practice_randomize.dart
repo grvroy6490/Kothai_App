@@ -2,7 +2,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:flutter_svg/flutter_svg.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/star_burst_badge.dart';

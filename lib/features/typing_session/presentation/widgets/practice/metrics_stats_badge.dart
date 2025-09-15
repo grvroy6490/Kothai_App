@@ -51,6 +51,10 @@ class MetricsStatBadge extends StatelessWidget {
                     ]
                 )
             )
+<<<<<<< HEAD
         );;
+=======
+        );
+>>>>>>> 12fa72b (updated IOS build)
     }
 }

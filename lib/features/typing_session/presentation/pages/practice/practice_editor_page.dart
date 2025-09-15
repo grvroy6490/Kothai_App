@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+<<<<<<< HEAD
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
@@ -8,11 +9,18 @@ import 'package:kothai_app/core/theme/app_typography.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/core/utils/characters_utils.dart';
 import 'package:kothai_app/di/poviders/navigation_provider.dart';
+=======
+import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/theme/figma_color.dart';
+>>>>>>> 12fa72b (updated IOS build)
 import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/animated_content_board.dart';
+<<<<<<< HEAD
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_metrics_bar.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/prcatice_start_button.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/typing_progress.dart';

@@ -1,5 +1,8 @@
 
+<<<<<<< HEAD
 import 'package:flutter/material.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 
 class Letters {
     static List<String> uyirLetters = [

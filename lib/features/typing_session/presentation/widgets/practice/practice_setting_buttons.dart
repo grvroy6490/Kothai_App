@@ -8,7 +8,10 @@ import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/poviders/theme_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/settings/practise_settings_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
+<<<<<<< HEAD
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 
 class PracticeSettingButtons extends ConsumerWidget {
     const PracticeSettingButtons({super.key});

@@ -6,7 +6,10 @@ import 'package:kothai_app/features/typing_session/domain/enums/practice_status_
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/tamil_keyboard.dart' as tamil_keyboard;
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/tamil_keyboard_renderer.dart';
+<<<<<<< HEAD
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 
 import 'package:flutter/widgets.dart';
 

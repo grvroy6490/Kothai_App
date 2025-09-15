@@ -1,0 +1,20 @@
+current directory: /Users/user286286/Documents/dev/Kothai_App-dev_5__prod_1/ios/vendor/bundle/ruby/3.4.0/gems/nkf-0.2.0/ext/nkf
+/opt/homebrew/opt/ruby/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/user286286/Documents/dev/Kothai_App-dev_5__prod_1/ios/vendor/bundle/ruby/3.4.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250914-10297-gt1h0c sitelibdir\=./.gem.20250914-10297-gt1h0c clean
+
+current directory: /Users/user286286/Documents/dev/Kothai_App-dev_5__prod_1/ios/vendor/bundle/ruby/3.4.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250914-10297-gt1h0c sitelibdir\=./.gem.20250914-10297-gt1h0c
+compiling nkf.c
+linking shared-object nkf.bundle
+ld: warning: search path '/opt/homebrew/Cellar/openssl@3/3.5.1/lib' not found
+ld: warning: search path '/opt/homebrew/Cellar/openssl@3/3.5.1/lib' not found
+
+current directory: /Users/user286286/Documents/dev/Kothai_App-dev_5__prod_1/ios/vendor/bundle/ruby/3.4.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250914-10297-gt1h0c sitelibdir\=./.gem.20250914-10297-gt1h0c install
+/usr/bin/install -c -m 0755 nkf.bundle ./.gem.20250914-10297-gt1h0c
+
+current directory: /Users/user286286/Documents/dev/Kothai_App-dev_5__prod_1/ios/vendor/bundle/ruby/3.4.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20250914-10297-gt1h0c sitelibdir\=./.gem.20250914-10297-gt1h0c clean

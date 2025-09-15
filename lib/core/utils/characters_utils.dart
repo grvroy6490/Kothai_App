@@ -1,7 +1,10 @@
 
 
 import 'package:characters/characters.dart';
+<<<<<<< HEAD
 import 'dart:math';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 
 int graphemeCount(String s) => s.characters.length;
 

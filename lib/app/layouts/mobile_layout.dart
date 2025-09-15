@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/features/splash/splash_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
+<<<<<<< HEAD
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/complete/practice_complete_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/reset/practice_reset_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/stop/practice_stop_page.dart';
+=======
+>>>>>>> 12fa72b (updated IOS build)
 
 class MobileLayout extends StatefulWidget {
     const MobileLayout({super.key});
