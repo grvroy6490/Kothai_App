@@ -26,7 +26,7 @@ List<Widget> appBarActions(ctx, showXP, showNotifications, TextEditingController
               );
             },
             child: showXP
-                ? const PracticeLevelXPIndicatior()
+                ? PracticeLevelXPIndicatior(isCompact: true,)
                 : PracticeStopFilledButton(controller: controller,)
         ),
         const SizedBox(width: 5),

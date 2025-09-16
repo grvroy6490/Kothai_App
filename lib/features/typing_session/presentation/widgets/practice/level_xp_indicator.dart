@@ -7,14 +7,20 @@ import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/XP/xp_controller.dart';
 
 class PracticeLevelXPIndicatior extends ConsumerWidget {
-    const PracticeLevelXPIndicatior({super.key});
+    final double? width;
+    final bool isCompact;
+    const PracticeLevelXPIndicatior({
+        super.key, 
+        this.width = 150,
+        this.isCompact = true
+    });
 
     @override
     Widget build(BuildContext context, WidgetRef ref) {
         final xp = ref.watch(xpControllerProvider);
 
         return Container(
-            width: 150,
+            width: width,
             decoration: BoxDecoration(
                 color: getFigmaColor(context, 'State Layers/On Surface/Opacity-08'),
                 borderRadius: BorderRadius.circular(25),
@@ -77,9 +83,12 @@ class PracticeLevelXPIndicatior extends ConsumerWidget {
                                 ),
 
                                 Text('Level ${xp.level}',
-                                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                                    )
+                                    style: isCompact ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                        ) : Theme.of(context).textTheme.labelLarge?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                            fontWeight: FontWeight.w700
+                                        )
                                 ),
                                 Icon(
                                     Icons.circle,
@@ -88,11 +97,25 @@ class PracticeLevelXPIndicatior extends ConsumerWidget {
                                 ),
                                 Expanded(
                                     child: Text('${xp.totalXp} XP',
-                                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                            color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                        style: isCompact ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                                                color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                            ) : Theme.of(context).textTheme.labelLarge?.copyWith(
+                                                color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                fontWeight: FontWeight.w700
+                                            )
+                                    )
+                                ),
+
+                                if (!isCompact) ...[
+                                    Spacer(),
+
+                                    Text('${xp.xpPerLevel - xp.xpIntoLevel} XP to next level',
+                                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                            fontWeight: FontWeight.w700
                                         )
                                     )
-                                )
+                                ] 
                             ]
                         )
                     )
