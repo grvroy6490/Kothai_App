@@ -59,18 +59,20 @@ flutter_native_splash:
   web: false
 
   # FOR IOS
-  color: "#F9F9F9"
-  #  background_image: ""
-  image: "assets/images/Kothai_logo.png"
+#  color: "#F9F9F9"
+  background_image: "assets/images/Light_Mode_BG.png"
+  image: "assets/images/logo.png"
   #  branding: ""
 
-  #  background_image_dark: ""
+  background_image_dark: "assets/images/Dark_Mode_BG.png"
   #  image_dark: ""
   #  branding_dark: ""
 
   android_12:
-    color: "#F9F9F9"
-    image: "assets/images/Kothai_logo.png"
+    #color: "#F9F9F9"
+    image: "assets/images/logo.png"
+    background_image: "assets/images/Light_Mode_BG.png"
+    background_image_dark: "assets/images/Dark_Mode_BG.png"
   # branding: ""
 
 
