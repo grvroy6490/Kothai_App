@@ -36,7 +36,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
         await setTheme(newMode);
     }
 
-    Future<void> followSystem() => setTheme(ThemeMode.system);
+    Future<void> followSystem() => setTheme(ThemeMode.light);
 }
 
 

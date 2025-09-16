@@ -1,15 +1,24 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/reset/practice_reset_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 
-class PracticeResetPause extends StatelessWidget {
-    const PracticeResetPause({super.key});
+class PracticeResetPause extends ConsumerWidget {
+    void Function(TextEditingController) handlePause;
+    void Function(TextEditingController) handleReset;
+    final TextEditingController controller;
+    PracticeResetPause({super.key, required this.handlePause, required this.handleReset, required this.controller});
 
     @override
-    Widget build(BuildContext context) {
+    Widget build(BuildContext context, WidgetRef ref) {
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
+
         return Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -37,26 +46,25 @@ class PracticeResetPause extends StatelessWidget {
                             context,
                             icon: FontAwesomeIcons.clockRotateLeft,
                             label: 'Reset',
-                            handlePressed: () => {
-                                Get.to(() => const Placeholder(), transition: Transition.fadeIn)
-                            }
+                            handlePressed: () => handleReset(controller)
                         )
                     ),
                     Expanded(
                         flex: 3,
                         child: Text('')
                     ),
+
+                    
                     Expanded(
                         flex: 2,
-                        child: _buildResetPauseButtons(
+                        child: practiceConfig.allowPauses // 👈 ALLOW PAUSES SETTINGS
+                            ? _buildResetPauseButtons(
                             context,
                             icon: FontAwesomeIcons.circlePause,
                             label: 'Pause',
                             flip: true,
-                            handlePressed: () => {
-                                Get.to(() => const Placeholder(), transition: Transition.fadeIn)
-                            }
-                        )
+                            handlePressed: () => handlePause(controller)
+                        ) : Text('')
                     )
                 ]
             )

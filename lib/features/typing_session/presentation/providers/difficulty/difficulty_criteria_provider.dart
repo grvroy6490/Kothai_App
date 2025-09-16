@@ -1,5 +1,6 @@
 
 
+import 'package:kothai_app/di/poviders/difficulty_criteia_provider.dart';
 import 'package:kothai_app/features/typing_session/domain/entities/difficulty/difficulty_criteria.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/accuracy_threshold_enum.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
@@ -15,22 +16,32 @@ class DifficultyCriteriaNotifier extends _$DifficultyCriteriaNotifier {
     @override
     DifficultyCriteria build() {
         // default state when provider is first created
-        return DifficultyCriteria(
+        final defaults = DifficultyCriteria(
             level: DifficultyEnum.easy,
             accuracyThreshold: AccuracyThresholdEnum.accuracyEasy,
             wpmThreshold: DifficultyWPMEnum.wpmEasy,
             timeLimit: DifficultyTimeLimit.limitEasy,
             xpMultiplier: XpMultiplier.easy
         );
+
+
+        // try restore (fire-and-forget then update state)
+        Future.microtask(() async {
+            final repo = ref.read(difficultyCriteriaRepositoryProvider);
+            final saved = await repo.load();
+            if (saved != null) state = saved;
+        });
+
+        return defaults;
     }
 
-    void setDifficulty({
+    Future<void> setDifficulty({
         DifficultyEnum? level,
         AccuracyThresholdEnum? accuracyThreshold,
         DifficultyWPMEnum? wpmThreshold,
         DifficultyTimeLimit? timeLimit,
         XpMultiplier? xpMultiplier
-    }) {
+    }) async {
         state = state.copyWith(
             level: level ?? state.level,
             accuracyThreshold: accuracyThreshold ?? state.accuracyThreshold,
@@ -39,18 +50,17 @@ class DifficultyCriteriaNotifier extends _$DifficultyCriteriaNotifier {
             xpMultiplier: xpMultiplier ?? state.xpMultiplier
         );
 
+        // persist
+        await ref.read(difficultyCriteriaRepositoryProvider).save(state);
     }
 
-    // Convenience updaters
-    void updateAccuracy(AccuracyThresholdEnum value) {
-        state = state.copyWith(accuracyThreshold: value);
-    }
+    // convenience updaters that also persist
+    Future<void> updateAccuracy(AccuracyThresholdEnum value) =>
+        setDifficulty(accuracyThreshold: value);
 
-    void updateWpm(DifficultyWPMEnum value) {
-        state = state.copyWith(wpmThreshold: value);
-    }
+    Future<void> updateWpm(DifficultyWPMEnum value) =>
+        setDifficulty(wpmThreshold: value);
 
-    void updateLevel(DifficultyEnum newLevel, XpMultiplier multiplier) {
-        state = state.copyWith(level: newLevel, xpMultiplier: multiplier);
-    }
+    Future<void> updateLevel(DifficultyEnum newLevel, XpMultiplier multiplier) =>
+        setDifficulty(level: newLevel, xpMultiplier: multiplier);
 }

@@ -25,13 +25,13 @@ _PracticeConfig _$PracticeConfigFromJson(Map<String, dynamic> json) =>
       wpmEnabled: json['wpmEnabled'] as bool? ?? true,
       accuracyEnabled: json['accuracyEnabled'] as bool? ?? true,
       timerEnabled: json['timerEnabled'] as bool? ?? true,
-      errorsEnabled: json['errorsEnabled'] as bool? ?? false,
+      errorsEnabled: json['errorsEnabled'] as bool? ?? true,
       allowPauses: json['allowPauses'] as bool? ?? true,
-      allowTakeBacks: json['allowTakeBacks'] as bool? ?? false,
+      allowTakeBacks: json['allowTakeBacks'] as bool? ?? true,
       soundEnabled: json['soundEnabled'] as bool? ?? false,
       soundOnError: json['soundOnError'] as bool? ?? false,
       hapticEnabled: json['hapticEnabled'] as bool? ?? false,
-      hapticOnError: json['hapticOnError'] as bool? ?? false,
+      hapticOnError: json['hapticOnError'] as bool? ?? true,
       darkMode: json['darkMode'] as bool? ?? true,
     );
 

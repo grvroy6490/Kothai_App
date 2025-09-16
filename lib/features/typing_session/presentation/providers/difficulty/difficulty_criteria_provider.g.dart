@@ -7,7 +7,7 @@ part of 'difficulty_criteria_provider.dart';
 // **************************************************************************
 
 String _$difficultyCriteriaNotifierHash() =>
-    r'89739db0d4400e39541c68c5667a0ca3397f2774';
+    r'39ff50d66adccb8f6bea1fa5115ca43a11a68c09';
 
 /// See also [DifficultyCriteriaNotifier].
 @ProviderFor(DifficultyCriteriaNotifier)

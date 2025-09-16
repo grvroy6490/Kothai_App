@@ -22,13 +22,13 @@ abstract class PracticeConfig with _$PracticeConfig {
         @Default(true) bool wpmEnabled,
         @Default(true) bool accuracyEnabled,
         @Default(true) bool timerEnabled,
-        @Default(false) bool errorsEnabled,
+        @Default(true) bool errorsEnabled,
         @Default(true) bool allowPauses,
-        @Default(false) bool allowTakeBacks,
+        @Default(true) bool allowTakeBacks,
         @Default(false) bool soundEnabled,
         @Default(false) bool soundOnError,
         @Default(false) bool hapticEnabled,
-        @Default(false) bool hapticOnError,
+        @Default(true) bool hapticOnError,
         @Default(true) bool darkMode
     }) = _PracticeConfig;
 

@@ -1,18 +1,44 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/session_state/session_state_provider.dart';
 
-class PracticeResetPage extends StatefulWidget {
-    const PracticeResetPage({super.key});
+class PracticeResetPage extends ConsumerStatefulWidget {
+    final TextEditingController controller;
+    const PracticeResetPage({super.key, required this.controller});
 
     @override
-    State<PracticeResetPage> createState() => _PracticeResetPageState();
+    ConsumerState<PracticeResetPage> createState() => _PracticeResetPageState();
 }
 
-class _PracticeResetPageState extends State<PracticeResetPage> {
+class _PracticeResetPageState extends ConsumerState<PracticeResetPage> {
+
     @override
     Widget build(BuildContext context) {
+
+        void handlePracticeReset(){
+            ref.read(practiceSessionControllerProvider.notifier).reset();
+            var arguments = Get.arguments;
+            widget.controller.clear();
+
+            if(arguments == 'fromReset'){
+                Get.back();
+            } else if(arguments == 'fromPause') {
+                Get.back();
+                Get.back();
+            }
+        }
+
+        void handlePracticeResetDenied(){
+            Get.back();
+        }
+
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Background'),
             body: SizedBox(
@@ -44,7 +70,7 @@ class _PracticeResetPageState extends State<PracticeResetPage> {
                                                         left:0,
                                                         bottom: 0,
                                                         child: Align(
-                                                          alignment: Alignment.center,
+                                                            alignment: Alignment.center,
                                                             child: Container(
                                                                 constraints: BoxConstraints(
                                                                     minWidth: MediaQuery.of(context).size.width - 32
@@ -130,9 +156,7 @@ class _PracticeResetPageState extends State<PracticeResetPage> {
                                                                                     backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/On Secondary')),
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Secondary'))
                                                                                 ),
-                                                                                onPressed: (){
-
-                                                                                },
+                                                                                onPressed: () => handlePracticeReset(),
                                                                                 child: Text('Yes, Reset it', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                                                         color: getFigmaColor(context, 'Schemes/Secondary')
                                                                                     )
@@ -147,9 +171,7 @@ class _PracticeResetPageState extends State<PracticeResetPage> {
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Surface Variant')),
                                                                                     padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 0, vertical: Gap(context).gap(16)))
                                                                                 ),
-                                                                                onPressed: (){
-
-                                                                                },
+                                                                                onPressed: () => handlePracticeResetDenied(),
                                                                                 child: Text('No', style: Theme.of(context).textTheme.bodyLarge)
                                                                             )
                                                                         )

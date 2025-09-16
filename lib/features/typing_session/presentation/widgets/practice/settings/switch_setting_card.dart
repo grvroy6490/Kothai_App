@@ -1,4 +1,4 @@
-
+﻿
 import 'package:flutter/material.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
@@ -58,6 +58,7 @@ Widget switchSettinsCard(
                         itemBuilder: (context, index) {
                             final opt = options[index];
                             final isOn = opt.select(config);
+
                             return Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: Gap(context).gap(15),
@@ -83,7 +84,7 @@ Widget switchSettinsCard(
                                         ),
 
                                         SizedBox(
-                                            child: switchButton(context, isOn, () => updateCofiguration(opt.toggle(config))) // // 👈 mutate
+                                            child: switchButton(context, isOn, (_) => updateCofiguration(opt.toggle(config)))  // 👈 mutate
                                         )
                                     ]
                                 )

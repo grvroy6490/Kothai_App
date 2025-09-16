@@ -2,9 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/switch_button.dart';
 
-Widget blindMode(context){
+Widget blindMode(
+    BuildContext context,
+    PracticeConfig config,
+    void Function(PracticeConfig) updateConfiguration
+    ){
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -51,8 +56,7 @@ Widget blindMode(context){
                     )
                 ),
                 SizedBox(width: 10),
-                switchButton(context, false, (){
-                    })
+                switchButton(context, config.blindMode, (_) => updateConfiguration(config.copyWith(blindMode: !config.blindMode)))
             ]
         )
     );

@@ -2,10 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
-<<<<<<< HEAD
-import 'package:kothai_app/core/theme/app_typography_scaled.dart';
-=======
->>>>>>> 12fa72b (updated IOS build)
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 

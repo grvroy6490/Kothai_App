@@ -17,11 +17,7 @@ import 'package:kothai_app/features/typing_session/presentation/widgets/practice
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/switch_setting_card.dart';
 
 class PracticeSettingsPage extends ConsumerStatefulWidget {
-<<<<<<< HEAD
-    PracticeSettingsPage({super.key});
-=======
     const PracticeSettingsPage({super.key});
->>>>>>> 12fa72b (updated IOS build)
 
     @override
     ConsumerState<PracticeSettingsPage> createState() => _PracticeSettingsPageState();
@@ -36,7 +32,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
         final PracticeConfig configuration = PracticeConfig(
             accuracyEnabled: config.accuracyEnabled,
             allowPauses: config.allowPauses,
-            allowTakeBacks: config.allowPauses,
+            allowTakeBacks: config.allowTakeBacks,
             blindMode: config.blindMode,
             contentFontSize: config.contentFontSize,
             contentLength: config.contentLength,
@@ -51,7 +47,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
             soundOnError: config.soundOnError,
             timerEnabled: config.timerEnabled,
             wpmEnabled: config.wpmEnabled
-        ); 
+        );
 
         final liveStats = <ConfigSwitchOption>[
             ConfigSwitchOption(title: 'WPM', select: (c) => c.wpmEnabled, toggle: (c) => c.copyWith(wpmEnabled: !c.wpmEnabled)),
@@ -73,7 +69,9 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
           ConfigSwitchOption(title: 'Error Vibration', select: (c) => c.hapticOnError, toggle: (c) => c.copyWith(hapticOnError: !c.hapticOnError))
         ];
 
-        void updateCofiguration(PracticeConfig config){
+
+        // 👇 HANDLE UPDATE SETTING
+        void updateConfiguration(PracticeConfig config){
             ref.read(practiceConfigurationProvider.notifier).replace(config);
         }
 
@@ -114,7 +112,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                         context, 
                                                         configuration.difficulty, 
                                                         DifficultyEnum.values, 
-                                                        (option) => updateCofiguration(configuration.copyWith(difficulty: option))
+                                                        (option) => updateConfiguration(configuration.copyWith(difficulty: option))
                                                     )
                                                 )
                                             ]
@@ -143,7 +141,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                                 context, 
                                                                 configuration.mode, 
                                                                 ExpertiseModeEnum.values, 
-                                                                (option) => updateCofiguration(configuration.copyWith(mode: option))
+                                                                (option) => updateConfiguration(configuration.copyWith(mode: option))
                                                             )
                                                         )
                                                     ]
@@ -159,7 +157,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                 ),
                                                 SizedBox(height: Gap(context).gap(15)),
 
-                                                blindMode(context)
+                                                blindMode(context, configuration, updateConfiguration)
 
                                             ]
                                         )
@@ -185,7 +183,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                         context,
                                                         configuration.contentLength,
                                                         TextLengthEnum.values,
-                                                        (option) => updateCofiguration(configuration.copyWith(contentLength: option))
+                                                        (option) => updateConfiguration(configuration.copyWith(contentLength: option))
                                                     )
                                                 )
                                             ]
@@ -212,7 +210,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                         context,
                                                         configuration.contentFontSize,
                                                         TextSizeEnum.values,
-                                                        (option) => updateCofiguration(configuration.copyWith(contentFontSize: option))
+                                                        (option) => updateConfiguration(configuration.copyWith(contentFontSize: option))
                                                     )
                                                 )
                                             ]
@@ -227,7 +225,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                         "Show Live Stats",
                                         liveStats,
                                         configuration,
-                                        updateCofiguration
+                                        updateConfiguration
                                     ),
 
                                     SizedBox(height: 10),
@@ -238,7 +236,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                         "Assistance Options",
                                         assistanceOptions,
                                         configuration,
-                                        updateCofiguration
+                                        updateConfiguration
                                     ),
 
                                     SizedBox(height: 10),
@@ -249,7 +247,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                         "Feedbacks",
                                         feedbacks,
                                         configuration,
-                                        updateCofiguration
+                                        updateConfiguration
                                     )
                                 ]
                             )

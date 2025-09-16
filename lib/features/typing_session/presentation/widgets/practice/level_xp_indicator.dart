@@ -1,14 +1,18 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/XP/xp_controller.dart';
 
-class PracticeLevelXPIndicatior extends StatelessWidget {
+class PracticeLevelXPIndicatior extends ConsumerWidget {
     const PracticeLevelXPIndicatior({super.key});
 
     @override
-    Widget build(BuildContext context) {
+    Widget build(BuildContext context, WidgetRef ref) {
+        final xp = ref.watch(xpControllerProvider);
+
         return Container(
             width: 150,
             decoration: BoxDecoration(
@@ -25,9 +29,9 @@ class PracticeLevelXPIndicatior extends StatelessWidget {
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: FractionallySizedBox(
-                                widthFactor: 0.01, // 60% progress, adjust as needed
+                                widthFactor: xp.progress, // 60% progress, adjust as needed
                                 child: Container(
-                                    height: Gap(context).gap(35),
+                                    height: Gap(context).gap(40),
                                     decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                             begin: Alignment.topLeft,
@@ -37,7 +41,7 @@ class PracticeLevelXPIndicatior extends StatelessWidget {
                                                 getFigmaColor(context, 'Palettes/Primary 80')
                                             ]
                                         ),
-                                        borderRadius: BorderRadius.circular(25)
+                                        borderRadius: BorderRadius.circular(0)
                                     )
                                 )
                             )
@@ -72,7 +76,7 @@ class PracticeLevelXPIndicatior extends StatelessWidget {
                                     )
                                 ),
 
-                                Text('Level 1',
+                                Text('Level ${xp.level}',
                                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                         color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                     )
@@ -83,7 +87,7 @@ class PracticeLevelXPIndicatior extends StatelessWidget {
                                     color: Colors.white
                                 ),
                                 Expanded(
-                                    child: Text('0 XP',
+                                    child: Text('${xp.totalXp} XP',
                                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                         )

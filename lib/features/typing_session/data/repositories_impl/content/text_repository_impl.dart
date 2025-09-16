@@ -26,7 +26,7 @@ class TextRepositoryImpl  implements TextRepository {
 
     @override
     Future<List<TextParagraph>> getRandomizedTexts() async {
-        final texts = cache.read();
+        final texts = List<TextParagraph>.from(cache.read()); // clone it
         texts.shuffle();
         return texts;
     }

@@ -8,8 +8,9 @@ import 'package:kothai_app/features/typing_session/domain/entities/content/text_
 import 'package:kothai_app/services/shared_prefs_service.dart';
 
 class TextCache {
-    TextCache(this.prefs);
     final SharedPrefsService prefs;
+    TextCache(this.prefs);
+
     static const key = kPreloadedTextsPrefsKey; // from core/constants
 
     Future<void> write(List<TextParagraph> items) async {

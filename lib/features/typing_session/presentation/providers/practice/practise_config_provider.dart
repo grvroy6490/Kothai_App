@@ -17,6 +17,7 @@ import 'package:kothai_app/features/typing_session/domain/enums/expertise_mode_e
 import 'package:kothai_app/features/typing_session/domain/enums/multipliers_enums.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/text_length_enum.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/text_size_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/difficulty/difficulty_criteria_provider.dart';
 
 class PracticeConfigController extends Notifier<PracticeConfig> {
@@ -65,7 +66,7 @@ class PracticeConfigController extends Notifier<PracticeConfig> {
         try {
             final prefs = ref.watch(sharedPrefsServiceProvider);
 
-            final raw = prefs.getString(kPracticeModePrefsKey);
+            final raw = prefs.getString(kPracticeSettingsPrefsKey);
             if (raw != null) {
                 final decoded = PracticeConfig.fromJson(
                     jsonDecode(raw) as Map<String, dynamic>
@@ -83,9 +84,23 @@ class PracticeConfigController extends Notifier<PracticeConfig> {
             await _save(state);
         }
 
-        // After state is established, sync the external difficulty object.
-        final d = _difficultyFromEnum(state.difficulty);
-        _updateDifficultyObject(d);
+        // --- 2) Sync DifficultyCriteria ---
+        final criteria = _difficultyFromEnum(state.difficulty);
+        _updateDifficultyObject(criteria);
+
+        // --- 3) Preload typing texts for current difficulty ---
+        await ref.read(preloadTypingTextsProvider).call(
+            difficulty: state.difficulty,
+            randomize: state.randomize,
+        );
+
+        // --- 4) Seed TextContent ---
+        final list = await ref.read(preloadedTextsProvider.future);
+        if (list.isNotEmpty) {
+            ref.read(textContentProvider.notifier).setTextContent(list.first);
+        } else {
+            ref.read(textContentProvider.notifier).clearTextContent();
+        }
     }
 
     // Keep this inside the notifier and use `Ref`, not `WidgetRef`.
@@ -101,7 +116,7 @@ class PracticeConfigController extends Notifier<PracticeConfig> {
 
     Future<void> _save(PracticeConfig s) async {
         final prefs = ref.watch(sharedPrefsServiceProvider);
-        await prefs.setString(kPracticeModePrefsKey, jsonEncode(s.toJson()));
+        await prefs.setString(kPracticeSettingsPrefsKey, jsonEncode(s.toJson()));
         state = s; // plain model, not AsyncValue
     }
 
@@ -116,8 +131,26 @@ class PracticeConfigController extends Notifier<PracticeConfig> {
     Future<void> setDifficulty(DifficultyEnum v) async {
         // 1) Persist the enum to settings.
         await _update((s) => s.copyWith(difficulty: v));
-        // 2) Push the resolved Difficulty preset to the external provider.
+
+        // 2) push resolved Difficulty preset to difficultyCriteriaNotifier (which now persists)
         _updateDifficultyObject(_difficultyFromEnum(v));
+
+        // 3) refresh preloaded texts for this difficulty
+        final randomize = state.randomize; // from your config
+        await ref.read(preloadTypingTextsProvider).call(
+            difficulty: v,
+            randomize: randomize,
+        );
+
+        // 4) pick a paragraph and publish to TextContent
+        final list = await ref.read(preloadedTextsProvider.future); // your FutureProvider<List<TextParagraph>>
+
+
+        if (list.isNotEmpty) {
+            ref.read(textContentProvider.notifier).setTextContent(list.first);
+        } else {
+            ref.read(textContentProvider.notifier).clearTextContent();
+        }
     }
 
     Future<void> setContentLength(TextLengthEnum v) =>

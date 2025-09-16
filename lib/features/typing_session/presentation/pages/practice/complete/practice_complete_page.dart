@@ -2,21 +2,55 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/core/utils/time_utils.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/star_burst_badge.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/metrics/metrics_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/session_state/session_state_provider.dart';
 
-class PracticeCompletePage extends StatefulWidget {
+class PracticeCompletePage extends ConsumerStatefulWidget {
     const PracticeCompletePage({super.key});
 
     @override
-    State<PracticeCompletePage> createState() => _PracticeCompletePageState();
+    ConsumerState<PracticeCompletePage> createState() => _PracticeCompletePageState();
 }
 
-class _PracticeCompletePageState extends State<PracticeCompletePage> {
+class _PracticeCompletePageState extends ConsumerState<PracticeCompletePage> {    
+
     @override
     Widget build(BuildContext context) {
+        final engine = ref.watch(sessionStateNotifierProvider);
+        final metrics = ref.watch(metricsNotifierProvider);
+
+        void handleNextPractice() async{
+          Navigator.of(context).pop();
+          var newContent = await ref.watch(textRepositoryProvider).getRandomizedTexts();
+          ref.read(textContentProvider.notifier).setTextContent(newContent[0]);
+        }
+
+        void handleClose() async{
+            Navigator.of(context).pop();
+            var newContent = await ref.watch(textRepositoryProvider).getRandomizedTexts();
+            ref.read(textContentProvider.notifier).setTextContent(newContent[0]);
+        }
+
+        void handleAuthentication(){
+            // TODO: HANLDE AUTHENTICATION
+        }
+
+        void handleRepeat(){
+            Get.back();
+        }
+
+        void handleShare(){
+            // TODO: SHARE YOUR PROGRESS
+        }
+
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Background'),
             body: Stack(
@@ -127,19 +161,19 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
                                             children: [
                                                 Expanded(
                                                     child: Container(
-                                                        child: _statBlock(context, Icons.text_fields, 'WPM', '42')
+                                                        child: _statBlock(context, Icons.text_fields, 'WPM', metrics.wpm.toStringAsFixed(0))
                                                     )
                                                 ),
                                                 SizedBox(width: Gap(context).gap(15)),
                                                 Expanded(
                                                     child: Container(
-                                                        child: _statBlock(context, Icons.text_fields, 'Accuracy', '42')
+                                                        child: _statBlock(context, Icons.my_location, 'Accuracy', '${(metrics.accuracy*100).toStringAsFixed(0)}%')
                                                     )
                                                 ),
                                                 SizedBox(width: Gap(context).gap(15)),
                                                 Expanded(
                                                     child: Container(
-                                                        child: _statBlock(context, Icons.text_fields, 'Time Taken', '42')
+                                                        child: _statBlock(context, Icons.schedule, 'Time Taken', formatDuration(engine.elapsed))
                                                     )
                                                 )
                                             ]
@@ -154,8 +188,7 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
                                     child: Padding(
                                         padding: EdgeInsetsGeometry.symmetric(horizontal: Gap(context).gap(16)),
                                         child: FilledButton(
-                                            onPressed: (){
-                                            },
+                                            onPressed: () => handleNextPractice(),
                                             style: ButtonStyle(
                                                 padding: WidgetStateProperty.all(EdgeInsetsGeometry.symmetric(vertical: Gap(context).gap(16))),
                                                 backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Green'))
@@ -181,8 +214,7 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
                                                 child: _customIconButton(
                                                     context,
                                                     Icon(Icons.repeat, color: getFigmaColor(context, 'Schemes/On Secondary')),
-                                                    () {
-                                                    },
+                                                    handleRepeat,
                                                     Gap(context).gap(12),
                                                     getFigmaColor(context, 'Schemes/Secondary')
                                                 )
@@ -192,11 +224,10 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
 
                                             Expanded(
                                                 flex: 3,
-                                                child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(12), vertical: Gap(context).gap(15)),
-                                                    decoration: BoxDecoration(
-                                                        color: getFigmaColor(context, 'Schemes/On Background'),
-                                                        borderRadius: BorderRadius.circular(24)
+                                                child: FilledButton(
+                                                    onPressed: () => handleAuthentication(),                                                    
+                                                    style: ButtonStyle(
+                                                        backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/On Background'))
                                                     ),
                                                     child: Text('Sign up to save results',
                                                         textAlign: TextAlign.center,
@@ -213,8 +244,7 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
                                                 child: _customIconButton(
                                                     context,
                                                     Icon(Icons.share, color: getFigmaColor(context, 'Schemes/On Secondary')),
-                                                    () {
-                                                    },
+                                                    handleShare,
                                                     Gap(context).gap(12),
                                                     getFigmaColor(context, 'Schemes/Tertiary')
                                                 )
@@ -235,19 +265,19 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
                                         child: BackdropFilter(
                                             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                                             child: GestureDetector(
-                                                onTap: (){
-                                                    // TODO: HANLDE TAP
-                                                },
+                                                onTap: () => handleClose(),
                                                 child: Container(
                                                     // make it translucent so the blur is visible
                                                     color: getFigmaColor(context, 'State Layers/On Background/Opacity-08'),
                                                     padding: EdgeInsets.all(Gap(context).gap(16)),
                                                     child: Column(
                                                         children: [
-                                                            CloseButton(
-                                                                color: Color.fromARGB(255, 29, 26, 34),
-                                                                style: ButtonStyle(
-                                                                    iconSize: WidgetStateProperty.all(KxScale(context).sp(25))
+                                                            AbsorbPointer(
+                                                                child: CloseButton(
+                                                                    color: Color.fromARGB(255, 29, 26, 34),
+                                                                    style: ButtonStyle(
+                                                                        iconSize: WidgetStateProperty.all(KxScale(context).sp(25))
+                                                                    )
                                                                 )
                                                             ),
 
@@ -311,7 +341,7 @@ class _PracticeCompletePageState extends State<PracticeCompletePage> {
 
     Widget _customIconButton(BuildContext context, Widget icon, VoidCallback handlePress, double padding, Color? bgColor){
         return IconButton(
-            onPressed: handlePress,
+            onPressed: () => handlePress(),
             style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
                     bgColor ?? getFigmaColor(context, 'State Layers/On Surface/Opacity-08')

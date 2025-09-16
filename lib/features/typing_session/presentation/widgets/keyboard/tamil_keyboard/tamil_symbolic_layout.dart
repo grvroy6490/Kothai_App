@@ -6,6 +6,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/features/typing_session/domain/contracts/keyboard_controller.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/keyboard_type_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_button.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_model.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/letters.dart';
@@ -16,6 +17,7 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
 
     @override
     Widget build(BuildContext context, ref) {
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
 
         final List<String> symbolicLetters = [...Letters.symbols];
 
@@ -33,7 +35,7 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
                                     flex: 1,
                                     child: KeyButton(
                                         keyModel: KeyModel(id: 'numeric_$letter', type: KeyType.uyir, label: letter, onTap: (ctrl) => ctrl.insert(letter)),
-                                        controller: controller,
+                                        controller: controller
                                     )
                                 );
                             })
@@ -50,7 +52,7 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
                                     flex: 1,
                                     child: KeyButton(
                                         keyModel: KeyModel(id: 'numeric_$letter', type: KeyType.uyir, label: letter, onTap: (ctrl) => ctrl.insert(letter)),
-                                        controller: controller,
+                                        controller: controller
                                     )
                                 );
                             })
@@ -65,8 +67,8 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'numeric', type: KeyType.functional, label: '?123', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setNumeric()},),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'numeric', type: KeyType.functional, label: '?123', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setNumeric()}),
+                                controller: controller
                             )
                         ),
                         ...symbolicLetters.sublist(37, symbolicLetters.length).map((letter) {
@@ -74,15 +76,16 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
                                     flex: 1,
                                     child: KeyButton(
                                         keyModel: KeyModel(id: 'numeric_$letter', type: KeyType.uyir, label: letter, onTap: (ctrl) => ctrl.insert(letter)),
-                                        controller: controller,
+                                        controller: controller
                                     )
                                 );
                             }),
+                        if(practiceConfig.allowTakeBacks) // 👈 ALLOW TAKEBACKS SETTINGS
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'backspace', type: KeyType.functional, label: '', icon: Icons.backspace_outlined, onTap: (ctrl) => ctrl.backspace(''),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'backspace', type: KeyType.functional, label: '', icon: Icons.backspace_outlined, onTap: (ctrl) => ctrl.backspace('')),
+                                controller: controller
                             )
                         )
                     ]
@@ -95,41 +98,41 @@ class TamilSymbolicKeyboardLayout extends ConsumerWidget {
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'regular', type: KeyType.functional, label: 'அ/a', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setRegular()},),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'regular', type: KeyType.functional, label: 'அ/a', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setRegular()}),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 1,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'comma', type: KeyType.functional, label: ',', onTap: (ctrl) => ctrl.insert(','),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'comma', type: KeyType.functional, label: ',', onTap: (ctrl) => ctrl.insert(',')),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 4,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'space', type: KeyType.functional, label: ' ', onTap: (ctrl) => ctrl.insert(' '),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'space', type: KeyType.functional, label: ' ', onTap: (ctrl) => ctrl.insert(' ')),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 1,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'period', type: KeyType.symbolic, label: '.', onTap: (ctrl) => ctrl.insert('.'),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'period', type: KeyType.symbolic, label: '.', onTap: (ctrl) => ctrl.insert('.')),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'enter', type: KeyType.colored, label: '', icon: Icons.keyboard_return, onTap: (ctrl) => ctrl.insert('\n'),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'enter', type: KeyType.colored, label: '', icon: Icons.keyboard_return, onTap: (ctrl) => ctrl.insert('\n')),
+                                controller: controller
                             )
-                        ),
+                        )
 
                     ]
-                ),
+                )
             ]
         );
     }

@@ -37,6 +37,10 @@ dependencies:
   flutter_native_splash: ^2.4.6
   auto_size_text: ^3.0.0
   characters: ^1.4.0
+  path: ^1.9.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  sqflite: ^2.4.2
 
 dev_dependencies:
   flutter_test:

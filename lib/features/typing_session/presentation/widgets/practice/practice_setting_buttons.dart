@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/poviders/theme_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/settings/practise_settings_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
-<<<<<<< HEAD
-import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
-=======
->>>>>>> 12fa72b (updated IOS build)
 
 class PracticeSettingButtons extends ConsumerWidget {
     const PracticeSettingButtons({super.key});
@@ -28,17 +26,19 @@ class PracticeSettingButtons extends ConsumerWidget {
                         context,
                         ImageFiltered(
                             imageFilter: ColorFilter.linearToSrgbGamma(),
-                            child: SvgPicture.asset('assets/images/dice.svg',
-                                width: Gap(context).gap(18),
-                                colorFilter: themeMode == ThemeMode.dark
-                                    ? ColorFilter.mode(Colors.white70, BlendMode.srcIn)
-                                    : ColorFilter.mode(Colors.black45, BlendMode.srcIn)
+                           child: SvgPicture.asset(
+                              'assets/images/dice.svg',
+                              width: Gap(context).gap(18),
+                              colorFilter: ColorFilter.mode(Colors.black45, BlendMode.srcIn),
                             )
 
                         ),
-                        () async {
-                            var newContent = await ref.watch(textRepositoryProvider).getRandomizedTexts();
-                            ref.read(textContentProvider.notifier).setTextContent(newContent[0]);
+                        () {
+                            Get.to(() => PracticeRandomizePage(),
+                                transition: Transition.fadeIn,
+                                duration: Duration(milliseconds: 600),
+                                curve: Curves.easeInOut
+                            );
                         },
                         Gap(context).gap(12)
                     )

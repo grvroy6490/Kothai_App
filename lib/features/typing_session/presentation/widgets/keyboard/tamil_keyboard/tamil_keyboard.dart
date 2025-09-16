@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/features/typing_session/domain/contracts/keyboard_controller.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/letters.dart';
+import 'package:vibration/vibration.dart';
 
 class TamilKeyboard extends KeyboardController {
     String? _heldLeftDiacritic;
@@ -29,11 +33,11 @@ class TamilKeyboard extends KeyboardController {
             final newText = textValue.replaceRange(
                 selection.start,
                 selection.end,
-                '',
+                ''
             );
             text.value = TextEditingValue(
                 text: newText,
-                selection: TextSelection.collapsed(offset: selection.start),
+                selection: TextSelection.collapsed(offset: selection.start)
             );
             return;
         }
@@ -45,7 +49,7 @@ class TamilKeyboard extends KeyboardController {
         final newText = textValue.replaceRange(caretIndex - 1, caretIndex, '');
         text.value = TextEditingValue(
             text: newText,
-            selection: TextSelection.collapsed(offset: caretIndex - 1),
+            selection: TextSelection.collapsed(offset: caretIndex - 1)
         );
         // _ref?.read(sessionStateProvider.notifier).backspace();
 
@@ -53,6 +57,7 @@ class TamilKeyboard extends KeyboardController {
 
     @override
     void insert(String value) {
+        final practiceConfig = _ref?.watch(practiceConfigurationProvider);
 
         // Handle left diacritic hold mechanism
         if (Letters.leftDiacriticLetters.contains(value)) {
@@ -68,6 +73,10 @@ class TamilKeyboard extends KeyboardController {
             return; // Hold the diacritic, wait for next character
         }
 
+        if(practiceConfig!.hapticEnabled){ // 👈 TYPING VIBRATION SETTINGS
+            _vibrate();
+        }
+
         // Handle special keys - clear hold
         if (value == ' ' || value == '\n') {
             if (_heldLeftDiacritic != null) {
@@ -76,8 +85,9 @@ class TamilKeyboard extends KeyboardController {
             }
             _insertText(value);
             // Count spaces/newlines toward progress
+            // ✅ notify session per character
             for (var ch in value.characters) {
-              // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                _notifyOnKey(ch);
             }
             return;
         }
@@ -99,7 +109,7 @@ class TamilKeyboard extends KeyboardController {
                 _insertText(combinedValue);
                 // Update session state for each committed character
                 for (var ch in combinedValue.characters) {
-                  // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                    // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
                 }
                 return;
             } else {
@@ -109,7 +119,7 @@ class TamilKeyboard extends KeyboardController {
                 _insertText(value);
                 // Update session state for each committed character
                 for (var ch in value.characters) {
-                  // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                    // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
                 }
                 return;
             }
@@ -140,13 +150,13 @@ class TamilKeyboard extends KeyboardController {
                 final newText = prefix + combinedValue;
                 text.value = TextEditingValue(
                     text: newText,
-                    selection: TextSelection.collapsed(offset: newText.length),
+                    selection: TextSelection.collapsed(offset: newText.length)
                 );
 
                 // Adjust session regardless of allowTakeBacks: undo previous base commit, then commit combined cluster
                 // _ref?.read(sessionStateProvider.notifier).composeBackspace();
                 for (var ch in combinedValue.characters) {
-                  // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+                    // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
                 }
                 return;
             }
@@ -154,9 +164,9 @@ class TamilKeyboard extends KeyboardController {
 
         // For normal character insertions, update session state
         _insertText(value);
-        for (var ch in value.characters) {
-          // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
-        }
+        // for (var ch in value.characters) {
+            // _ref?.read(sessionStateProvider.notifier).typeChar(ch);
+        // }
     }
 
     void _insertText(String value) {
@@ -171,7 +181,22 @@ class TamilKeyboard extends KeyboardController {
         final newOffset = start + value.length;
         text.value = TextEditingValue(
             text: newText,
-            selection: TextSelection.collapsed(offset: newOffset),
+            selection: TextSelection.collapsed(offset: newOffset)
         );
+    }
+
+    void _vibrate() async {
+        if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+            Vibration.vibrate(duration: 100);
+        }
+    }
+
+    void _notifyOnKey(String ch) {
+        final para = _ref?.read(textContentProvider)?.content ?? ''; // fallback to ''
+        final idx = text.text.length - 1; // last committed index
+        final expected = (idx >= 0 && idx < para.length) ? para[idx] : null;
+        final correct = expected != null && ch == expected;
+
+        _ref?.read(practiceSessionControllerProvider.notifier).onKey(correct: correct);
     }
 }

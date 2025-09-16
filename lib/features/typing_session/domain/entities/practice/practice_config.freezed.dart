@@ -225,7 +225,7 @@ return $default(_that.mode,_that.difficulty,_that.contentLength,_that.contentFon
 @JsonSerializable()
 
 class _PracticeConfig implements PracticeConfig {
-  const _PracticeConfig({this.mode = ExpertiseModeEnum.normal, this.difficulty = DifficultyEnum.easy, this.contentLength = TextLengthEnum.short, this.contentFontSize = TextSizeEnum.L, this.blindMode = false, this.randomize = true, this.wpmEnabled = true, this.accuracyEnabled = true, this.timerEnabled = true, this.errorsEnabled = false, this.allowPauses = true, this.allowTakeBacks = false, this.soundEnabled = false, this.soundOnError = false, this.hapticEnabled = false, this.hapticOnError = false, this.darkMode = true});
+  const _PracticeConfig({this.mode = ExpertiseModeEnum.normal, this.difficulty = DifficultyEnum.easy, this.contentLength = TextLengthEnum.short, this.contentFontSize = TextSizeEnum.L, this.blindMode = false, this.randomize = true, this.wpmEnabled = true, this.accuracyEnabled = true, this.timerEnabled = true, this.errorsEnabled = true, this.allowPauses = true, this.allowTakeBacks = true, this.soundEnabled = false, this.soundOnError = false, this.hapticEnabled = false, this.hapticOnError = true, this.darkMode = true});
   factory _PracticeConfig.fromJson(Map<String, dynamic> json) => _$PracticeConfigFromJson(json);
 
 @override@JsonKey() final  ExpertiseModeEnum mode;

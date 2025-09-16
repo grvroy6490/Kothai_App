@@ -141,11 +141,7 @@ class AppTypography {
     static TextTheme scaled(BuildContext c) {
         // helper to scale a TextStyle’s fontSize if present
         TextStyle? s(TextStyle? t) =>
-<<<<<<< HEAD
-        t == null ? null : t.copyWith(fontSize: t.fontSize == null ? null : c.sp(t.fontSize!));
-=======
         t?.copyWith(fontSize: t.fontSize == null ? null : c.sp(t.fontSize!));
->>>>>>> 12fa72b (updated IOS build)
 
         return TextTheme(
             displayLarge:   s(displayLarge),

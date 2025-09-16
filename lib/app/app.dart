@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:kothai_app/app/layout_builder.dart';
+import 'package:kothai_app/core/constants/typin_session_constants.dart';
 import 'package:kothai_app/core/routing/routes.dart';
 import 'package:kothai_app/core/theme/app_typography_scaled.dart';
 import 'package:kothai_app/core/theme/theme_manager.dart';
+import 'package:kothai_app/di/poviders/shared_prefs_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/XP/xp_controller.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/text_preloader_provider.dart';
 
 class App extends ConsumerWidget {
@@ -17,6 +20,8 @@ class App extends ConsumerWidget {
     Widget build(BuildContext context, ref) {
         ref.watch(preloadOnConfigControllerProvider);
 
+        print(ref.watch(xpControllerProvider).totalXp);
+
         return ScreenUtilInit(
             designSize: const Size(360, 812),
             minTextAdapt: true,
@@ -24,7 +29,7 @@ class App extends ConsumerWidget {
             child: GetMaterialApp(
                 getPages: routes,
                 debugShowCheckedModeBanner: false,
-                themeMode: ThemeMode.system,
+                themeMode: ThemeMode.light,
                 theme: getTheme(false),
                 darkTheme: getTheme(true),
                 home: ResponsivePage(),

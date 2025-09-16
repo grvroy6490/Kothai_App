@@ -5,6 +5,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/features/typing_session/domain/contracts/keyboard_controller.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/keyboard_type_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_button.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_model.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/letters.dart';
@@ -21,82 +22,85 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
 
     TamilRegularKeyboardLayout({
         super.key,
-        required this.controller,
+        required this.controller
     });
 
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> firstRow = uyirLetters.sublist(0,10).map((letter) {
-            return KeyModel(id: 'uyir_$letter', type: KeyType.uyir, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
+            return KeyModel(id: 'uyir_$letter', type: KeyType.uyir, label: letter, onTap: (ctrl) => ctrl.insert(letter));
         }).toList();
 
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> secondRow = [
-        KeyModel(id: 'diacritic_${leftDiacriticLetters[0]}', type: KeyType.diacritic, label: leftDiacriticLetters[0], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[0]),),
+        KeyModel(id: 'diacritic_${leftDiacriticLetters[0]}', type: KeyType.diacritic, label: leftDiacriticLetters[0], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[0])),
 
         /***********************************************/
         ...meiLetters.sublist(0, 3).map((letter) {
-                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
+                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 
         /***********************************************/
-        KeyModel(id: 'uyir_${uyirLetters[10]}', type: KeyType.uyir, label: uyirLetters[10], onTap: (ctrl) => ctrl.insert(uyirLetters[10]),),
+        KeyModel(id: 'uyir_${uyirLetters[10]}', type: KeyType.uyir, label: uyirLetters[10], onTap: (ctrl) => ctrl.insert(uyirLetters[10])),
 
         /***********************************************/
         ...meiLetters.sublist(3, 6).map((letter) {
-                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
+                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 
         /***********************************************/
         ...rightDiacriticLetters.sublist(0, 2).map((letter) {
-                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
-            }),
+                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter));
+            })
     ];
 
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> thirdRow = [
-        KeyModel(id: 'diacritic_${leftDiacriticLetters[1]}', type: KeyType.diacritic, label: leftDiacriticLetters[1], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[1]),),
+        KeyModel(id: 'diacritic_${leftDiacriticLetters[1]}', type: KeyType.diacritic, label: leftDiacriticLetters[1], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[1])),
 
         /***********************************************/
         ...meiLetters.sublist(6, 13).map((letter) {
-                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
+                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 
         /***********************************************/
         ...rightDiacriticLetters.sublist(2, 4).map((letter) {
-                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
-            }),
+                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter));
+            })
     ];
 
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> fourthRow = [
-        KeyModel(id: 'diacritic_${leftDiacriticLetters[2]}', type: KeyType.diacritic, label: leftDiacriticLetters[2], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[2]),),
+        KeyModel(id: 'diacritic_${leftDiacriticLetters[2]}', type: KeyType.diacritic, label: leftDiacriticLetters[2], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[2])),
 
         /***********************************************/
         ...meiLetters.sublist(13, meiLetters.length).map((letter) {
-                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
+                return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 
         /***********************************************/
         ...rightDiacriticLetters.sublist(4, rightDiacriticLetters.length).map((letter) {
-                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
-            }),
+                return KeyModel(id: 'diacritic_$letter', type: KeyType.diacritic, label: letter, onTap: (ctrl) => ctrl.insert(letter));
+            })
 
     ];
 
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> fifthRow = [
-        KeyModel(id: 'symbol_comma', type: KeyType.symbolic, label: ',', onTap: (ctrl) => ctrl.insert(','),),
-        KeyModel(id: 'symbol_${specialLetters[0]}', type: KeyType.symbolic, label: specialLetters[0], onTap: (ctrl) => ctrl.insert(specialLetters[0]),),
+        KeyModel(id: 'symbol_comma', type: KeyType.symbolic, label: ',', onTap: (ctrl) => ctrl.insert(',')),
+        KeyModel(id: 'symbol_${specialLetters[0]}', type: KeyType.symbolic, label: specialLetters[0], onTap: (ctrl) => ctrl.insert(specialLetters[0])),
 
         /***********************************************/
         ...specialLetters.sublist(1, specialLetters.length).map((letter) {
-                return KeyModel(id: 'symbol_$letter', type: KeyType.special, label: letter, onTap: (ctrl) => ctrl.insert(letter),);
-            }),
+                return KeyModel(id: 'symbol_$letter', type: KeyType.special, label: letter, onTap: (ctrl) => ctrl.insert(letter));
+            })
 
     ];
 
     @override
     Widget build(BuildContext context, ref) {
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
+
+
         return Column(
             mainAxisSize: MainAxisSize.min,
             spacing: Gap(context).gap(2),
@@ -109,10 +113,10 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                             return Expanded(
                                 child: KeyButton(
                                     keyModel: keyModel,
-                                    controller: controller,
+                                    controller: controller
                                 )
                             );
-                        }).toList(),
+                        }).toList()
                 ),
 
                 // Second Row - Left Diacritic + Mei Letters
@@ -123,10 +127,10 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                             return Expanded(
                                 child: KeyButton(
                                     keyModel: keyModel,
-                                    controller: controller,
+                                    controller: controller
                                 )
                             );
-                        }).toList(),
+                        }).toList()
                 ),
 
                 // Third Row - Mei Letters + Right Diacritic
@@ -137,10 +141,10 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                             return Expanded(
                                 child: KeyButton(
                                     keyModel: keyModel,
-                                    controller: controller,
+                                    controller: controller
                                 )
                             );
-                        }).toList(),
+                        }).toList()
                 ),
 
                 // Fourth Row - Mei Letters + Right Diacritic
@@ -153,7 +157,7 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                                 return Expanded(
                                     child: KeyButton(
                                         keyModel: keyModel,
-                                        controller: controller,
+                                        controller: controller
                                     )
                                 );
                             }),
@@ -166,19 +170,22 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     spacing: Gap(context).gap(2),
                     children: [
+
                         ...fifthRow.map((keyModel) {
                                 return Expanded(
                                     child: KeyButton(
                                         keyModel: keyModel,
-                                        controller: controller,
+                                        controller: controller
                                     )
                                 );
                             }),
+
+                        if(practiceConfig.allowTakeBacks) // 👈 ALLOW TAKEBACKS SETTINGS
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'backspace', type: KeyType.functional, label: '', icon: Icons.backspace_outlined, onTap: (ctrl) => ctrl.backspace(''),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'backspace', type: KeyType.functional, label: '', icon: Icons.backspace_outlined, onTap: (ctrl) => ctrl.backspace('')),
+                                controller: controller
                             )
                         )
                     ]
@@ -192,43 +199,43 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'numeric', type: KeyType.functional, label: '?123', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setNumeric()},),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'numeric', type: KeyType.functional, label: '?123', onTap: (ctrl) => {ref.read(keyboardLayoutProvider.notifier).setNumeric()}),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 1,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'language', type: KeyType.functional, label: '', icon: FontAwesomeIcons.globe, onTap: (ctrl) => {},),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'language', type: KeyType.functional, label: '', icon: FontAwesomeIcons.globe, onTap: (ctrl) => {}),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 4,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'space', type: KeyType.functional, label: ' ', onTap: (ctrl) => ctrl.insert(' '),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'space', type: KeyType.functional, label: ' ', onTap: (ctrl) => ctrl.insert(' ')),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 1,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'period', type: KeyType.symbolic, label: '.', onTap: (ctrl) => ctrl.insert('.'),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'period', type: KeyType.symbolic, label: '.', onTap: (ctrl) => ctrl.insert('.')),
+                                controller: controller
                             )
                         ),
                         Expanded(
                             flex: 2,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'enter', type: KeyType.colored, label: '', icon: Icons.keyboard_return, onTap: (ctrl) => ctrl.insert('\n'),),
-                                controller: controller,
+                                keyModel: KeyModel(id: 'enter', type: KeyType.colored, label: '', icon: Icons.keyboard_return, onTap: (ctrl) => ctrl.insert('\n')),
+                                controller: controller
                             )
-                        ),
+                        )
 
                     ]
-                ),
+                )
 
-            ],
+            ]
         );
     }
 }

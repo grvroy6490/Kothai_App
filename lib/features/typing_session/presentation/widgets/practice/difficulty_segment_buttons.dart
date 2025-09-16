@@ -5,6 +5,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/di/poviders/theme_provider.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 
 class DifficultySegmentButtons extends ConsumerWidget {
@@ -19,9 +20,11 @@ class DifficultySegmentButtons extends ConsumerWidget {
         final selectedDifficulty = ref.watch(practiceConfigurationProvider).difficulty;
         final themeMode = ref.watch(themeProvider);
 
-        // UPDATE DIFFICULTY
+        // 👇 UPDATE DIFFICULTY
         void updateDifficulty(DifficultyEnum d) async {
             await ref.read(practiceConfigurationProvider.notifier).setDifficulty(d);
+            var newContent = await ref.watch(textRepositoryProvider).getRandomizedTexts();
+            ref.read(textContentProvider.notifier).setTextContent(newContent[0]);
         }
 
         return Container(
@@ -92,7 +95,7 @@ class DifficultySegmentButtons extends ConsumerWidget {
                                                 ),
                                                 child: Text('${difficulty.name[0].toUpperCase()}${difficulty.name.substring(1).toLowerCase()}',
                                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                        color: isActive ? themeMode == ThemeMode.dark ? Colors.black87 : Colors.white70 : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                        color: isActive ?  Colors.white70 : getFigmaColor(context, 'Schemes/On Surface Variant')
                                                     )
                                                 )
                                             )

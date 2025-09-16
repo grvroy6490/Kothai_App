@@ -1,19 +1,19 @@
 
-<<<<<<< HEAD
-import 'package:flutter/foundation.dart';
-=======
->>>>>>> 12fa72b (updated IOS build)
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/di/poviders/db_provider.dart';
 import 'package:kothai_app/di/poviders/navigation_provider.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_editor_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/reset/practice_reset_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/keyboard.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
@@ -56,13 +56,26 @@ class _PracticePageState extends ConsumerState<PracticePage> {
 
         final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
 
-        void showNotifications(){
+        void showNotifications() async {
+          // final records = await ref.read(sessionDaoProvider).list();
+          // for (final r in records) {
+          //   debugPrint(r.);
+          // }
+        }
 
+        void handlePracticePause(TextEditingController controller){
+            ref.read(practiceSessionControllerProvider.notifier).pause();
+            Get.to(() => PracticePausePage(controller: controller), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        }
+
+        void handlePracticeReset(TextEditingController controller){
+            Get.to(() => PracticeResetPage(controller: controller), arguments: 'fromReset', transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Background'),
             appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
                 backgroundColor: getFigmaColor(context, 'Schemes/Background'),
                 automaticallyImplyLeading: false,
                 title: Text('Practice', style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -72,7 +85,8 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 actions: appBarActions(
                     context,
                     practiceStatus != PracticeStatusEnum.start,
-                    showNotifications
+                    showNotifications,
+                    controller
                 ) // 👈 PRACTICE APP BAR ACTIONS
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -107,6 +121,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 width: double.infinity,
 
                 child: Stack(
+                    clipBehavior: Clip.hardEdge,
                     children: [
                         PracticeEditorPage(
                             controller: _controller,
@@ -123,7 +138,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                        PracticeResetPause(),
+                                        PracticeResetPause(
+                                            handlePause: handlePracticePause,
+                                            handleReset: handlePracticeReset, 
+                                            controller: controller
+                                        ),
                                         Container(
                                             padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(16)),
                                             width: double.infinity,

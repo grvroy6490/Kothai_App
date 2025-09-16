@@ -2,23 +2,35 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:flutter_svg/flutter_svg.dart';
-=======
->>>>>>> 12fa72b (updated IOS build)
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/star_burst_badge.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class PracticeRandomizePage extends StatefulWidget {
+class PracticeRandomizePage extends ConsumerStatefulWidget {
     const PracticeRandomizePage({super.key});
 
     @override
-    State<PracticeRandomizePage> createState() => _PracticeRandomizePageState();
+    ConsumerState<PracticeRandomizePage> createState() => _PracticeRandomizePageState();
 }
 
-class _PracticeRandomizePageState extends State<PracticeRandomizePage> {
+class _PracticeRandomizePageState extends ConsumerState<PracticeRandomizePage> {
+
+    @override
+    void initState() {
+        super.initState();
+        Future.delayed(const Duration(seconds: 2), () async {
+                if(mounted){
+                    Navigator.of(context).pop();
+                    var newContent = await ref.watch(textRepositoryProvider).getRandomizedTexts();
+                    ref.read(textContentProvider.notifier).setTextContent(newContent[0]);
+                }
+            });
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -102,7 +114,7 @@ class _PracticeRandomizePageState extends State<PracticeRandomizePage> {
                                             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                                             child: GestureDetector(
                                                 onTap: (){
-                                                    // TODO: HANLDE TAP
+                                                    Get.back();
                                                 },
                                                 child: Container(
                                                     // make it translucent so the blur is visible
@@ -110,10 +122,12 @@ class _PracticeRandomizePageState extends State<PracticeRandomizePage> {
                                                     padding: EdgeInsets.all(Gap(context).gap(16)),
                                                     child: Column(
                                                         children: [
-                                                            CloseButton(
-                                                                color: getFigmaColor(context, 'Schemes/Secondary'),
-                                                                style: ButtonStyle(
-                                                                    iconSize: WidgetStateProperty.all(KxScale(context).sp(25))
+                                                            AbsorbPointer(
+                                                                child: CloseButton(
+                                                                    color: getFigmaColor(context, 'Schemes/Secondary'),
+                                                                    style: ButtonStyle(
+                                                                        iconSize: WidgetStateProperty.all(KxScale(context).sp(25))
+                                                                    )
                                                                 )
                                                             ),
 

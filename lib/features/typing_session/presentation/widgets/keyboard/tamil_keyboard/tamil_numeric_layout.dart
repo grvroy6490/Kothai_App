@@ -6,6 +6,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/features/typing_session/domain/contracts/keyboard_controller.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/keyboard_type_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_button.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/key_model.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/tamil_keyboard/letters.dart';
@@ -16,6 +17,7 @@ class TamilNumericKeyboardLayout extends ConsumerWidget {
 
     @override
     Widget build(BuildContext context, ref) {
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
 
         final List<String> symbolicLetters = [...Letters.symbols];
 
@@ -81,6 +83,8 @@ class TamilNumericKeyboardLayout extends ConsumerWidget {
                                     )
                                 );
                             }),
+
+                        if(practiceConfig.allowTakeBacks) // 👈 ALLOW TAKEBACKS SETTINGS
                         Expanded(
                             flex: 2,
                             child: KeyButton(

@@ -8,7 +8,8 @@ import 'package:kothai_app/features/typing_session/presentation/widgets/practice
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_setting_buttons.dart';
 
 class PracticeStartButton extends StatelessWidget {
-    const PracticeStartButton({super.key});
+    void Function() handleStart;
+    PracticeStartButton({super.key, required this.handleStart});
 
     @override
     Widget build(BuildContext context) {
@@ -63,9 +64,7 @@ class PracticeStartButton extends StatelessWidget {
                                         builder: (context, ref, child) {                                           
 
                                             return GestureDetector(
-                                                onTap: (){
-                                                    ref.read(practiceStatusProvider.notifier).startPractice(); // 👈 START PRACTICE FROM PROVIDER
-                                                },
+                                                onTap: () => handleStart(),
                                                 child: Column(
                                                     mainAxisSize: MainAxisSize.min,
                                                     crossAxisAlignment: CrossAxisAlignment.center,

@@ -2,7 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 
-Widget switchButton(context, switchValue, onChanged){
+Widget switchButton(
+    BuildContext context,
+    bool switchValue,
+    ValueChanged<bool> onChanged,
+){
     return Switch(
         value: switchValue,
         padding: EdgeInsets.zero,
@@ -11,6 +15,6 @@ Widget switchButton(context, switchValue, onChanged){
         activeTrackColor: getFigmaColor(context, 'Schemes/On Surface Variant'),
         activeThumbColor: getFigmaColor(context, 'Schemes/Surface'),
         trackOutlineColor: WidgetStateProperty.all(getFigmaColor(context, 'State Layers/On Surface Variant/Opacity-04')),
-        onChanged: (val) => onChanged(val)
+        onChanged: onChanged,
     );
 }

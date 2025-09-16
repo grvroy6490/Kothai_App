@@ -2,22 +2,52 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/core/utils/time_utils.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/star_burst_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/stats_badge.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/reset/practice_reset_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/stop/practice_stop_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/metrics/metrics_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/progress/practice_progress_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/session_state/session_state_provider.dart';
 
-class PracticePausePage extends StatefulWidget {
-    const PracticePausePage({super.key});
+class PracticePausePage extends ConsumerStatefulWidget {
+    final TextEditingController controller;
+    const PracticePausePage({super.key, required this.controller});
 
     @override
-    State<PracticePausePage> createState() => _PracticePausePageState();
+    ConsumerState<PracticePausePage> createState() => _PracticePausePageState();
 }
 
-class _PracticePausePageState extends State<PracticePausePage> {
+class _PracticePausePageState extends ConsumerState<PracticePausePage> {
     @override
     Widget build(BuildContext context) {
+      final engine = ref.watch(sessionStateNotifierProvider);
+      final metrics = ref.watch(metricsNotifierProvider);
+      final practiceConfig = ref.watch(practiceConfigurationProvider);
+      final progress = ref.watch(practiceProgressProvider);
+
+        void handlePracticeStopConfirmation(){
+            Get.to(() => PracticeStopPage(), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        }
+
+        void handlePracticeResume(){
+            ref.read(practiceSessionControllerProvider.notifier).resume();
+            Get.back();
+        }
+
+        void handlePracticeResetConfirmation(){
+            Get.to(() => PracticeResetPage(controller: widget.controller,), arguments: 'fromPause', transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        }
+
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Background'),
             body: Stack(
@@ -73,7 +103,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.text_fields,
                                                                 label: 'WPM',
-                                                                value: '45'
+                                                                value: practiceConfig.wpmEnabled ? metrics.wpm.toStringAsFixed(0) : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -81,7 +111,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.my_location,
                                                                 label: 'Accuracy',
-                                                                value: '45%'
+                                                                value: practiceConfig.accuracyEnabled ? '${(metrics.accuracy*100).toStringAsFixed(0)}%' : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -89,7 +119,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: FontAwesomeIcons.clock,
                                                                 label: 'Time',
-                                                                value: '1m 2s'
+                                                                value: practiceConfig.timerEnabled ? formatDuration(engine.elapsed) : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -97,7 +127,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.rotate_right,
                                                                 label: 'Progress',
-                                                                value: '98%'
+                                                                value: '${(progress * 100).toStringAsFixed(1)}%'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             _iconLabelButton(
@@ -105,9 +135,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                                 color: getFigmaColor(context, 'Schemes/Error'),
                                                                 label: 'Stop this Practice',
                                                                 icon: Icons.front_hand,
-                                                                tapBehavior: () {
-
-                                                                }
+                                                                tapBehavior: () => handlePracticeStopConfirmation()
                                                             )
                                                         ]
                                                     )
@@ -129,8 +157,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                         spikes: 20,           // try 16–24 for different scallops
                                         innerRatio: 0.78,
                                         starColor: getFigmaColor(context, 'State Layers/Primary/Opacity-08'),// closer to 1.0 = less spiky
-                                        onTap: () {
-                                        },
+                                        onTap: () => handlePracticeResume(),
                                         child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
@@ -196,8 +223,7 @@ class _PracticePausePageState extends State<PracticePausePage> {
                                                             color: getFigmaColor(context, 'Schemes/Secondary'),
                                                             label: 'Reset Progress',
                                                             icon: FontAwesomeIcons.clockRotateLeft,
-                                                            tapBehavior: ()  {
-                                                            }
+                                                            tapBehavior: ()  => handlePracticeResetConfirmation()
                                                         ),
                                                         SizedBox(height: Gap(context).gap(20))
                                                     ]

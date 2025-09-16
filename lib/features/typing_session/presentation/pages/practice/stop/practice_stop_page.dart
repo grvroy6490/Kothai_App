@@ -1,18 +1,34 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
 
-class PracticeStopPage extends StatefulWidget {
+class PracticeStopPage extends ConsumerStatefulWidget {
     const PracticeStopPage({super.key});
 
     @override
-    State<PracticeStopPage> createState() => _PracticeStopPageState();
+    ConsumerState<PracticeStopPage> createState() => _PracticeStopPageState();
 }
 
-class _PracticeStopPageState extends State<PracticeStopPage> {
+class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
+
     @override
     Widget build(BuildContext context) {
+        void handlePracticeStop(){
+            ref.read(practiceSessionControllerProvider.notifier).stop();
+            ref.read(practiceStatusProvider.notifier).stopPractice();
+            Get.to(() => PracticePage(), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        }
+
+        void handlePracticeStopDenied(){
+            Get.back();
+        }
+
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Background'),
             body: SizedBox(
@@ -130,9 +146,7 @@ class _PracticeStopPageState extends State<PracticeStopPage> {
                                                                                     backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/On Error')),
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Error'))
                                                                                 ),
-                                                                                onPressed: (){
-
-                                                                                },
+                                                                                onPressed: () => handlePracticeStop(),
                                                                                 child: Text('Yes, Reset it', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                                                         color: getFigmaColor(context, 'Schemes/Error')
                                                                                     )
@@ -147,9 +161,7 @@ class _PracticeStopPageState extends State<PracticeStopPage> {
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Surface Variant')),
                                                                                     padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 0, vertical: Gap(context).gap(16)))
                                                                                 ),
-                                                                                onPressed: (){
-
-                                                                                },
+                                                                                onPressed: () => handlePracticeStopDenied(),
                                                                                 child: Text('No', style: Theme.of(context).textTheme.bodyLarge)
                                                                             )
                                                                         )
