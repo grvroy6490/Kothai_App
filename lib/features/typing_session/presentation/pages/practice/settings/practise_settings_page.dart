@@ -53,7 +53,7 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
             ConfigSwitchOption(title: 'WPM', select: (c) => c.wpmEnabled, toggle: (c) => c.copyWith(wpmEnabled: !c.wpmEnabled)),
             ConfigSwitchOption(title: 'Accuracy', select: (c) => c.accuracyEnabled, toggle: (c) => c.copyWith(accuracyEnabled: !c.accuracyEnabled)),
             ConfigSwitchOption(title: 'Time', select: (c) => c.timerEnabled, toggle: (c) => c.copyWith(timerEnabled: !c.timerEnabled)),
-            ConfigSwitchOption(title: 'Errors', select: (c) => c.errorsEnabled, toggle: (c) => c.copyWith(errorsEnabled: !c.errorsEnabled))
+            // ConfigSwitchOption(title: 'Errors', select: (c) => c.errorsEnabled, toggle: (c) => c.copyWith(errorsEnabled: !c.errorsEnabled))
         ];
 
         final assistanceOptions = <ConfigSwitchOption>[
@@ -63,8 +63,8 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
 
 
         final feedbacks = <ConfigSwitchOption>[
-          ConfigSwitchOption(title: 'Sound on Typing', select: (c) => c.soundEnabled, toggle: (c) => c.copyWith(soundEnabled: !c.soundEnabled)),
-          ConfigSwitchOption(title: 'Sound on Error', select: (c) => c.soundOnError, toggle: (c) => c.copyWith(soundOnError: !c.soundOnError)),
+          // ConfigSwitchOption(title: 'Sound on Typing', select: (c) => c.soundEnabled, toggle: (c) => c.copyWith(soundEnabled: !c.soundEnabled)),
+          // ConfigSwitchOption(title: 'Sound on Error', select: (c) => c.soundOnError, toggle: (c) => c.copyWith(soundOnError: !c.soundOnError)),
           ConfigSwitchOption(title: 'Typing Vibration', select: (c) => c.hapticEnabled, toggle: (c) => c.copyWith(hapticEnabled: !c.hapticEnabled)),
           ConfigSwitchOption(title: 'Error Vibration', select: (c) => c.hapticOnError, toggle: (c) => c.copyWith(hapticOnError: !c.hapticOnError))
         ];
@@ -126,36 +126,36 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                         padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(10)),
                                         child: Column(
                                             children: [
-                                                Row(
-                                                    children: [
-                                                        Text(
-                                                            'Mode',
-                                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                                color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                                                fontWeight: FontWeight.w500
-                                                            )
-                                                        ),
-                                                        SizedBox(width: Gap(context).gap(20)),
-                                                        Expanded(
-                                                            child: segmentedButtons(
-                                                                context, 
-                                                                configuration.mode, 
-                                                                ExpertiseModeEnum.values, 
-                                                                (option) => updateConfiguration(configuration.copyWith(mode: option))
-                                                            )
-                                                        )
-                                                    ]
-                                                ),
-                                                SizedBox(height: Gap(context).gap(5)),
-                                                Align(
-                                                    alignment: Alignment.centerRight,
-                                                    child: Text('Only play at 100% accuracy (Stop on a Error)',
-                                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                            color: getFigmaColor(context, 'State Layers/On Background/Opacity-60')
-                                                        )
-                                                    )
-                                                ),
-                                                SizedBox(height: Gap(context).gap(15)),
+                                                // Row(
+                                                //     children: [
+                                                //         Text(
+                                                //             'Mode',
+                                                //             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                //                 color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                //                 fontWeight: FontWeight.w500
+                                                //             )
+                                                //         ),
+                                                //         SizedBox(width: Gap(context).gap(20)),
+                                                //         Expanded(
+                                                //             child: segmentedButtons(
+                                                //                 context,
+                                                //                 configuration.mode,
+                                                //                 ExpertiseModeEnum.values,
+                                                //                 (option) => updateConfiguration(configuration.copyWith(mode: option))
+                                                //             )
+                                                //         )
+                                                //     ]
+                                                // ),
+                                                // SizedBox(height: Gap(context).gap(5)),
+                                                // Align(
+                                                //     alignment: Alignment.centerRight,
+                                                //     child: Text('Only play at 100% accuracy (Stop on a Error)',
+                                                //         style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                //             color: getFigmaColor(context, 'State Layers/On Background/Opacity-60')
+                                                //         )
+                                                //     )
+                                                // ),
+                                                // SizedBox(height: Gap(context).gap(15)),
 
                                                 blindMode(context, configuration, updateConfiguration)
 
@@ -166,29 +166,29 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                     Divider(),
 
                                     // SET TEXT LENGTH
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(10)),
-                                        child: Row(
-                                            children: [
-                                                Text(
-                                                    'Text Length',
-                                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                        color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                                        fontWeight: FontWeight.w500
-                                                    )
-                                                ),
-                                                SizedBox(width: Gap(context).gap(20)),
-                                                Expanded(
-                                                    child: segmentedButtons(
-                                                        context,
-                                                        configuration.contentLength,
-                                                        TextLengthEnum.values,
-                                                        (option) => updateConfiguration(configuration.copyWith(contentLength: option))
-                                                    )
-                                                )
-                                            ]
-                                        )
-                                    ),
+                                    // Padding(
+                                    //     padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(10)),
+                                    //     child: Row(
+                                    //         children: [
+                                    //             Text(
+                                    //                 'Text Length',
+                                    //                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    //                     color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                    //                     fontWeight: FontWeight.w500
+                                    //                 )
+                                    //             ),
+                                    //             SizedBox(width: Gap(context).gap(20)),
+                                    //             Expanded(
+                                    //                 child: segmentedButtons(
+                                    //                     context,
+                                    //                     configuration.contentLength,
+                                    //                     TextLengthEnum.values,
+                                    //                     (option) => updateConfiguration(configuration.copyWith(contentLength: option))
+                                    //                 )
+                                    //             )
+                                    //         ]
+                                    //     )
+                                    // ),
 
                                     Divider(),
 

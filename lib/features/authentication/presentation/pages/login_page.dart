@@ -7,7 +7,8 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 
 class LoginPage extends StatefulWidget {
-    const LoginPage({super.key});
+    String? email;
+    LoginPage({super.key, this.email});
 
     @override
     State<LoginPage> createState() => _LoginPageState();

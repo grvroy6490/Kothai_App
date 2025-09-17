@@ -5,9 +5,12 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/metrics/metrics_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/user_input/user_input_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/providers/sessions/session_state/session_state_provider.dart';
+import 'package:vibration/vibration.dart';
 
 class AnimatedContentBoard extends ConsumerStatefulWidget {
     String paragraph;
@@ -66,6 +69,18 @@ class _TypingAreaState extends ConsumerState<TypingArea> {
     Widget build(BuildContext context) {
         final practiceConfig = ref.watch(practiceConfigurationProvider);
 
+        if(practiceConfig.hapticOnError) {
+            ref.listen<int>(metricsNotifierProvider.select((s) => s.errors),
+                (prev, next) async {
+                    if (prev != null && next > prev) {
+                        if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+                            Vibration.vibrate(duration: 200);
+                        }
+                    }
+                }
+            );
+        }
+
         return SingleChildScrollView(
             padding: EdgeInsets.only(bottom: Gap(context).gap(8)),
             physics: const BouncingScrollPhysics(),
@@ -99,9 +114,9 @@ class _TypingAreaState extends ConsumerState<TypingArea> {
                 Color textColor = typedChar == null
                     ? Colors.grey.shade400
                     : practiceConfig.blindMode ? Colors.grey.shade600 // 👈 BLIND MODE SETTINGS
-                    : isCorrect
-                        ? Colors.green
-                        : Colors.red;
+                        : isCorrect
+                            ? Colors.green
+                            : Colors.red;
 
                 return TextSpan(
                     text: actualChar,

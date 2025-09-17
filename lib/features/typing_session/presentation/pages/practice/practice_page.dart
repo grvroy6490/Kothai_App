@@ -97,7 +97,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                     nav.set(index);
                     final route = nav.currentRoute;
                     if (Get.currentRoute != route) {
-                        Get.offNamed(route);
+                        // Get.offNamed(route);
                     }
                 },
                 selectedLabelStyle: null,
@@ -111,9 +111,9 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 ).withAlpha(153),
                 items: [
                     BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.solidKeyboard), label: 'Practice'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.trophy), label: 'Challenge'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.circleUser), label: 'Profile'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.grip), label: 'More')
+                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.trophy), label: 'Coming Soon'),
+                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.circleUser), label: 'Coming Soon'),
+                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.grip), label: 'Coming Soon')
                 ]
             ),
             body: SizedBox(

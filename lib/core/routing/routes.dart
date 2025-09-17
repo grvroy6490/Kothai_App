@@ -35,10 +35,10 @@ List<GetPage<dynamic>> routes = [
             ),
         ]
     ),
-    GetPage(
-        name: '/profile',
-        page: () => ProfilePage()
-    ),
+    // GetPage(
+    //     name: '/profile',
+    //     page: () => ProfilePage()
+    // ),
     GetPage(
         name: '/error',
         page: () => Default404()

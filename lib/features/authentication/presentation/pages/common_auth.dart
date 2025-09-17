@@ -1,24 +1,90 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/login_page.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/signup_page.dart';
 
-class CommonAuth extends StatelessWidget {
+
+class  CommonAuth extends StatefulWidget {
     const CommonAuth({super.key});
 
     @override
-    Widget build(BuildContext context) {
+    State<CommonAuth> createState() => _CommonAuthState();
+}
 
-        Future<void> _launchUrl(String url) async {
-            final Uri uri = Uri.parse(url);
-            // if (!await launchUrl(uri)) {
-            //     // ignore: avoid_print
-            //     print('Could not launch $url');
-            // }
+class _CommonAuthState extends State<CommonAuth> {
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
+    Future<void> _signUpWithEmail() async {
+        if (!_formKey.currentState!.validate()) {
+            return; // Don't proceed if validation fails
         }
 
+        // Show loading indicator (optional, but good UX)
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => Center(child: CircularProgressIndicator())
+        );
+
+        try {
+
+            String email = _emailController.text.trim();
+
+            if (mounted) {
+                Navigator.of(context).pop(); // Close loading dialog
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true, // Usually true if keyboard might appear
+                    builder: (BuildContext context) {
+                        // Pass the email to your LoginPage if it needs it
+                        return Padding(
+                            padding: MediaQuery.of(context).viewInsets,
+                            child: LoginPage(email: email) // Assuming LoginPage takes an email
+                        );
+                    }
+                );
+            }
+
+        } on FirebaseAuthException catch (e) {
+            if (mounted) Navigator.of(context).pop(); // Close loading dialog
+            String errorMessage = "An error occurred. Please try again.";
+            if (e.code == 'weak-password') {
+                errorMessage = 'The password provided is too weak.';
+            } else if (e.code == 'email-already-in-use') {
+                errorMessage = 'An account already exists for that email.';
+                // You might want to navigate to a sign-in flow here
+            } else if (e.code == 'invalid-email') {
+                errorMessage = 'The email address is not valid.';
+            }
+            print('Firebase Auth Error: ${e.message}'); // Log for debugging
+            if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(errorMessage), backgroundColor: Colors.red)
+                );
+            }
+        } catch (e) {
+            if (mounted) Navigator.of(context).pop(); // Close loading dialog
+            print('Generic Error: $e'); // Log for debugging
+            if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('An unexpected error occurred.'), backgroundColor: Colors.red)
+                );
+            }
+        }
+    }
+
+    @override
+    void dispose() {
+        _emailController.dispose();
+        super.dispose();
+    }
+
+    @override
+    Widget build(BuildContext context) {
 
         return SizedBox(
             child: Container(
