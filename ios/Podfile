@@ -1,5 +1,5 @@
-# ios/Podfile
-platform :ios, '15.0'          # or '16.0' if you bumped it
+
+platform :ios, '16.0'         # (15.0 also works; 16.0 is safe for recent Firebase)
 
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
@@ -9,14 +9,13 @@ project 'Runner', {
   'Release' => :release,
 }
 
-# Discover FLUTTER_ROOT from the generated build settings
+# Discover FLUTTER_ROOT from ios/Flutter/Generated.xcconfig
 def flutter_root
-  # 👇 NOTE: points to ios/Flutter/Generated.xcconfig (not ../Flutter)
-  generated_xcode_build_settings_path = File.expand_path(File.join('Flutter', 'Generated.xcconfig'), __dir__)
-  unless File.exist?(generated_xcode_build_settings_path)
-    raise "Generated.xcconfig not found at #{generated_xcode_build_settings_path}. Run 'flutter pub get' first."
+  generated_xcconfig = File.expand_path(File.join('Flutter', 'Generated.xcconfig'), __dir__)
+  unless File.exist?(generated_xcconfig)
+    raise "Generated.xcconfig not found at #{generated_xcconfig}. Run 'flutter pub get' first."
   end
-  File.foreach(generated_xcode_build_settings_path) do |line|
+  File.foreach(generated_xcconfig) do |line|
     match = line.match(/FLUTTER_ROOT\=(.*)/)
     return match[1].strip if match
   end
@@ -35,9 +34,10 @@ target 'Runner' do
 end
 
 post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    if defined?(flutter_additional_ios_build_settings)
-      flutter_additional_ios_build_settings(target)
+  flutter_additional_ios_build_settings(installer)
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0' # match platform above
     end
   end
 end
