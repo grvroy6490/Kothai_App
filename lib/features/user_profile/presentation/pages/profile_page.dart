@@ -1,15 +1,25 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/di/poviders/auth_provider.dart';
+import 'package:kothai_app/di/poviders/db_provider.dart';
 import 'package:kothai_app/di/poviders/navigation_provider.dart';
 import 'package:kothai_app/di/poviders/theme_provider.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/common_auth.dart';
+import 'package:kothai_app/features/authentication/presentation/pages/login_page.dart';
+import 'package:kothai_app/features/authentication/presentation/pages/signup_page.dart';
+import 'package:kothai_app/features/authentication/presentation/providers/ApplicationState.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/level_xp_indicator.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar_widget.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/level_xp_indicator.dart';
+import 'package:kothai_app/services/firebase/authentication_service.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
     const ProfilePage({super.key});
@@ -23,6 +33,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     @override
     Widget build(BuildContext context) {
         final practiceConfig = ref.watch(practiceConfigurationProvider);
+        final _auth = ref.watch(authUserProvider);
+        final isLoggedIn = ref.watch(isLoggedInProvider);
+
+        print("auth user: " + _auth.toString());
+
         final idx = ref.watch(selectNavProvider);
         final nav = ref.read(selectNavProvider.notifier);
         final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
@@ -61,7 +76,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ]
                             );
                         },
-                        child: false
+                        child: !_auth.hasValue
                             ? FilledButton.icon(
                                 onPressed: (){
                                 },
@@ -113,33 +128,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     )
                 ]
             ),
-            bottomNavigationBar: BottomNavigationBar(
-                iconSize: 20,
-                enableFeedback: false,
-                currentIndex: currentIndex,
-                onTap: (index) {
-                    nav.set(index);
-                    final route = nav.currentRoute;
-                    if (Get.currentRoute != route) {
-                        Get.offNamed(route);
-                    }
-                },
-                selectedLabelStyle: null,
-                unselectedLabelStyle: null,
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: getFigmaColor(context, 'Schemes/Surface'),
-                selectedItemColor: getFigmaColor(context, 'Schemes/Primary'),
-                unselectedItemColor: getFigmaColor(
-                    context,
-                    'Schemes/On Background'
-                ).withAlpha(153),
-                items: [
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.solidKeyboard), label: 'Practice'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.trophy), label: 'Challenge'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.circleUser), label: 'Profile'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.grip), label: 'More')
-                ]
-            ),
+            bottomNavigationBar: BottomNavigationBarWidget(),
 
             body: SizedBox(
                 height: double.infinity,
@@ -171,7 +160,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                                     backgroundColor: getFigmaColor(context, 'Schemes/Primary'),
                                                                     radius: 25,
                                                                     foregroundColor: getFigmaColor(context, 'Schemes/On Primary Container'),
-                                                                    child: Text("JD", style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                                    child: Text(_auth.hasValue && _auth.value?.displayName != null ? _auth.value!.displayName!.substring(0,1).toUpperCase() : 'GU', style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                                             color: getFigmaColor(context, 'Schemes/On Primary Container')
                                                                         ))
                                                                 ),
@@ -180,13 +169,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                                     child: Column(
                                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                                         children: [
-                                                                            Text('Guest User',
+                                                                            Text(_auth.hasValue && _auth.value?.displayName != null ?  _auth.value!.displayName.toString() : 'Guest User',
                                                                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                                                     color: getFigmaColor(context, 'Schemes/On Surface')
                                                                                 )
                                                                             ),
 
-                                                                            Text('Login or Signup to save your progress',
+                                                                            Text(_auth.hasValue && _auth.value?.email != null ? _auth.value!.email.toString() : 'Login or Signup to save your progress',
                                                                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                                                 )
@@ -202,10 +191,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                                                     PopupMenuButton<String>(
                                                         icon: Icon(Icons.more_vert, color: getFigmaColor(context, 'Schemes/On Surface Variant')),
-                                                        onSelected: (String result) {
+                                                        onSelected: (String result) async {
                                                             // Handle the selection
                                                             switch (result) {
-                                                                case 'Login / Signup':
+                                                                case 'Login':
+                                                                    showModalBottomSheet(
+                                                                        context: context,
+                                                                        isScrollControlled: true,
+                                                                        backgroundColor: getFigmaColor(context, 'Schemes/Surface Container'),       // optional
+                                                                        shape: const RoundedRectangleBorder( // optional
+                                                                            borderRadius: BorderRadius.vertical(top: Radius.circular(24))
+                                                                        ),
+                                                                        builder: (context) {
+                                                                            return FractionallySizedBox(                  // 80% of screen
+                                                                                child: Padding(                   // keeps content above keyboard if needed
+                                                                                    padding: EdgeInsets.only(
+                                                                                        bottom: MediaQuery.of(context).viewInsets.bottom
+                                                                                    ),
+                                                                                    child: LoginPage()
+                                                                                )
+                                                                            );
+                                                                        }
+                                                                    );
+                                                                    break;
+
+                                                                case 'Signup':
                                                                     showModalBottomSheet(
                                                                         context: context,
                                                                         isScrollControlled: true,
@@ -214,32 +224,56 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                                             borderRadius: BorderRadius.vertical(top: Radius.circular(24))
                                                                         ),
                                                                         builder: (context) {
-                                                                            return FractionallySizedBox(       // or SizedBox(height: MediaQuery.of(context).size.height * 0.8)
-                                                                                heightFactor: 0.9,               // 80% of screen
+                                                                            return FractionallySizedBox(
+                                                                              heightFactor: 0.8,// 80% of screen
                                                                                 child: Padding(                   // keeps content above keyboard if needed
                                                                                     padding: EdgeInsets.only(
                                                                                         bottom: MediaQuery.of(context).viewInsets.bottom
                                                                                     ),
-                                                                                    child: CommonAuth()
+                                                                                    child: SignupPage()
                                                                                 )
                                                                             );
                                                                         }
                                                                     );
                                                                     break;
+
+                                                                case 'Logout':
+                                                                    // Sign out current user
+                                                                    await FirebaseAuth.instance.signOut();
+                                                                    if (mounted) {
+                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(
+                                                                                content: Text('Logged out'),
+                                                                                behavior: SnackBarBehavior.floating,
+                                                                            ),
+                                                                        );
+                                                                    }
+                                                                    break;
                                                             }
                                                         },
                                                         itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                                            const PopupMenuItem<String>(
-                                                                value: 'Login / Signup',
-                                                                child: Text('Login / Signup')
-                                                            )
+                                                            if (_auth.value == null) ...const [
+                                                                PopupMenuItem<String>(
+                                                                    value: 'Login',
+                                                                    child: Text('Login'),
+                                                                ),
+                                                                PopupMenuItem<String>(
+                                                                    value: 'Signup',
+                                                                    child: Text('Signup'),
+                                                                ),
+                                                            ] else ...const [
+                                                                PopupMenuItem<String>(
+                                                                    value: 'Logout',
+                                                                    child: Text('Logout'),
+                                                                ),
+                                                            ],
                                                         ]
                                                     )
                                                 ]
                                             ),
 
                                             SizedBox(height: Gap(context).gap(20)),
-                                            PracticeLevelXPIndicatior(
+                                            LevelXPIndicatior(
                                                 width: double.infinity,
                                                 isCompact: false
                                             ),
@@ -384,7 +418,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                         SizedBox(width: 10),
                                                         _switchButton(context, 
                                                             ref.watch(themeProvider) == ThemeMode.dark,
-                                                            (val) {ref.read(themeProvider.notifier).toggleTheme();}
+                                                            (val) {
+                                                                ref.read(themeProvider.notifier).toggleTheme();
+                                                            }
                                                         )
                                                     ]
                                                 )

@@ -1,17 +1,16 @@
-
-
-
 import 'package:kothai_app/features/typing_session/data/sources/local/content/asset_texts_source.dart';
 import 'package:kothai_app/features/typing_session/data/sources/local/content/text_cache.dart';
 import 'package:kothai_app/features/typing_session/data/sources/remote/content/text_api_service.dart';
 import 'package:kothai_app/features/typing_session/domain/entities/content/text_paragraph.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:kothai_app/features/typing_session/domain/repositories/content/text_repository.dart';
+import 'package:logger/logger.dart';
 
-class TextRepositoryImpl  implements TextRepository {
-    final TextApiService api;         // optional for fallback/generation
-    final AssetTextsSource assets;    // local bundled JSON
-    final TextCache cache;            // SharedPrefs cache
+class TextRepositoryImpl implements TextRepository {
+    final TextApiService api; // optional for fallback/generation
+    final AssetTextsSource assets; // local bundled JSON
+    final TextCache cache; // SharedPrefs cache
+    // final logger = new Logger();
 
     TextRepositoryImpl({
         required this.api,
@@ -53,5 +52,4 @@ class TextRepositoryImpl  implements TextRepository {
         // 4) cache
         await cache.write(filtered);
     }
-
 }

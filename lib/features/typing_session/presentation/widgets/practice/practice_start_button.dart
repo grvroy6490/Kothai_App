@@ -1,4 +1,6 @@
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
@@ -22,32 +24,41 @@ class PracticeStartButton extends StatelessWidget {
                     children: [
                         Align(
                             alignment: Alignment.bottomCenter,
-                            child: Container(
-                                width: Gap(context).gap(280),
-                                height: Gap(context).gap(200),
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                            getFigmaColor(
-                                                context,
-                                                'Schemes/Surface Container Lowest'
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(150),
+                                    topRight: Radius.circular(150)
+                                ),
+                                child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                    child: Container(
+                                        width: Gap(context).gap(280),
+                                        height: Gap(context).gap(200),
+                                        decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                    getFigmaColor(
+                                                        context,
+                                                        'Schemes/Surface Container Lowest'
+                                                    ),
+                                                    getFigmaColor(
+                                                        context,
+                                                        'Schemes/Surface Container'
+                                                    ).withAlpha(0)
+                                                ]
                                             ),
-                                            getFigmaColor(
-                                                context,
-                                                'Schemes/Surface Container'
-                                            ).withAlpha(0)
-                                        ]
-                                    ),
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(150),
-                                        topRight: Radius.circular(150)
-                                    ),
-                                    border: Border(
-                                        top: BorderSide(
-                                            color: Color.fromARGB(255, 220, 195, 122),
-                                            width: Gap(context).gap(3)
+                                            borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(150),
+                                                topRight: Radius.circular(150)
+                                            ),
+                                            border: Border(
+                                                top: BorderSide(
+                                                    color: Color.fromARGB(255, 220, 195, 122),
+                                                    width: Gap(context).gap(3)
+                                                )
+                                            )
                                         )
                                     )
                                 )

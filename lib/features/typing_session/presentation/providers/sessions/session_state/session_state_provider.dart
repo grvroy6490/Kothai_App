@@ -85,5 +85,4 @@ class SessionStateNotifier extends _$SessionStateNotifier {
         }
     }
 
-
 }

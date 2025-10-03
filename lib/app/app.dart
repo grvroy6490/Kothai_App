@@ -9,18 +9,21 @@ import 'package:kothai_app/core/constants/typin_session_constants.dart';
 import 'package:kothai_app/core/routing/routes.dart';
 import 'package:kothai_app/core/theme/app_typography_scaled.dart';
 import 'package:kothai_app/core/theme/theme_manager.dart';
-import 'package:kothai_app/di/poviders/shared_prefs_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/providers/XP/xp_controller.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/text_preloader_provider.dart';
+// import 'package:logger/logger.dart';
+
 
 class App extends ConsumerWidget {
     const App({super.key});
 
+
     @override
     Widget build(BuildContext context, ref) {
-        ref.watch(preloadOnConfigControllerProvider);
 
-        print(ref.watch(xpControllerProvider).totalXp);
+      // debugPrintStack(stackTrace: StackTrace.current);
+        ref.watch(preloadOnConfigControllerProvider); // Getting the preload text from source and writing to text cache
+
+        // print(ref.watch(xpControllerProvider).totalXp);
 
         return ScreenUtilInit(
             designSize: const Size(360, 812),

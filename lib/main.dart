@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'services/firebase/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/app/app.dart';
+import 'package:kothai_app/features/authentication/presentation/providers/ApplicationState.dart' as auth;
 import 'package:kothai_app/di/poviders/db_provider.dart';
 import 'package:kothai_app/di/poviders/shared_prefs_provider.dart';
-import 'package:kothai_app/services/firebase/firebase_option.dart';
 import 'package:kothai_app/services/shared_prefs_service.dart';
 
 void main() async {
@@ -25,6 +26,8 @@ void main() async {
     );
     // Warm the DB so downstream providers have it ready
     await container.read(databaseProvider.future);
+    // Start auth prefs sync listener
+    container.read(auth.authPrefsSyncProvider);
 
     runApp(
         UncontrolledProviderScope(
@@ -80,3 +83,4 @@ void main() async {
 //  hapticEnabled, 👍
 //  hapticOnError,
 //  darkMode
+

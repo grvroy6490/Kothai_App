@@ -1,22 +1,160 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/di/poviders/auth_provider.dart';
+import 'package:kothai_app/features/authentication/presentation/pages/signup_page.dart';
 
-class LoginPage extends StatefulWidget {
-    String? email;
-    LoginPage({super.key, this.email});
+class LoginPage extends ConsumerStatefulWidget {
+    const LoginPage({super.key});
 
     @override
-    State<LoginPage> createState() => _LoginPageState();
+    ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
     bool _isPasswordVisible = false;
-    bool _acceptTerms = false;
+    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+    final FocusNode _focusNode = FocusNode();
+    final FocusNode _passwordFocusNode = FocusNode();
+    final _formKey = GlobalKey<FormState>();
+    String? _passwordError;
+    bool _loggingIn = false;
+
+    void _handleSignup(){
+        Navigator.of(context).pop();
+        showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: getFigmaColor(context, 'Schemes/Background'),       // optional
+            shape: const RoundedRectangleBorder( // optional
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24))
+            ),
+            builder: (context) {
+                return FractionallySizedBox(
+                    heightFactor: 0.8,// 80% of screen
+                    child: Padding(                   // keeps content above keyboard if needed
+                        padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom
+                        ),
+                        child: SignupPage()
+                    )
+                );
+            }
+        );
+    }
+
+    // HANDLE LOGIN
+    Future<void> _loginWithEmailAndPassword() async{
+        if (!_formKey.currentState!.validate()) return;
+
+        FocusScope.of(context).unfocus();
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+        // Show loading while checking the account
+        setState(() => _loggingIn = true);
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            useRootNavigator: true,
+            builder: (_) => const Center(child: CircularProgressIndicator())
+        );
+
+        bool loaderDismissed = false;
+        final email = _emailController.text.trim().toLowerCase();
+        final password = _passwordController.text;
+
+        try {
+            // Capture messenger before popping routes
+            final messenger = ScaffoldMessenger.of(context);
+
+            final credential = await ref.read(authServiceProvider).signInWithEmailAndPassword(email, password);
+            print(credential);
+
+            // Close the loading dialog attached to root navigator
+            if (!loaderDismissed) {
+                if (mounted) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                }
+                loaderDismissed = true;
+            }
+
+            if (!mounted) return;
+            Navigator.of(context, rootNavigator: true).pop(); // close loading
+
+            // Close the signup sheet and notify success
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('You are successfully Logged In!'), backgroundColor: Colors.green)
+            );
+
+            return;
+
+        } catch (e) {
+            if (mounted) {
+                if (!loaderDismissed) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    loaderDismissed = true;
+                }
+                String? fieldError;
+                String? snack;
+                if (e is FirebaseAuthException) {
+                    switch (e.code) {
+                        case 'wrong-password':
+                        case 'invalid-credential':
+                            fieldError = 'Incorrect password. Please try again.';
+                            break;
+                        case 'user-not-found':
+                            fieldError = 'Incorrect email or password.';
+                            break;
+                        case 'too-many-requests':
+                            snack = 'Too many attempts. Try again later.';
+                            break;
+                        case 'network-request-failed':
+                            snack = 'Network error. Check your connection.';
+                            break;
+                        default:
+                        snack = e.message ?? 'Sign in failed.';
+                    }
+                } else {
+                    snack = 'Unexpected error. Please try again.';
+                }
+
+                if (fieldError != null) {
+                    setState(() {
+                            _passwordError = fieldError;
+                        });
+                    _formKey.currentState?.validate();
+                    _passwordFocusNode.requestFocus();
+                }
+                if (snack != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(snack), backgroundColor: Colors.red)
+                    );
+                }
+            }
+        } finally {
+            if (mounted && !loaderDismissed) {
+                Navigator.of(context, rootNavigator: true).pop();
+            }
+            if (mounted) setState(() => _loggingIn = false);
+        }
+
+    }
+
+    @override
+    void dispose() {
+        _emailController.dispose();
+        _passwordController.dispose();
+        _focusNode.dispose();
+        _passwordFocusNode.dispose();
+        super.dispose();
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -37,128 +175,283 @@ class _LoginPageState extends State<LoginPage> {
                                                 Text('Welcome Back', style: TextStyle(
                                                         fontSize: KxScale(context).sp(28),
                                                         fontWeight: FontWeight.bold,
-                                                        color: Color.fromARGB(255, 107, 114, 128)
+                                                        color: getFigmaColor(context, 'Schemes/On Surface')
                                                     )),
                                                 Text('Login to Continue your Tamil typing journey', style: TextStyle(
                                                         fontSize: KxScale(context).sp(14),
                                                         fontWeight: FontWeight.bold,
-                                                        color: Color.fromARGB(255, 107, 114, 128)
+                                                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                     ))
                                             ]
                                         )
                                     ),
 
-                                    FilledButton(
+                                    IconButton(
                                         onPressed: (){
                                             Navigator.of(context).pop();
                                         },
                                         style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all(Color.fromARGB(26, 37, 39, 44))
+                                            backgroundColor: WidgetStateProperty.all(Color.fromARGB(26, 37, 39, 44)),
+                                            visualDensity: VisualDensity.compact
                                         ),
-                                        child: Text('Back',
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                color: Color.fromARGB(255, 107, 114, 128)                                 )
-                                        )
+                                        iconSize: 20,
+                                        padding: EdgeInsets.all(5),
+                                        icon: Icon(Icons.close, color:  getFigmaColor(context, 'Schemes/On Surface'))
                                     )
 
                                 ]
                             )
                         ),
+
+                        // FORM AREA
                         Padding(
                             padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(10) ),
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                     SizedBox(height: Gap(context).gap(20)),
-                                    Text(
-                                        'Enter password',
-                                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                            color: Color.fromARGB(255, 107, 114, 128),
-                                            fontWeight: FontWeight.w500
-                                        )
-                                    ),
-                                    SizedBox(height: Gap(context).gap(8)),
-                                    TextFormField(
-                                        obscureText: !_isPasswordVisible,
-                                        decoration: InputDecoration(
-                                            hintText: 'Enter your password',
-                                            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                color: Color.fromARGB(255, 182, 186, 195)
-                                            ),
-                                            border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                                borderSide: BorderSide(color: Color.fromARGB(255, 216, 219, 223))
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                                borderSide: BorderSide(color: Color.fromARGB(255, 216, 219, 223))
-                                            ),
-                                            contentPadding: EdgeInsets.symmetric(horizontal: Gap(context).gap(12), vertical: Gap(context).gap(10)),
-                                            suffixIcon: IconButton(
-                                                icon: Icon(
-                                                    _isPasswordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                                    color: Color.fromARGB(255, 107, 114, 128),
-                                                    size: 20
+                                    Form(
+                                        key: _formKey,
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                                Container(
+                                                    decoration: BoxDecoration(
+                                                        color: getFigmaColor(context, 'Schemes/Surface Container Highest').withAlpha(100),
+                                                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                                                        border: Border(
+                                                            bottom: BorderSide(color: getFigmaColor(context, 'Schemes/On Surface Variant'), width: 1.0)
+                                                        )
+                                                    ),
+                                                    padding: EdgeInsets.only(
+                                                        top: Gap(context).gap(10),
+                                                        left: Gap(context).gap(16),
+                                                        right: Gap(context).gap(16)
+                                                    ),
+                                                    child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                            Text(
+                                                                'Email Address',
+                                                                style: Theme.of(context).textTheme.labelMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                                        fontWeight: FontWeight.w500
+                                                                    )
+                                                            ),
+                                                            TextFormField(
+                                                                controller: _emailController,
+                                                                focusNode: _focusNode,
+                                                                validator: (value) {
+                                                                    if (value == null || value.isEmpty) {
+                                                                        return 'Please enter your email';
+                                                                    }
+                                                                    if (!RegExp(
+                                                                        r'^[^@]+@[^@]+\.[^@]+'
+                                                                    ).hasMatch(value)) {
+                                                                        return 'Please enter a valid email address';
+                                                                    }
+                                                                    return null;
+                                                                },
+                                                                style: Theme.of(context).textTheme.titleMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(context, 'Schemes/On Surface'),
+                                                                        fontWeight: FontWeight.w500
+                                                                    ),
+                                                                decoration: InputDecoration(
+                                                                    hintText: 'Enter your email',
+                                                                    hintStyle: Theme.of(context).textTheme.titleMedium
+                                                                        ?.copyWith(
+                                                                            color: Color.fromARGB(255, 182, 186, 195)
+                                                                        ),
+                                                                    border: InputBorder.none,
+                                                                    contentPadding: EdgeInsets.symmetric(
+                                                                        horizontal: Gap(context).gap(0),
+                                                                        vertical: Gap(context).gap(10)
+                                                                    )
+                                                                )
+                                                            )
+                                                        ]
+                                                    )
                                                 ),
-                                                onPressed: () {
-                                                    setState(() => _isPasswordVisible = !_isPasswordVisible);
-                                                }
-                                            )
+
+                                                SizedBox(height: Gap(context).gap(20)),
+
+                                                Container(
+                                                    decoration: BoxDecoration(
+                                                        color: getFigmaColor(context, 'Schemes/Surface Container Highest').withAlpha(100),
+                                                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                                                        border: Border(
+                                                            bottom: BorderSide(color: getFigmaColor(context, 'Schemes/On Surface Variant'), width: 1.0)
+                                                        )
+                                                    ),
+                                                    padding: EdgeInsets.only(
+                                                        top: Gap(context).gap(10),
+                                                        left: Gap(context).gap(16),
+                                                        right: Gap(context).gap(16)
+                                                    ),
+                                                    child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                            Text(
+                                                                'Enter password',
+                                                                style: Theme.of(context).textTheme.labelMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                                        fontWeight: FontWeight.w500
+                                                                    )
+                                                            ),
+                                                            TextFormField(
+                                                                obscureText: !_isPasswordVisible,
+                                                                controller: _passwordController,
+                                                                focusNode: _passwordFocusNode,
+                                                                autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                                validator: (value) {
+                                                                    if (value == null || value.isEmpty) {
+                                                                        return 'Please enter your password';
+                                                                    }
+                                                                    if (_passwordError != null) {
+                                                                        return _passwordError;
+                                                                    }
+                                                                    return null;
+                                                                },
+                                                                onChanged: (_) {
+                                                                    if (_passwordError != null) {
+                                                                        setState(() {
+                                                                                _passwordError = null;
+                                                                            });
+                                                                    }
+                                                                },
+                                                                style: Theme.of(context).textTheme.titleMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(context, 'Schemes/On Surface'),
+                                                                        fontWeight: FontWeight.w500
+                                                                    ),
+                                                                decoration: InputDecoration(
+                                                                    hintText: 'Enter your password',
+                                                                    hintStyle: Theme.of(context).textTheme.titleMedium
+                                                                        ?.copyWith(
+                                                                            color: Color.fromARGB(255, 182, 186, 195)
+                                                                        ),
+
+                                                                    border: InputBorder.none,
+                                                                    contentPadding: EdgeInsets.symmetric(
+                                                                        horizontal: Gap(context).gap(0),
+                                                                        vertical: Gap(context).gap(12)
+                                                                    ),
+                                                                    suffixIcon: IconButton(
+                                                                        icon: Icon(
+                                                                            _isPasswordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                                                            color: Color.fromARGB(255, 107, 114, 128),
+                                                                            size: 18
+                                                                        ),
+                                                                        onPressed: () {
+                                                                            setState(() => _isPasswordVisible = !_isPasswordVisible);
+                                                                        }
+                                                                    )
+                                                                )
+                                                            )
+                                                        ]
+                                                    )
+                                                )
+                                            ]
                                         )
                                     ),
 
                                     SizedBox(height: Gap(context).gap(20)),
-                                    FilledButton.icon(
-                                        onPressed: () {
-                                            // Add your signup logic here
-                                        },
-                                        icon: Icon(Icons.mail_outline, color: Color.fromARGB(255, 247, 248, 248)),
-                                        label: Text('Login',
+                                    FilledButton(
+                                        onPressed: _loggingIn ? null : () => _loginWithEmailAndPassword(),
+                                        style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Primary')),
+                                            padding: WidgetStateProperty.all(
+                                                EdgeInsets.symmetric(
+                                                    horizontal: Gap(context).gap(16),
+                                                    vertical: Gap(context).gap(16)
+                                                )
+                                            ),
+                                            minimumSize: WidgetStateProperty.all(Size(double.infinity, 0)),
+                                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)))
+                                        ),
+                                        child: Text('Login',
                                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                 color: Color.fromARGB(255, 247, 248, 248),
                                                 fontWeight: FontWeight.w600
                                             )
-                                        ),
-                                        style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 107, 114, 128)),
-                                            padding: WidgetStateProperty.all(
-                                                EdgeInsets.symmetric(
-                                                    horizontal: Gap(context).gap(16),
-                                                    vertical: Gap(context).gap(14)
-                                                )
-                                            ),
-                                            minimumSize: WidgetStateProperty.all(Size(double.infinity, 0)),
-                                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                                         )
                                     ),
                                     SizedBox(height: Gap(context).gap(20)),
 
-                                    Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                            TextButton(
-                                                onPressed: () {
-                                                    // Handle forgot password
-                                                },
-                                                child: Text('Forgot Password?',
-                                                    style: TextStyle(
-                                                        color: Color.fromARGB(255, 107, 114, 128),
-                                                        decoration: TextDecoration.underline
-                                                    )))
-                                        ]
+                                    Center(
+                                        child: RichText(
+                                            text: TextSpan(children: [
+                                                    TextSpan(
+                                                        text: 'New User? ',
+                                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                            color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                        )
+                                                    ),
+                                                    TextSpan(
+                                                        text: 'Signup',
+                                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                            color: getFigmaColor(context, 'Schemes/Primary'),
+                                                            fontWeight: FontWeight.bold
+                                                        ),
+                                                        recognizer: TapGestureRecognizer()..onTap = () => _handleSignup()
+                                                    )
+                                                ])
+                                        )
                                     ),
+
+                                    // Row(
+                                    //     mainAxisAlignment: MainAxisAlignment.center,
+                                    //     children: [
+                                    //         TextButton(
+                                    //             onPressed: () {
+                                    //                 // Handle forgot password
+                                    //             },
+                                    //             child: Text('Forgot Password?',
+                                    //                 style: TextStyle(
+                                    //                     color: Color.fromARGB(255, 107, 114, 128),
+                                    //                     decoration: TextDecoration.underline
+                                    //                 )))
+                                    //     ]
+                                    // ),
 
                                     Divider(height: 40),
 
-                                    Center(
-                                        child: RichText(
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                                text: 'By Continuing, you agree to the Terms of Use and Privacy Policy. கோதை is designed for educational Tamil typing practice only',
-                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                    color: Color.fromARGB(255, 107, 114, 128)
-                                                )
-                                            )
+                                    RichText(
+                                        textAlign: TextAlign.left,
+                                        text: TextSpan(
+                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                color: Color.fromARGB(255, 107, 114, 128)
+                                            ),
+                                            children: <TextSpan>[
+                                                const TextSpan(text: 'By Continuing, you agree to the '),
+                                                TextSpan(
+                                                    text: 'Terms of Use',
+                                                    style: TextStyle(
+                                                        // color: getFigmaColor(context, 'Schemes/Primary'),
+                                                        decoration: TextDecoration.underline
+                                                    ),
+                                                    recognizer: TapGestureRecognizer()
+                                                        ..onTap = () {
+                                                        // TODO: Go To Terms Page
+                                                        // launchUrl(Uri.parse('https://kothai.app/terms-of-use'));
+                                                    }
+                                                ),
+                                                const TextSpan(text: ' and '),
+                                                TextSpan(
+                                                    text: 'Privacy Policy',
+                                                    style: TextStyle(
+                                                        // color: getFigmaColor(context, 'Schemes/Primary'),
+                                                        decoration: TextDecoration.underline
+                                                    ),
+                                                    recognizer: TapGestureRecognizer()..onTap = () => {
+                                                        // TODO: Go To Policy Page
+                                                    }
+                                                ),
+                                                const TextSpan(text: '. கோதை is designed for educational Tamil typing practice only.')
+                                            ]
                                         )
                                     ),
 

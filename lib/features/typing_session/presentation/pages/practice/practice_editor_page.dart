@@ -13,7 +13,6 @@ import 'package:kothai_app/features/typing_session/presentation/providers/practi
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/progress/practice_progress_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/user_input/user_input_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
-import 'package:kothai_app/features/typing_session/presentation/providers/sessions/session_state/session_state_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/animated_content_board.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_metrics_bar.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_start_button.dart';
@@ -175,11 +174,11 @@ class _PracticeEditorPageState extends ConsumerState<PracticeEditorPage> {
                                     ),
 
                                     Positioned.fill(
-                                        top: MediaQuery.of(context).size.height * 1.2,
+                                        top: MediaQuery.of(context).size.height * 0.3,
                                         child: IgnorePointer(
                                             ignoring: true, // <- key change: don't intercept taps/scrolls
                                             child: Opacity(
-                                                opacity: 0.0,
+                                                opacity: 1,
                                                 child: TextFormField(
                                                     maxLines: 2,
                                                     controller: widget.controller,

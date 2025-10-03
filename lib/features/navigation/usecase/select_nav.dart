@@ -7,7 +7,7 @@ class SelectNavNotifier extends Notifier<int> {
     String routeFor(int index) {
         switch (index) {
             case 0: return '/practice';
-            case 1: return '/';
+            case 1: return '/challenge';
             case 2: return '/profile';
             case 3: return '/';
             default: return '/practice';

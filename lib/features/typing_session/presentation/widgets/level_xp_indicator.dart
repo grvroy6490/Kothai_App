@@ -6,12 +6,12 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/XP/xp_controller.dart';
 
-class PracticeLevelXPIndicatior extends ConsumerWidget {
+class LevelXPIndicatior extends ConsumerWidget {
     final double? width;
     final bool isCompact;
-    const PracticeLevelXPIndicatior({
+    const LevelXPIndicatior({
         super.key, 
-        this.width = 150,
+        this.width = 165,
         this.isCompact = true
     });
 
@@ -47,7 +47,7 @@ class PracticeLevelXPIndicatior extends ConsumerWidget {
                                                 getFigmaColor(context, 'Palettes/Primary 80')
                                             ]
                                         ),
-                                        borderRadius: BorderRadius.circular(0)
+                                        borderRadius: BorderRadius.circular(25)
                                     )
                                 )
                             )
@@ -76,7 +76,7 @@ class PracticeLevelXPIndicatior extends ConsumerWidget {
                                     child: Stack(
                                         children: [
                                             SvgPicture.asset('assets/images/Gold_Icon.svg',
-                                                width: Gap(context).gap(18)
+                                                width: Gap(context).gap(16)
                                             )
                                         ]
                                     )

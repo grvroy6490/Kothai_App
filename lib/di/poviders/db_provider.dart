@@ -12,6 +12,7 @@ import 'package:kothai_app/features/typing_session/domain/repositories/XP/xp_loc
 import 'package:kothai_app/features/typing_session/domain/repositories/session/last_session_store.dart';
 import 'package:kothai_app/features/typing_session/domain/repositories/session/session_local_repository.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:kothai_app/features/authentication/presentation/providers/ApplicationState.dart' as auth;
 import 'package:sqflite/sqflite.dart';
 
 
@@ -52,7 +53,7 @@ final xpLocalRepoProvider = Provider<XpLocalRepository>((ref) {
     });
 
 // Stubs for auth + cloud
-final isLoggedInProvider = Provider<bool>((ref) => false);
+final isLoggedInProvider = Provider<bool>((ref) => ref.watch(auth.authIsLoggedInProvider));
 
 final xpCloudRepoProvider = Provider((ref) => _NoopXpCloudRepo());
 

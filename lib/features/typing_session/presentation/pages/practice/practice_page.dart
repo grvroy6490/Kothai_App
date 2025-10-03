@@ -1,11 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/di/poviders/db_provider.dart';
 import 'package:kothai_app/di/poviders/navigation_provider.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
@@ -14,6 +12,7 @@ import 'package:kothai_app/features/typing_session/presentation/pages/practice/r
 import 'package:kothai_app/features/typing_session/presentation/providers/keyboard/keyboard_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/practice/practice_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/providers/sessions/practice/practice_session_controller.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar_widget.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/keyboard/keyboard.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
@@ -46,15 +45,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         final isKeyboardVisible = ref.watch(keyboardStatusProvider); // 👈 KEYBOARD STATUS PROVIDER
         final practiceStatus = ref.watch(practiceStatusProvider); // 👈 PRACTICE STATUS PROVIDER
         final keyboardRenderer = ref.watch(keyboardRendererProvider); // 👈 KEYBOARD RENDERER
-        final idx = ref.watch(selectNavProvider); // 👈 NAVIGATION PROVIDER WATCH
-        final nav = ref.read(selectNavProvider.notifier); // 👈 NAVIGATION PROVIDER READ
 
         final controller = _controller;
         final focusNode = _focusNode;
 
         final keyboardController = ref.watch(keyboardControllerProvider(controller)); // 👈 KEYBOARD CONTROLLER PROVIDER
 
-        final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
 
         void showNotifications() async {
           // final records = await ref.read(sessionDaoProvider).list();
@@ -89,33 +85,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                     controller
                 ) // 👈 PRACTICE APP BAR ACTIONS
             ),
-            bottomNavigationBar: BottomNavigationBar(
-                iconSize: 20,
-                enableFeedback: false,
-                currentIndex: 0,
-                onTap: (index) {
-                    nav.set(index);
-                    final route = nav.currentRoute;
-                    if (Get.currentRoute != route) {
-                        // Get.offNamed(route);
-                    }
-                },
-                selectedLabelStyle: null,
-                unselectedLabelStyle: null,
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: getFigmaColor(context, 'Schemes/Surface'),
-                selectedItemColor: getFigmaColor(context, 'Schemes/Primary'),
-                unselectedItemColor: getFigmaColor(
-                    context,
-                    'Schemes/On Background'
-                ).withAlpha(153),
-                items: [
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.solidKeyboard), label: 'Practice'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.trophy), label: 'Coming Soon'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.circleUser), label: 'Coming Soon'),
-                    BottomNavigationBarItem(icon: FaIcon(FontAwesomeIcons.grip), label: 'Coming Soon')
-                ]
-            ),
+            bottomNavigationBar: BottomNavigationBarWidget(),
             body: SizedBox(
                 height: double.infinity,
                 width: double.infinity,
@@ -144,7 +114,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                                             controller: controller
                                         ),
                                         Container(
-                                            padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(16)),
+                                            padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(8), vertical: Gap(context).gap(10)),
                                             width: double.infinity,
                                             color:  getFigmaColor(context, 'Schemes/Surface Container'),
                                             child: Keyboard(controller: keyboardController, renderer: keyboardRenderer)

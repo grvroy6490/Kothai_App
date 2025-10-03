@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "445212196583",
-    "project_id": "kothai-32a62",
-    "storage_bucket": "kothai-32a62.firebasestorage.app"
+    "project_number": "381212783799",
+    "project_id": "kothai-2425",
+    "storage_bucket": "kothai-2425.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:445212196583:android:1e16c22327450336bcec42",
+        "mobilesdk_app_id": "1:381212783799:android:a2fa7f51f1a5b8dbf60932",
         "android_client_info": {
-          "package_name": "com.example.kothai_app"
+          "package_name": "org.dckap.kothaiapp"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "445212196583-rfejr0988qbvurp6u4ejaeo6tunhjlrf.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCSrbkdZ-j6vVYv-yHw_SB695EdUmBT99E"
+          "current_key": "AIzaSyCjj0u-GP2j26zN8qo6uz86MiFlzHBBgzk"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "445212196583-rfejr0988qbvurp6u4ejaeo6tunhjlrf.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "445212196583-qrt93palvob5tgdtg3ftt2uf8le6l1ng.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.kothaiApp"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

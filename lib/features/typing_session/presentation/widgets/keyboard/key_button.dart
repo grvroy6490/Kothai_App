@@ -87,7 +87,7 @@ class KeyButton extends ConsumerWidget {
                     ? (keyModel.icon != null
                         ? Icon(
                             keyModel.icon,
-                            size: KxScale(context).sp(16),
+                            size: KxScale(context).sp(20),
                             color: switch (keyModel.type) {
                                 KeyType.colored => Colors.white,
                                 _ => getFigmaColor(context, 'Schemes/On Background')
@@ -97,7 +97,8 @@ class KeyButton extends ConsumerWidget {
                     : Text(
                         keyModel.label,
                         style: TextStyle(
-                            fontSize: KxScale(context).sp(13),
+                            fontSize: KxScale(context).sp(16),
+                            height: 1.2,
                             fontWeight: FontWeight.w500,
                             color: switch (keyModel.type) {
                                 KeyType.colored => Colors.white,
