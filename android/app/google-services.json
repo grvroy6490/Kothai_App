@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "381212783799",
+    "project_id": "kothai-2425",
+    "storage_bucket": "kothai-2425.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381212783799:android:aa5ba667b871ab3ff60932",
+        "android_client_info": {
+          "package_name": "org.dckap.kothai_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjj0u-GP2j26zN8qo6uz86MiFlzHBBgzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381212783799:android:a2fa7f51f1a5b8dbf60932",
+        "android_client_info": {
+          "package_name": "org.dckap.kothaiapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjj0u-GP2j26zN8qo6uz86MiFlzHBBgzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

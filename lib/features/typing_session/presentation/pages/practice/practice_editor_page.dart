@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
+import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
+import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/animated_context_board.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/main_metrics_bar.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_start_button.dart';
+import 'package:kothai_app/features/typing_session/presentation/widgets/typing_progress.dart';
+import 'package:logger/logger.dart';
+
+class PracticeEditorPage extends ConsumerStatefulWidget {
+    final TextEditingController controller;
+    final FocusNode focusNode;
+    final GamificationEntity? gamificationData;
+
+    const PracticeEditorPage({
+        super.key,
+        required this.controller,
+        required this.focusNode,
+        required this.gamificationData
+    });
+
+    @override
+    ConsumerState<PracticeEditorPage> createState() => _PracticeEditorPage();
+}
+
+class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
+    final _logger = Logger();
+    late String paragraph;
+    int _lastLen = 0;
+    late VoidCallback _controllerListener;
+    late DifficultyCriteriaEntity? difficultyCriteria;
+
+    @override
+    void initState() {
+        super.initState();
+
+        _controllerListener = () {
+            if (!mounted) return;
+
+            final textNow = widget.controller.text;
+
+            // 1) keep your provider in sync
+            ref.read(userInputProvider.notifier).set(textNow);
+
+            // 2) compute deltas and call onKey for new chars
+            final ctrl = ref.read(sessionControllerProvider.notifier);
+
+            // If user pasted multiple chars, process each new char
+            if (textNow.length > _lastLen) {
+                for (int i = _lastLen; i < textNow.length; i++) {
+                    final received = textNow[i];
+                    // Guard against paragraph shorter than input
+                    final expected = (i < paragraph.length) ? paragraph[i] : null;
+                    final correct = expected != null && received == expected;
+                    ctrl.onKey(correct: correct);
+                }
+            }
+            // If user deleted (backspace), we won’t alter metrics here.
+            // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
+
+            _lastLen = textNow.length;
+            setState(() {
+                }); // if you still need a local rebuild
+        };
+
+        widget.controller.addListener(_controllerListener);
+    }
+
+    @override
+    void dispose() {
+        widget.controller.removeListener(_controllerListener);
+        super.dispose();
+    }
+
+    @override
+    Widget build(BuildContext ctx) {
+        // 🌐 PROVIDERS ------------------------------
+        final textContent = ref.watch(textContentControllerProvider);
+        final sessionController = ref.read(sessionHandlerControllerProvider.notifier); // Session Controller
+        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final typingProgress = ref.watch(typingProgressProvider);
+        final practiceConfig = ref.watch(
+            practiceConfigurationProvider.select((config) => config.difficulty)
+        );
+
+        // _logger.f(textContent);
+
+        // 📃 DECLARATION ----------------------------
+        final practiceStatus = sessionState.mode == SessionMode.practice ? sessionState.status : false;
+        paragraph = textContent != null ? textContent.content : placeholderText;
+        difficultyCriteria = widget.gamificationData?.difficultyCriteria // Getting difficulty criteria based on difficulty config
+            .where((criteria) => criteria.type.toLowerCase() == practiceConfig.name.toString().toLowerCase())
+            .firstOrNull;
+
+        // 🚀 METHODS ---------------------------------
+
+        // 👇 HANDLE START
+        void handleStartMain() {
+            sessionController.updateMode(SessionMode.practice);
+            sessionController.updateStatus(SessionStatusEnum.start);
+        }
+
+        // 👇 HANDLE TEXT FIELD FOCUS
+        ref.listen(sessionHandlerControllerProvider, (prev, next) {
+                if (next.mode == SessionMode.practice && next.status == SessionStatusEnum.start) {
+                    // focus the text field
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                            widget.focusNode.requestFocus();
+                        });
+                } else {
+                    widget.focusNode.unfocus();
+                }
+            });
+
+        // 👇 LISTEN TO PROGRESS COMPLETION
+
+        // ⭐ Widget --------------------------------------
+        return SizedBox(
+            height: double.infinity,
+            child: Padding(
+                padding: EdgeInsets.only(top: Gap(context).gap(5)),
+                child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                        // TYPING PROGRESS
+                        Positioned(
+                            top: -3,
+                            left: 0,
+                            right: 0,
+                            child: TypingProgress(
+                                width: typingProgress
+                            ) // 👈 TYPING PROGRESS // TODO: Dynamic Progress Variable here
+                        ),
+
+                        Container(
+                            decoration: BoxDecoration(
+                                color: getFigmaColor(context, 'Schemes/Surface Container'),
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(24))
+                            ),
+                            child: Stack(
+                                children: [
+                                    Column(
+                                        children: [
+                                            SizedBox(
+                                                height: Gap(context).gap(75),
+                                                width: double.infinity,
+                                                child: MainMetricsBar(
+                                                    paragraph: paragraph,
+                                                    difficulty: difficultyCriteria
+                                                ) // 👈 PRACTICE METRICS BAR
+                                            ),
+                                            Flexible(
+                                                child: AnimatedContentBoard(
+                                                    paragraph: paragraph
+                                                ) // 👈 CONTENT BOARD
+                                            )
+                                        ]
+                                    ),
+
+                                    Positioned.fill(
+                                        top: MediaQuery.of(context).size.height * 0.3,
+                                        child: IgnorePointer(
+                                            ignoring:
+                                            true, // <- key change: don't intercept taps/scrolls
+                                            child: Opacity(
+                                                opacity: 1,
+                                                child: TextFormField(
+                                                    maxLines: 2,
+                                                    controller: widget.controller,
+                                                    focusNode: widget.focusNode,
+                                                    readOnly: true,
+                                                    showCursor: false,
+                                                    enableInteractiveSelection: false,
+                                                    style: Theme.of(context).textTheme.labelLarge
+                                                        ?.copyWith(
+                                                            color: getFigmaColor(
+                                                                context,
+                                                                'Schemes/On Surface'
+                                                            )
+                                                        ),
+                                                    decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color: Colors.black87,
+                                                                width: 1
+                                                            )
+                                                        ),
+                                                        contentPadding: EdgeInsets.zero
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+
+                                    AnimatedSlide(
+                                        offset: practiceStatus == SessionStatusEnum.start
+                                            ? const Offset(0, 1)
+                                            : Offset.zero,
+                                        duration: const Duration(milliseconds: 700),
+                                        curve: Curves.fastOutSlowIn,
+                                        child: SizedBox(
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            child: PracticeStartButton(
+                                                handleStart: handleStartMain
+                                            ) // 👈 PRACTICE BOTTOM START BUTTON
+                                        )
+                                    )
+                                ]
+                            )
+                        )
+                    ]
+                )
+            )
+        );
+    }
+}

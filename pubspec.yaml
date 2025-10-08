@@ -1,0 +1,129 @@
+name: kothai_app
+description: "Learn Tamil by Typing!"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  carousel_slider: ^5.1.1
+  smooth_page_indicator: ^1.2.1
+  flutter_svg: ^2.2.0
+  font_awesome_flutter: ^10.10.0
+  dotted_line: ^3.2.3
+  form_field_validator: ^1.1.0
+  loading_animation_widget: ^1.3.0
+  shared_preferences: ^2.5.3
+  cupertino_icons: ^1.0.8
+  riverpod: ^2.6.1
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  json_annotation: ^4.9.0
+  flutter_hooks: ^0.21.3+1
+  freezed_annotation: ^3.1.0
+  uuid: ^4.5.1
+  dio: ^5.9.0
+  flutter_launcher_icons: ^0.14.4
+  vibration: ^3.1.3
+  get: ^4.7.2
+  flutter_screenutil: ^5.9.3
+  flutter_native_splash: ^2.4.6
+  auto_size_text: ^3.0.0
+  characters: ^1.4.0
+  path: ^1.9.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  sqflite: ^2.4.2
+  envied: ^1.3.0
+  firebase_ui_auth: ^1.13.0
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.7.0
+  cloud_firestore: ^5.6.12
+  google_sign_in: ^7.2.0
+  logger: ^2.6.1
+  flutter_custom_clippers: ^2.1.0
+  unorm_dart: ^0.3.2
+  just_audio: ^0.10.5
+  lottie: ^3.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.5.4
+  json_serializable: ^6.9.5
+  riverpod_generator: ^2.6.5
+  freezed: ^3.1.0
+  riverpod_lint: ^2.6.5
+
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+
+  # FOR IOS
+  #  color: "#F9F9F9"
+  background_image: "assets/images/splash.jpg"
+  #  image: "assets/images/logo_1024.png"
+  #  branding: ""
+
+  background_image_dark: "assets/images/splash.jpg"
+  #  image_dark: ""
+  #  branding_dark: ""
+
+  android_12:
+    #color: "#F9F9F9"
+    #    image: "assets/images/logo_1024.png"
+    background_image: "assets/images/splash.jpg"
+  #    background_image_dark: "assets/images/Dark_Mode_BG.png"
+  # branding: ""
+
+flutter_launcher_icons:
+  #  image_path: "assets/images/icon-128x128.png"
+  image_path_android: "assets/images/Kothai_logo.png"
+  image_path_ios: "assets/images/Kothai_logo.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+  #  adaptive_icon_background: "assets/images/christmas-background.png" # only available for Android 8.0 devices and above
+  #  adaptive_icon_foreground: "assets/images/Kothai_logo.png" # only available for Android 8.0 devices and above
+  #  adaptive_icon_foreground_inset: 16 # only available for Android 8.0 devices and above
+  #  adaptive_icon_monochrome: "assets/images/Kothai_logo.png" # only available for Android 13 devices and above
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true
+  background_color_ios: "#ffffff"
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/practice_content.json
+    - assets/challenge_content.json
+    - assets/gamification.json
+    - assets/images/
+    - assets/lottie/
+    - assets/sounds/
+
+  fonts:
+    - family: NotoSansTamil
+      fonts:
+        - asset: assets/fonts/NotoSansTamil-Regular.ttf
+        - asset: assets/fonts/NotoSansTamil-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansTamil-Black.ttf
+          weight: 900
+        - asset: assets/fonts/NotoSansTamil-Medium.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansTamil-SemiBold.ttf
+          weight: 300
+
+    - family: Inter
+      fonts:
+        - asset: 'assets/fonts/Inter-VariableFont.ttf'

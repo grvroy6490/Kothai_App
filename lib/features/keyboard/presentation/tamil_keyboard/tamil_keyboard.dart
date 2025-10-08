@@ -1,0 +1,247 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
+import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
+import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:vibration/vibration.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
+
+class TamilKeyboard extends KeyboardController {
+    String? _heldLeftDiacritic;
+    Ref? _ref;
+
+    final AudioPlayer _keypressPlayer = AudioPlayer();
+
+    TamilKeyboard(super.text);
+
+    Future<void> preloadSounds() async {
+        try {
+            await _keypressPlayer.setAsset('assets/sounds/single keypad click.wav');
+            await _keypressPlayer.setVolume(1); // optional
+        } catch (e) {
+            debugPrint('Error preloading sound: $e');
+        }
+    }
+
+    void setRef(Ref ref) {
+        _ref = ref;
+    }
+
+    /// Play the preloaded sound
+    Future<void> _playKeySound() async {
+        try {
+            if (_keypressPlayer.playing) {
+                // Prevent overlapping by resetting
+                await _keypressPlayer.stop();
+            }
+            await _keypressPlayer.seek(Duration.zero);
+            await _keypressPlayer.play();
+        } catch (e) {
+            debugPrint('Error playing keypress sound: $e');
+        }
+    }
+
+    @override
+    void backspace(String value) {
+        // Backspace should also honor the initial diacritic rule only if text is empty
+        // If empty, nothing to delete; just return
+        if (text.text.isEmpty) {
+            return;
+        }
+        final selection = text.selection;
+        final textValue = text.text;
+
+        // If there's a selection, delete the selected text
+        if (selection.start != selection.end) {
+            final newText = textValue.replaceRange(
+                selection.start,
+                selection.end,
+                ''
+            );
+            text.value = TextEditingValue(
+                text: newText,
+                selection: TextSelection.collapsed(offset: selection.start)
+            );
+            return;
+        }
+
+        // If selection is collapsed, delete the character before the caret
+        final caretIndex = selection.start;
+        if (caretIndex <= 0) return;
+
+        final newText = textValue.replaceRange(caretIndex - 1, caretIndex, '');
+        text.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: caretIndex - 1)
+        );
+        // _ref?.read(sessionStateProvider.notifier).backspace();
+
+        final configSound = _ref?.watch(practiceConfigurationProvider.select((config) => config.soundEnabled));
+
+        if (configSound == true) {
+            _playKeySound();
+        }
+    }
+
+    @override
+    void insert(String value) {
+        final practiceConfig = _ref?.watch(practiceConfigurationProvider);
+
+        if (practiceConfig!.soundEnabled) {
+            _playKeySound();
+        }
+
+        // Handle left diacritic hold mechanism
+        if (Letters.leftDiacriticLetters.contains(value)) {
+            if (text.text.isNotEmpty) {
+                final lastChar = text.text.characters.last;
+                if (Letters.uyirLetters.contains(lastChar) && lastChar != 'ஒ') {
+                    return; // Don't hold diacritic after uyir
+                }
+            }
+            _heldLeftDiacritic = value;
+            _ref?.read(holdKeyProvider.notifier).holdFor(value);
+            return;
+        }
+
+        if (practiceConfig!.hapticEnabled) { // TODO: Check this settings
+            _vibrate();
+        }
+
+        if (value == ' ' || value == '\n') {
+            if (_heldLeftDiacritic != null) {
+                _heldLeftDiacritic = null;
+                _ref?.read(holdKeyProvider.notifier).clear();
+            }
+            _insertText(value);
+            for (var ch in value.characters) {
+                _notifyOnKey(ch);
+            }
+            return;
+        }
+
+        if (value == 'delete') {
+            if (_heldLeftDiacritic != null) {
+                _heldLeftDiacritic = null;
+                _ref?.read(holdKeyProvider.notifier).clear();
+            }
+            return;
+        }
+
+        // Handle held left diacritic
+        if (_heldLeftDiacritic != null) {
+            if (Letters.meiLetters.contains(value)) {
+                final combinedValue = value + _heldLeftDiacritic!;
+                _heldLeftDiacritic = null;
+                _ref?.read(holdKeyProvider.notifier).clear();
+                _insertText(_normalizeAndInsert(combinedValue));
+                for (var ch in combinedValue.characters) {
+                    _notifyOnKey(ch);
+                }
+                return;
+            } else {
+                _heldLeftDiacritic = null;
+                _ref?.read(holdKeyProvider.notifier).clear();
+                _insertText(value);
+                for (var ch in value.characters) {
+                    _notifyOnKey(ch);
+                }
+                return;
+            }
+        }
+
+        if (Letters.rightDiacriticLetters.contains(value)) {
+            if (text.text.isEmpty) return;
+            final lastChar = text.text.characters.last;
+            if (Letters.uyirLetters.contains(lastChar) && lastChar != 'ஒ') return;
+
+            if (!Letters.uyirLetters.contains(lastChar)) {
+                final combinedValue = lastChar + value;
+                final prefix = text.text.characters.skipLast(1).string;
+                final newText = _normalizeAndInsert(prefix + combinedValue);
+
+                text.value = TextEditingValue(
+                    text: newText,
+                    selection: TextSelection.collapsed(offset: newText.length)
+                );
+
+                for (var ch in combinedValue.characters) {
+                    _notifyOnKey(ch);
+                }
+                return;
+            }
+        }
+
+        // Handle special diacritic combos (like ெ + ா = ொ)
+        final cursorPosition = text.selection.baseOffset;
+        final prefix = text.text.characters.take(cursorPosition).string;
+        final suffix = text.text.characters.skip(cursorPosition).string;
+
+        if (prefix.isNotEmpty) {
+            final lastChar = prefix.characters.last;
+            final comboKey = lastChar + value;
+            if (Letters.diacriticCombos.containsKey(comboKey)) {
+                final combined = Letters.diacriticCombos[comboKey]!;
+                final newPrefix = prefix.characters.skipLast(1).string + combined;
+                final normalized = _normalizeAndInsert(newPrefix + suffix);
+
+                text.value = TextEditingValue(
+                    text: normalized,
+                    selection: TextSelection.collapsed(offset: newPrefix.length)
+                );
+                return;
+            }
+        }
+
+        // Default insert
+        final newPrefix = prefix + value;
+        final normalized = _normalizeAndInsert(newPrefix + suffix);
+
+        text.value = TextEditingValue(
+            text: normalized,
+            selection: TextSelection.collapsed(offset: newPrefix.length)
+        );
+
+        for (var ch in value.characters) {
+            _notifyOnKey(ch);
+        }
+    }
+
+    void _insertText(String value) {
+        final selection = text.selection;
+        final textValue = text.text;
+        final start = selection.start;
+        final end = selection.end;
+        final newText = textValue.replaceRange(start, end, value);
+
+        final newOffset = start + value.length;
+        text.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: newOffset)
+        );
+    }
+
+    void _vibrate() async {
+        if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+            Vibration.vibrate(duration: 100);
+        }
+    }
+
+    void _notifyOnKey(String ch) { // TODO: Check this settings
+        final para = _ref?.read(textContentControllerProvider)?.content ?? '';
+        final idx = text.text.length - 1;
+        final expected = (idx >= 0 && idx < para.length) ? para[idx] : null;
+        final correct = expected != null && ch == expected;
+
+        // _ref?.read(sessionControllerProvider.notifier).onKey(correct: correct);
+    }
+
+    String _normalizeAndInsert(String text) {
+        return unorm.nfc(text);
+    }
+
+}
