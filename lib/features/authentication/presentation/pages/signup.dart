@@ -6,6 +6,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/constants/auth_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/auth/auth_provider.dart';
+import 'package:kothai_app/domain/usecases/show_modal.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/login.dart';
 import 'package:kothai_app/features/authentication/presentation/widgets/form-text-field.dart';
 
@@ -32,23 +33,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   // 🚀 METHODS --------------------------------
     void _handleLogin(){
         Navigator.of(context).pop();
-        showModalBottomSheet(
+        showAppModalBottomSheet(
             context: context,
-            isScrollControlled: true,
-            backgroundColor: getFigmaColor(context, 'Schemes/Surface Container'),       // optional
-            shape: const RoundedRectangleBorder( // optional
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24))
-            ),
-            builder: (context) {
-                return FractionallySizedBox(                  // 80% of screen
-                    child: Padding(                   // keeps content above keyboard if needed
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom
-                        ),
-                        child: LoginPage()
-                    )
-                );
-            }
+            builder: (_) => const LoginPage(),
+            heightFactor: 0.65
         );
     }
 
@@ -146,12 +134,12 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                                 Text('Welcome', style: TextStyle(
                                                         fontSize: KxScale(context).sp(28),
                                                         fontWeight: FontWeight.bold,
-                                                        color: Color.fromARGB(255, 107, 114, 128)
+                                                        color: getFigmaColor(context, 'Schemes/On Surface')
                                                     )),
                                                 Text('Create your Tamil typing mastery account', style: TextStyle(
                                                         fontSize: KxScale(context).sp(14),
                                                         fontWeight: FontWeight.bold,
-                                                        color: Color.fromARGB(255, 107, 114, 128)
+                                                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                     ))
                                             ]
                                         )

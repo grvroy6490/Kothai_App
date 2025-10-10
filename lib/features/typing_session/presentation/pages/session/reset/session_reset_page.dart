@@ -2,32 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 
-class PracticeResetPage extends ConsumerStatefulWidget {
+class SessionResetPage extends ConsumerStatefulWidget {
     final TextEditingController controller;
-    const PracticeResetPage({super.key, required this.controller});
+    const SessionResetPage({super.key, required this.controller});
 
     @override
-    ConsumerState<PracticeResetPage> createState() => _PracticeResetPageState();
+    ConsumerState<SessionResetPage> createState() => _SessionResetPageState();
 }
 
-class _PracticeResetPageState extends ConsumerState<PracticeResetPage> {
+class _SessionResetPageState extends ConsumerState<SessionResetPage> {
 
     @override
     Widget build(BuildContext context) {
         // 📃 DECLARATION ----------------------------
         // 🌐 PROVIDERS ------------------------------
+        final typingProgress = ref.watch(typingProgressProvider);
 
         // 🚀 METHODS --------------------------------
         void handlePracticeReset(){
-            // ref.read(practiceSessionControllerProvider.notifier).reset();
+            ref.read(sessionControllerProvider.notifier).reset();
             var arguments = Get.arguments;
             widget.controller.clear();
 
-            if(arguments == 'fromReset'){
+            if(arguments == kReset){
                 Get.back();
-            } else if(arguments == 'fromPause') {
+            } else if(arguments == kPause) {
                 Get.back();
                 Get.back();
             }
@@ -134,7 +138,7 @@ class _PracticeResetPageState extends ConsumerState<PracticeResetPage> {
                                                                             ),
                                                                             SizedBox(width: Gap(context).gap(14)),
                                                                             Expanded(
-                                                                                child: Text("You've made it to 88%! If you reset your progress, it will return to 0%.",
+                                                                                child: Text("You've made it to ${(typingProgress * 100).toStringAsFixed(0)}%! If you reset your progress, it will return to 0%.",
                                                                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                                                         color: getFigmaColor(context, 'Schemes/Secondary')
                                                                                     )

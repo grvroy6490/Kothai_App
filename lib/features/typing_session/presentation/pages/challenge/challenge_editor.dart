@@ -11,7 +11,7 @@ import 'package:kothai_app/features/typing_session/domain/enums/session_status_e
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/animated_context_board.dart';
@@ -25,7 +25,7 @@ class ChallengeEditor extends ConsumerStatefulWidget {
     final GamificationEntity? gamificationData;
 
     const ChallengeEditor({
-        super.key, 
+        super.key,
         required this.controller,
         required this.focusNode,
         required this.gamificationData
@@ -46,7 +46,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
     void initState() {
         super.initState();
 
-        _controllerListener = () {
+        _controllerListener = () async {
             if (!mounted) return;
 
             final textNow = widget.controller.text;
@@ -56,6 +56,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
 
             // 2) compute deltas and call onKey for new chars
             final ctrl = ref.read(sessionControllerProvider.notifier);
+            final progress = ref.read(typingProgressProvider);
 
             // If user pasted multiple chars, process each new char
             if (textNow.length > _lastLen) {
@@ -64,11 +65,15 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                     // Guard against paragraph shorter than input
                     final expected = (i < paragraph.length) ? paragraph[i] : null;
                     final correct = expected != null && received == expected;
-                    ctrl.onKey(correct: correct);
+                    await ctrl.onKey(correct: correct);
                 }
             }
             // If user deleted (backspace), we won’t alter metrics here.
             // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
+
+            if(progress >= 1.0){
+                widget.controller.clear();
+            }
 
             _lastLen = textNow.length;
             setState(() {
@@ -88,8 +93,8 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
         final textContent = ref.watch(textContentControllerProvider);
-        final sessionController = ref.read(sessionHandlerControllerProvider.notifier); // Session Controller
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final sessionController = ref.read(sessionStatusControllerProvider.notifier); // Session Controller
+        final sessionState = ref.watch(sessionStatusControllerProvider);
         final challengeDifficulty = ref.watch(challengeDifficultyControllerProvider);
         final typingProgress = ref.watch(typingProgressProvider);
 
@@ -103,7 +108,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
         // 🚀 METHODS ---------------------------------
 
         // 👇 HANDLE TEXT FIELD FOCUS
-        ref.listen(sessionHandlerControllerProvider, (prev, next) {
+        ref.listen(sessionStatusControllerProvider, (prev, next) {
                 if (next.mode == SessionMode.challenge && next.status == SessionStatusEnum.start) {
                     // focus the text field
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -158,12 +163,12 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                                     ),
 
                                     Positioned.fill(
-                                        top: MediaQuery.of(context).size.height * 0.3,
+                                        top: MediaQuery.of(context).size.height * 1.1,
                                         child: IgnorePointer(
                                             ignoring:
                                             true, // <- key change: don't intercept taps/scrolls
                                             child: Opacity(
-                                                opacity: 1,
+                                                opacity: 0,
                                                 child: TextFormField(
                                                     maxLines: 2,
                                                     controller: widget.controller,

@@ -4,8 +4,9 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:vibration/vibration.dart';
 import 'package:characters/characters.dart';
@@ -29,9 +30,8 @@ class _AnimatedContentBoardState extends ConsumerState<AnimatedContentBoard> {
     @override
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
-        final sessionStatus = ref.watch(sessionHandlerControllerProvider);
+        final sessionStatus = ref.watch(sessionStatusControllerProvider);
         final userInput = ref.watch(userInputProvider);
-
 
         // 📃 DECLARATION ----------------------------
         final isPracticeStart = sessionStatus.status == SessionStatusEnum.start;
@@ -80,15 +80,15 @@ class _TypingAreaState extends ConsumerState<TypingArea> {
         // 🚀 METHODS --------------------------------
         // TODO: handle type haptic / vibration based on parctice config
         if(practiceConfig.hapticOnError) {
-            //     ref.listen<int>(metricsNotifierProvider.select((s) => s.errors),
-            //         (prev, next) async {
-            //             if (prev != null && next > prev) {
-            //                 if (await (Vibration.hasVibrator() ?? Future.value(false))) {
-            //                     Vibration.vibrate(duration: 200);
-            //                 }
-            //             }
-            //         }
-            //     );
+                ref.listen<int>(metricsStateControllerProvider.select((s) => s.errors),
+                    (prev, next) async {
+                        if (prev != null && next > prev) {
+                            if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+                                Vibration.vibrate(duration: 200);
+                            }
+                        }
+                    }
+                );
         }
 
         // ⭐ Widget ---------------------------------

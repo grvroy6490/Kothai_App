@@ -9,7 +9,7 @@ import 'package:kothai_app/features/typing_session/domain/enums/keyboard_layout_
 import 'package:flutter/widgets.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 
 // KEYBOARD NOTIFIER
 class KeyboardStatusController extends Notifier<bool> {
@@ -17,7 +17,7 @@ class KeyboardStatusController extends Notifier<bool> {
     bool build() {
         // listen to changes in session handler
         ref.listen<SessionHandler>(
-            sessionHandlerControllerProvider,
+            sessionStatusControllerProvider,
             (prev, next) {
                 // Logic: keyboard visible only when session is actively running
                 final isTypingSession = next.mode != SessionMode.none;

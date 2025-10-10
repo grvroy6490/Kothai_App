@@ -2,8 +2,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class AppDatabase {
-    static const _dbName = 'kothai_app.db'; // TODO: later add to ENV
-    static const _dbVersion = 2; // Incremented version to trigger onUpgrade
+    static const _dbName = 'kothai.db'; // TODO: later add to ENV
+    static const _dbVersion = 1; // Incremented version to trigger onUpgrade
 
     static Future<Database> open() async {
         final dbPath = await getDatabasesPath();
@@ -13,7 +13,7 @@ class AppDatabase {
             version: _dbVersion,
             onCreate: (db, version) async {
                 await db.execute('''
-                CREATE TABLE typing_sessions (
+                CREATE TABLE sessions (
                   id TEXT PRIMARY KEY,
                   mode TEXT NOT NULL,
                   difficulty TEXT NOT NULL,
@@ -25,9 +25,9 @@ class AppDatabase {
                   elapsedMs INTEGER NOT NULL
                 );
                 ''');
-                // Also create xp_entries table during onCreate for fresh installs
+               
                 await db.execute('''
-                 CREATE TABLE xp_entries (
+                 CREATE TABLE score_entries (
                    id TEXT PRIMARY KEY,
                    at INTEGER NOT NULL,
                    mode TEXT NOT NULL,

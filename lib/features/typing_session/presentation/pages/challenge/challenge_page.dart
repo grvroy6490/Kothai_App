@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
 import 'package:kothai_app/features/keyboard/presentation/keyboard.dart';
@@ -11,14 +13,17 @@ import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dar
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_editor.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_home_screen.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/reset/session_reset_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_ui_controller.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/level_xp_indicator.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChallengePage extends ConsumerStatefulWidget {
     const ChallengePage({super.key});
@@ -44,26 +49,31 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
         // 🌐 PROVIDERS ------------------------------
         final challengeDifficulty = ref.watch(challengeDifficultyControllerProvider); // 👈 CHALLENGE DIFFICULTY)
         final selectedChallengeSlide = ref.watch(selectedChallengeUIControllerProvider);
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final sessionState = ref.watch(sessionStatusControllerProvider);
         final keyboardRenderer = ref.watch(keyboardRendererProvider); // 👈 KEYBOARD RENDERER
         final isKeyboardVisible = ref.watch(keyboardStatusProvider); // 👈 KEYBOARD STATUS PROVIDER
         final keyboardController = ref.watch(keyboardControllerProvider(_controller));
         gamificationData = ref.watch(gamificationDataControllerProvider);
+        // final challengeProvider = ref.read(challengeSessionToPrefsProvider);
+
+        // challengeProvider.clear(kEasyChallenge);
+        // challengeProvider.clear(kMediumChallenge);
+        // challengeProvider.clear(kHardChallenge);
 
         // 📃 DECLARATION ----------------------------
         final sessionStatus = sessionState.mode == SessionMode.challenge ? sessionState.status : null;
 
         // 🚀 METHODS --------------------------------
         void showNotifications() async {
-
+            // final prefs = await SharedPreferences.getInstance();
+            // prefs.remove(kStreakLastYmdKey);
         }
 
         void handleChallengePause(TextEditingController controller){
-            // Get.to(() => PracticePausePage(controller: controller), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         void handleChallengeReset(TextEditingController controller){
-            // Get.to(() => PracticeResetPage(controller: controller), arguments: 'fromReset', transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+            Get.to(() => SessionResetPage(controller: controller), arguments: kReset, transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         // ⭐ Widget ---------------------------------
@@ -89,7 +99,7 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                     _controller
                 )
             ),// 👈 PRACTICE APP BAR ACTIONS
-            bottomNavigationBar: BottomNavigationBarWidget(),
+            bottomNavigationBar: BottomNavigationBarWidget(controller: _controller),
 
             body: LayoutBuilder(
                 builder: (context, constraints){

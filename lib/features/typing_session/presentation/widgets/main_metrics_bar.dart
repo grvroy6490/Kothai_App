@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/core/utils/characters_utils.dart';
+import 'package:kothai_app/core/utils/time_utils.dart';
 import 'package:kothai_app/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_wpm_enum.dart';
@@ -10,8 +11,10 @@ import 'package:kothai_app/features/typing_session/domain/enums/practice_status_
 import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/metrics_info_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/metrics_stat_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/toast.dart';
@@ -49,13 +52,15 @@ class _MainMetricsBarState extends ConsumerState<MainMetricsBar> {
     Widget build(BuildContext context) {
         // final _logger = Logger();
         // 🌐 PROVIDERS ------------------------------
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final sessionState = ref.watch(sessionStatusControllerProvider);
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
+        final sessionEngineController = ref.watch(sessionControllerProvider);
+        final metricsStateController = ref.watch(metricsStateControllerProvider);
 
         // 📃 DECLARATION ----------------------------
         wordsCount = getWordAndCharacter(widget.paragraph);
         avgTime = widget.difficulty != null ? getAverageTime(widget.paragraph, widget.difficulty!) : '~0 mins 0 secs';
         final sessionStatus = sessionState.status;
-
 
         // 🚀 METHODS --------------------------------
         // Listen to difficulty changes specifically
@@ -132,8 +137,7 @@ class _MainMetricsBarState extends ConsumerState<MainMetricsBar> {
                             children: [
                                 Expanded(
                                     child: MetricsStatBadge(
-                                        value: '--',
-                                        // value: practiceConfig.wpmEnabled ? metrics.wpm.toStringAsFixed(0) : '--', // 👈 WPM ENABLED SETTINGS // TODO: Show WPM Value here
+                                        value: practiceConfig.wpmEnabled ? metricsStateController.wpm.toStringAsFixed(0) : '--', // 👈 WPM ENABLED SETTINGS // TODO: Show WPM Value here
                                         label: 'WPM'
                                     )
                                 ),
@@ -141,8 +145,7 @@ class _MainMetricsBarState extends ConsumerState<MainMetricsBar> {
                                 Expanded(
                                     child: MetricsStatBadge(
                                         icon: Icons.my_location,
-                                        value: '--',
-                                        // value: practiceConfig.accuracyEnabled ? '${(metrics.accuracy*100).toStringAsFixed(0)}%' : '--', // 👈 ACCURACY ENABLED SETTINGS // TODO: Show Accuracy Value here
+                                        value: practiceConfig.accuracyEnabled ? '${(metricsStateController.accuracy*100).toStringAsFixed(0)}%' : '--', // 👈 ACCURACY ENABLED SETTINGS // TODO: Show Accuracy Value here
                                         label: 'Accuracy'
                                     )
                                 ),
@@ -150,8 +153,7 @@ class _MainMetricsBarState extends ConsumerState<MainMetricsBar> {
                                 Expanded(
                                     child: MetricsStatBadge(
                                         icon: Icons.schedule,
-                                        value: '--',
-                                        // value: practiceConfig.timerEnabled ? formatDuration(engine.elapsed) : '--', // 👈 TIMER ENABLED SETTINGS // TODO: Show Timer value here
+                                        value: practiceConfig.timerEnabled ? formatDuration(sessionEngineController.elapsed) : '--', // 👈 TIMER ENABLED SETTINGS // TODO: Show Timer value here
                                         label: 'Time'
                                     )
                                 )

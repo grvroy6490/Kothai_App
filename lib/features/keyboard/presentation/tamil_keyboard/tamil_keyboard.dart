@@ -14,36 +14,16 @@ class TamilKeyboard extends KeyboardController {
     String? _heldLeftDiacritic;
     Ref? _ref;
 
-    final AudioPlayer _keypressPlayer = AudioPlayer();
+
 
     TamilKeyboard(super.text);
 
-    Future<void> preloadSounds() async {
-        try {
-            await _keypressPlayer.setAsset('assets/sounds/single keypad click.wav');
-            await _keypressPlayer.setVolume(1); // optional
-        } catch (e) {
-            debugPrint('Error preloading sound: $e');
-        }
-    }
 
     void setRef(Ref ref) {
         _ref = ref;
     }
 
-    /// Play the preloaded sound
-    Future<void> _playKeySound() async {
-        try {
-            if (_keypressPlayer.playing) {
-                // Prevent overlapping by resetting
-                await _keypressPlayer.stop();
-            }
-            await _keypressPlayer.seek(Duration.zero);
-            await _keypressPlayer.play();
-        } catch (e) {
-            debugPrint('Error playing keypress sound: $e');
-        }
-    }
+
 
     @override
     void backspace(String value) {
@@ -80,20 +60,12 @@ class TamilKeyboard extends KeyboardController {
         );
         // _ref?.read(sessionStateProvider.notifier).backspace();
 
-        final configSound = _ref?.watch(practiceConfigurationProvider.select((config) => config.soundEnabled));
-
-        if (configSound == true) {
-            _playKeySound();
-        }
+      
     }
 
     @override
     void insert(String value) {
         final practiceConfig = _ref?.watch(practiceConfigurationProvider);
-
-        if (practiceConfig!.soundEnabled) {
-            _playKeySound();
-        }
 
         // Handle left diacritic hold mechanism
         if (Letters.leftDiacriticLetters.contains(value)) {

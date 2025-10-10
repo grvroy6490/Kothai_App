@@ -19,22 +19,22 @@ final authIsLoggedInProvider = Provider<bool>((ref) {
     });
 
 // Keep SharedPreferences in sync with the current Firebase user
-// final authPrefsSyncProvider = Provider<void>((ref) {
-//         ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
-//                 next.whenData((user) {
-//                         final prefs = ref.read(sharedPrefsServiceProvider);
-//                         if (user != null) {
-//                             // Fire and forget updates
-//                             prefs.setString(kcurrent_user_uid, user.uid);
-//                             final email = user.email;
-//                             if (email != null) {
-//                                 prefs.setString(kcurrent_user_uid, email);
-//                             } else {
-//                                 prefs.remove(kcurrent_user_uid);
-//                             }
-//                         } else {
-//                             prefs.remove(kcurrent_user_uid);
-//                         }
-//                     });
-//             });
-//     });
+final authPrefsSyncProvider = Provider<void>((ref) {
+        ref.listen<AsyncValue<User?>>(authUserProvider, (previous, next) {
+                next.whenData((user) {
+                        final prefs = ref.read(sharedPrefsServiceProvider);
+                        if (user != null) {
+                            // Fire and forget updates
+                            prefs.setString(kcurrent_user_uid, user.uid);
+                            final email = user.email;
+                            if (email != null) {
+                                prefs.setString(kcurrent_user_uid, email);
+                            } else {
+                                prefs.remove(kcurrent_user_uid);
+                            }
+                        } else {
+                            prefs.remove(kcurrent_user_uid);
+                        }
+                    });
+            });
+    });

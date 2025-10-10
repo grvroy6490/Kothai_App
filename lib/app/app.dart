@@ -29,7 +29,7 @@ class App extends ConsumerWidget {
     @override
     Widget build(BuildContext context, ref) {
         // final _logger = Logger();
-
+        
         // clear();
         // print(ref.watch(xpControllerProvider).totalXp);
 

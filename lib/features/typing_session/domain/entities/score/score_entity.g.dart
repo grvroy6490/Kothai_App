@@ -9,8 +9,8 @@ part of 'score_entity.dart';
 _ScoreEntity _$ScoreEntityFromJson(Map<String, dynamic> json) => _ScoreEntity(
   totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
   level: (json['level'] as num?)?.toInt() ?? 1,
-  xpIntoLevel: (json['xpIntoLevel'] as num?)?.toInt() ?? 0,
-  xpPerLevel: (json['xpPerLevel'] as num).toInt(),
+  xpIntoLevel: (json['xpIntoLevel'] as num?)?.toInt() ?? 1000,
+  xpNextLevel: (json['xpNextLevel'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$ScoreEntityToJson(_ScoreEntity instance) =>
@@ -18,7 +18,7 @@ Map<String, dynamic> _$ScoreEntityToJson(_ScoreEntity instance) =>
       'totalXp': instance.totalXp,
       'level': instance.level,
       'xpIntoLevel': instance.xpIntoLevel,
-      'xpPerLevel': instance.xpPerLevel,
+      'xpNextLevel': instance.xpNextLevel,
     };
 
 _ScoreEntry _$ScoreEntryFromJson(Map<String, dynamic> json) => _ScoreEntry(

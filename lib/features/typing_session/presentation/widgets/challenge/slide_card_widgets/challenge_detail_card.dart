@@ -7,6 +7,7 @@ class ChallengeDetailCard extends StatefulWidget {
     final double slideHeightMultiplier;
     final Widget? child;
     final String image;
+    final bool isBlocked;
 
     const ChallengeDetailCard({
         super.key,
@@ -14,7 +15,8 @@ class ChallengeDetailCard extends StatefulWidget {
         required this.slideAngle,
         this.slideHeightMultiplier = 0.6,
         this.child,
-        this.image = 'assets/images/start_challenge_green.png'
+        this.image = 'assets/images/start_challenge_green.png',
+        this.isBlocked = false
     });
 
     @override
@@ -24,7 +26,6 @@ class ChallengeDetailCard extends StatefulWidget {
 class _ChallengeDetailCardState extends State<ChallengeDetailCard> {
     @override
     Widget build(BuildContext context) {
-
         // ⭐ Widget ---------------------------------
         return AnimatedOpacity(
             opacity: widget.opacity,
@@ -33,12 +34,10 @@ class _ChallengeDetailCardState extends State<ChallengeDetailCard> {
             child: AnimatedContainer(
                 duration: Duration(milliseconds: 400),
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * widget.slideHeightMultiplier,
+                height:
+                MediaQuery.of(context).size.height * widget.slideHeightMultiplier,
                 transform: Matrix4.rotationZ(widget.slideAngle),
                 transformAlignment: Alignment.bottomCenter,
-                // decoration: BoxDecoration(
-                //     color: Color.fromARGB(255, 0, 0, 0)
-                // ),
                 child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
@@ -51,10 +50,7 @@ class _ChallengeDetailCardState extends State<ChallengeDetailCard> {
                             horizontal: Gap(context).gap(30)
                         ),
                         decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage(widget.image)
-                            ),
-                            // color: Colors.black,
+                            image: DecorationImage(image: AssetImage(widget.image)),
                             borderRadius: BorderRadius.circular(16)
                         ),
                         child: widget.child

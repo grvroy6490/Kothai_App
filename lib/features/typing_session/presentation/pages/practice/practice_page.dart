@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
 import 'package:kothai_app/features/keyboard/presentation/keyboard.dart';
@@ -9,9 +11,12 @@ import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_pro
 import 'package:kothai_app/features/typing_session/domain/enums/practice_status_enum.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_editor_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/reset/session_reset_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
@@ -45,8 +50,9 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         // 📃 DECLARATION ----------------------------
         final controller = _controller;
         final focusNode = _focusNode;
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
-        final practiceStatus = sessionState.mode == SessionMode.practice ? sessionState.status : false;
+        final sessionStatusController = ref.watch(sessionStatusControllerProvider);
+        final sessionEngineController = ref.read(sessionControllerProvider.notifier);
+        final practiceStatus = sessionStatusController.mode == SessionMode.practice ? sessionStatusController.status : false;
 
         // 🌐 PROVIDERS ------------------------------
         final keyboardRenderer = ref.watch(keyboardRendererProvider); // 👈 KEYBOARD RENDERER
@@ -64,11 +70,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         }
 
         void handlePracticePause(TextEditingController controller){
-            // Get.to(() => PracticePausePage(controller: controller), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+          sessionEngineController.pause();
+          Get.to(() => PracticePausePage(controller: controller), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         void handlePracticeReset(TextEditingController controller){
-            // Get.to(() => PracticeResetPage(controller: controller), arguments: 'fromReset', transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+            Get.to(() => SessionResetPage(controller: controller), arguments: kReset, transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         // ⭐ Widget --------------------------------------
@@ -98,8 +105,8 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                     clipBehavior: Clip.hardEdge,
                     children: [
                         PracticeEditorPage(
-                            controller: _controller,
-                            focusNode: _focusNode,
+                            controller: controller,
+                            focusNode: focusNode,
                             gamificationData: gamificationData
                         ), // 👈 EDITOR PAGE
 

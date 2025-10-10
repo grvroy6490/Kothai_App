@@ -5,15 +5,21 @@ import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/navigation/navigation_provider.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 
 class BottomNavigationBarWidget extends ConsumerWidget {
-    const BottomNavigationBarWidget({super.key});
+    final TextEditingController? controller;
+    const BottomNavigationBarWidget({super.key, this.controller});
 
     @override
     Widget build(BuildContext context, ref) {
         // 🌐 PROVIDERS ------------------------------
         final navNotifier = ref.read(selectNavProvider.notifier);
         final idx = ref.watch(selectNavProvider); // 👈 NAVIGATION PROVIDER WATCH
+        final sessionState = ref.watch(sessionStatusControllerProvider);
+        final sessionStatus = sessionState.status == SessionStatusEnum.start;
 
         // 📃 DECLARATION ----------------------------
         final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
@@ -22,12 +28,37 @@ class BottomNavigationBarWidget extends ConsumerWidget {
         return BottomNavigationBar(
             iconSize: KxScale(context).sp(20),
             enableFeedback: false,
-            currentIndex: idx,
-            onTap: (index) {
+            currentIndex: currentIndex,
+            onTap: (index) async {
+                final intendedRoute = navNotifier.routeFor(index);
+
+                // If a session is running and user is changing tabs (any index),
+                // show the stop dialog and keep the current selection unchanged.
+                final isChangingTab = index != currentIndex;
+                if (sessionStatus && isChangingTab) {
+                    final result = await Get.to(
+                        () => const SessionStopPage(),
+                        arguments: {
+                            'route': intendedRoute,
+                            'index': index,
+                        },
+                        transition: Transition.fadeIn,
+                        curve: Curves.easeInOutQuad,
+                    );
+                    final confirmed = (result is Map && result['confirmed'] == true);
+                    if (!confirmed) return;
+                    // proceed after confirmation
+                    navNotifier.set(index);
+                    if (Get.currentRoute != intendedRoute) {
+                        Get.offNamed(intendedRoute);
+                    }
+                    return;
+                }
+
+                // Otherwise, proceed: update selection and navigate if route differs.
                 navNotifier.set(index);
-                final route = navNotifier.currentRoute;
-                if (Get.currentRoute != route) {
-                    Get.offNamed(route);
+                if (Get.currentRoute != intendedRoute) {
+                    Get.offNamed(intendedRoute);
                 }
             },
             selectedLabelStyle: null,

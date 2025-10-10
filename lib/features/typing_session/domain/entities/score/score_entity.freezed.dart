@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$ScoreEntity {
 
  int get totalXp; int get level;// derived from totalXp; stored for convenience
- int get xpIntoLevel;// totalXp % xpPerLevel
- int get xpPerLevel;
+ int get xpIntoLevel; int get xpNextLevel;
 /// Create a copy of ScoreEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,16 +29,16 @@ $ScoreEntityCopyWith<ScoreEntity> get copyWith => _$ScoreEntityCopyWithImpl<Scor
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ScoreEntity&&(identical(other.totalXp, totalXp) || other.totalXp == totalXp)&&(identical(other.level, level) || other.level == level)&&(identical(other.xpIntoLevel, xpIntoLevel) || other.xpIntoLevel == xpIntoLevel)&&(identical(other.xpPerLevel, xpPerLevel) || other.xpPerLevel == xpPerLevel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ScoreEntity&&(identical(other.totalXp, totalXp) || other.totalXp == totalXp)&&(identical(other.level, level) || other.level == level)&&(identical(other.xpIntoLevel, xpIntoLevel) || other.xpIntoLevel == xpIntoLevel)&&(identical(other.xpNextLevel, xpNextLevel) || other.xpNextLevel == xpNextLevel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalXp,level,xpIntoLevel,xpPerLevel);
+int get hashCode => Object.hash(runtimeType,totalXp,level,xpIntoLevel,xpNextLevel);
 
 @override
 String toString() {
-  return 'ScoreEntity(totalXp: $totalXp, level: $level, xpIntoLevel: $xpIntoLevel, xpPerLevel: $xpPerLevel)';
+  return 'ScoreEntity(totalXp: $totalXp, level: $level, xpIntoLevel: $xpIntoLevel, xpNextLevel: $xpNextLevel)';
 }
 
 
@@ -50,7 +49,7 @@ abstract mixin class $ScoreEntityCopyWith<$Res>  {
   factory $ScoreEntityCopyWith(ScoreEntity value, $Res Function(ScoreEntity) _then) = _$ScoreEntityCopyWithImpl;
 @useResult
 $Res call({
- int totalXp, int level, int xpIntoLevel, int xpPerLevel
+ int totalXp, int level, int xpIntoLevel, int xpNextLevel
 });
 
 
@@ -67,12 +66,12 @@ class _$ScoreEntityCopyWithImpl<$Res>
 
 /// Create a copy of ScoreEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalXp = null,Object? level = null,Object? xpIntoLevel = null,Object? xpPerLevel = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalXp = null,Object? level = null,Object? xpIntoLevel = null,Object? xpNextLevel = null,}) {
   return _then(_self.copyWith(
 totalXp: null == totalXp ? _self.totalXp : totalXp // ignore: cast_nullable_to_non_nullable
 as int,level: null == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
 as int,xpIntoLevel: null == xpIntoLevel ? _self.xpIntoLevel : xpIntoLevel // ignore: cast_nullable_to_non_nullable
-as int,xpPerLevel: null == xpPerLevel ? _self.xpPerLevel : xpPerLevel // ignore: cast_nullable_to_non_nullable
+as int,xpNextLevel: null == xpNextLevel ? _self.xpNextLevel : xpNextLevel // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -158,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalXp,  int level,  int xpIntoLevel,  int xpPerLevel)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalXp,  int level,  int xpIntoLevel,  int xpNextLevel)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ScoreEntity() when $default != null:
-return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);case _:
+return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpNextLevel);case _:
   return orElse();
 
 }
@@ -179,10 +178,10 @@ return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalXp,  int level,  int xpIntoLevel,  int xpPerLevel)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalXp,  int level,  int xpIntoLevel,  int xpNextLevel)  $default,) {final _that = this;
 switch (_that) {
 case _ScoreEntity():
-return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);case _:
+return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpNextLevel);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +198,10 @@ return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalXp,  int level,  int xpIntoLevel,  int xpPerLevel)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalXp,  int level,  int xpIntoLevel,  int xpNextLevel)?  $default,) {final _that = this;
 switch (_that) {
 case _ScoreEntity() when $default != null:
-return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);case _:
+return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpNextLevel);case _:
   return null;
 
 }
@@ -214,15 +213,14 @@ return $default(_that.totalXp,_that.level,_that.xpIntoLevel,_that.xpPerLevel);ca
 @JsonSerializable()
 
 class _ScoreEntity extends ScoreEntity {
-  const _ScoreEntity({this.totalXp = 0, this.level = 1, this.xpIntoLevel = 0, required this.xpPerLevel}): super._();
+  const _ScoreEntity({this.totalXp = 0, this.level = 1, this.xpIntoLevel = 1000, this.xpNextLevel = 0}): super._();
   factory _ScoreEntity.fromJson(Map<String, dynamic> json) => _$ScoreEntityFromJson(json);
 
 @override@JsonKey() final  int totalXp;
 @override@JsonKey() final  int level;
 // derived from totalXp; stored for convenience
 @override@JsonKey() final  int xpIntoLevel;
-// totalXp % xpPerLevel
-@override final  int xpPerLevel;
+@override@JsonKey() final  int xpNextLevel;
 
 /// Create a copy of ScoreEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +235,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScoreEntity&&(identical(other.totalXp, totalXp) || other.totalXp == totalXp)&&(identical(other.level, level) || other.level == level)&&(identical(other.xpIntoLevel, xpIntoLevel) || other.xpIntoLevel == xpIntoLevel)&&(identical(other.xpPerLevel, xpPerLevel) || other.xpPerLevel == xpPerLevel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScoreEntity&&(identical(other.totalXp, totalXp) || other.totalXp == totalXp)&&(identical(other.level, level) || other.level == level)&&(identical(other.xpIntoLevel, xpIntoLevel) || other.xpIntoLevel == xpIntoLevel)&&(identical(other.xpNextLevel, xpNextLevel) || other.xpNextLevel == xpNextLevel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalXp,level,xpIntoLevel,xpPerLevel);
+int get hashCode => Object.hash(runtimeType,totalXp,level,xpIntoLevel,xpNextLevel);
 
 @override
 String toString() {
-  return 'ScoreEntity(totalXp: $totalXp, level: $level, xpIntoLevel: $xpIntoLevel, xpPerLevel: $xpPerLevel)';
+  return 'ScoreEntity(totalXp: $totalXp, level: $level, xpIntoLevel: $xpIntoLevel, xpNextLevel: $xpNextLevel)';
 }
 
 
@@ -257,7 +255,7 @@ abstract mixin class _$ScoreEntityCopyWith<$Res> implements $ScoreEntityCopyWith
   factory _$ScoreEntityCopyWith(_ScoreEntity value, $Res Function(_ScoreEntity) _then) = __$ScoreEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int totalXp, int level, int xpIntoLevel, int xpPerLevel
+ int totalXp, int level, int xpIntoLevel, int xpNextLevel
 });
 
 
@@ -274,12 +272,12 @@ class __$ScoreEntityCopyWithImpl<$Res>
 
 /// Create a copy of ScoreEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalXp = null,Object? level = null,Object? xpIntoLevel = null,Object? xpPerLevel = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalXp = null,Object? level = null,Object? xpIntoLevel = null,Object? xpNextLevel = null,}) {
   return _then(_ScoreEntity(
 totalXp: null == totalXp ? _self.totalXp : totalXp // ignore: cast_nullable_to_non_nullable
 as int,level: null == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
 as int,xpIntoLevel: null == xpIntoLevel ? _self.xpIntoLevel : xpIntoLevel // ignore: cast_nullable_to_non_nullable
-as int,xpPerLevel: null == xpPerLevel ? _self.xpPerLevel : xpPerLevel // ignore: cast_nullable_to_non_nullable
+as int,xpNextLevel: null == xpNextLevel ? _self.xpNextLevel : xpNextLevel // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

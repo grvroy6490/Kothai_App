@@ -7,7 +7,7 @@ part of 'text_content_controller_provider.dart';
 // **************************************************************************
 
 String _$currentContentTypeHash() =>
-    r'09c6aaa8a2bd8f8a95bdd031409417baae28757f';
+    r'de57b1c4ef5c053f23b004520efa7e21278e179c';
 
 /// Determines content type based on current session mode
 ///
@@ -50,7 +50,7 @@ final currentContentRepositoryProvider =
 typedef CurrentContentRepositoryRef =
     AutoDisposeProviderRef<TextContentRepository>;
 String _$getRandomizedContentHash() =>
-    r'13449fdd52767dc77bb13f2df8544cb5a0e86b56';
+    r'4c29d4b76d839b44cb0ae6c8e10f2c0a0b2c67c1';
 
 /// See also [getRandomizedContent].
 @ProviderFor(getRandomizedContent)
@@ -88,7 +88,7 @@ final getPreloadedTextsProvider =
 // ignore: unused_element
 typedef GetPreloadedTextsRef = AutoDisposeFutureProviderRef<List<TextContent>>;
 String _$textContentControllerHash() =>
-    r'7f78fa7089fda4c4a4c92033e0bc22a6b9b42912';
+    r'91bd8a51691644b12cd4dc66b4af8ee3a04d83f2';
 
 /// See also [TextContentController].
 @ProviderFor(TextContentController)

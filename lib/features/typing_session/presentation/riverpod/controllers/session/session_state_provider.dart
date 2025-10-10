@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
+import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_state_provider.g.dart';
@@ -33,6 +34,7 @@ class SessionState {
 @riverpod
 class SessionStateNotifier extends _$SessionStateNotifier {
     Timer? _timer;
+    final _logger = Logger();
 
     @override
     SessionState build() {
@@ -70,6 +72,7 @@ class SessionStateNotifier extends _$SessionStateNotifier {
         // TODO: If needed to reset the metrics typed to reset WPM
         // zero metrics elapsed as well
         ref.read(metricsStateControllerProvider.notifier).setElapsed(Duration.zero);
+        start(target: state.target);
     }
 
     void stop() {

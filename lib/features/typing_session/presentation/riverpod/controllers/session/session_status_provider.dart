@@ -6,10 +6,10 @@ import 'package:kothai_app/features/typing_session/domain/enums/session_status_e
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'session_handler_provider.g.dart';
+part 'session_status_provider.g.dart';
 
 @riverpod
-class SessionHandlerController extends _$SessionHandlerController {
+class SessionStatusController extends _$SessionStatusController {
     @override
     SessionHandler build() => const SessionHandler();
 

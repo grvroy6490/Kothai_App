@@ -11,13 +11,13 @@ abstract class ScoreEntity with _$ScoreEntity {
     const factory ScoreEntity({
         @Default(0) int totalXp,
         @Default(1) int level,          // derived from totalXp; stored for convenience
-        @Default(0) int xpIntoLevel,    // totalXp % xpPerLevel
-        required int xpPerLevel   // constant threshold per level
+        @Default(1000) int xpIntoLevel,
+        @Default(0) int xpNextLevel,     // totalXp % xpPerLevel
     }) = _ScoreEntity;
 
     const ScoreEntity._();
 
-    double get progress => xpPerLevel == 0 ? 0 : (xpIntoLevel / xpPerLevel).clamp(0, 1);
+    // double get progress => xpPerLevel == 0 ? 0 : (xpIntoLevel / xpPerLevel).clamp(0, 1);
 
     factory ScoreEntity.fromJson(Map<String, dynamic> json) => _$ScoreEntityFromJson(json);
 }

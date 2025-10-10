@@ -5,10 +5,10 @@ import 'package:get/get.dart';
 import 'package:kothai_app/app/app.dart';
 import 'package:kothai_app/core/errors/default_404.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/complete/practice_complete_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/stop/practice_stop_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
 import 'package:kothai_app/features/user_profile/presentation/pages/profile_page.dart';
 
 
@@ -27,11 +27,11 @@ List<GetPage<dynamic>> routes = [
             ),
             GetPage(
                 name: '/complete', // full path => /practice/editor
-                page: () => PracticeCompletePage()
+                page: () => SessionCompletePage()
             ),
             GetPage(
                 name: '/stop', // full path => /practice/editor
-                page: () => PracticeStopPage()
+                page: () => SessionStopPage()
             )
         ]
     ),

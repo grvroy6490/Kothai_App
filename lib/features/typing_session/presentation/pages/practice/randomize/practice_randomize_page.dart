@@ -26,6 +26,8 @@ class _PracticeRandomizePageState extends ConsumerState<PracticeRandomizePage> {
                 if(mounted){
                     Navigator.of(context).pop();
                     ref.invalidate(getRandomizedContentProvider);
+                    // Roll a new paragraph explicitly when starting
+                    ref.read(textContentControllerProvider.notifier).rollNewContent();
                 }
             });
     }

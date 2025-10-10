@@ -2,30 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
+import 'package:kothai_app/di/providers/navigation/navigation_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 
-class PracticeStopPage extends ConsumerStatefulWidget {
-    const PracticeStopPage({super.key});
+class SessionStopPage extends ConsumerStatefulWidget {
+    const SessionStopPage({super.key});
 
     @override
-    ConsumerState<PracticeStopPage> createState() => _PracticeStopPageState();
+    ConsumerState<SessionStopPage> createState() => _SessionStopPageState();
 }
 
-class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
+class _SessionStopPageState extends ConsumerState<SessionStopPage> {
 
     @override
     Widget build(BuildContext context) {
+        final typingProgress = ref.watch(typingProgressProvider);
+        final sessionMode = ref.watch(sessionStatusControllerProvider).mode;
 
+        final args = Get.arguments;
         // 🚀 METHODS --------------------------------
-        void handlePracticeStop(){
-            // ref.read(practiceSessionControllerProvider.notifier).stop();
-            // ref.read(practiceStatusProvider.notifier).stopPractice();
-            Get.to(() => PracticePage(), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        void handleSessionStop(){
+            ref.read(sessionStatusControllerProvider.notifier).reset();
+            // Clear text controller if provided
+            try {
+                if (args is Map && args['controller'] is TextEditingController) {
+                    final TextEditingController c = args['controller'] as TextEditingController;
+                    c.clear();
+                }
+            } catch (_) {
+            }
+
+            // Return result to caller; let caller handle nav/index changes to avoid key duplication
+            final route = (args is Map && args.containsKey('route')) ? args['route'] as String : (args is String ? args : Get.currentRoute);
+            final index = (args is Map && args.containsKey('index')) ? args['index'] as int? : null;
+
+            Get.back(result: {
+                    'confirmed': true,
+                    'route': route,
+                    'index': index
+                });
         }
 
-        void handlePracticeStopDenied(){
-            Get.back();
+        void handleSessionStopDenied(){
+            Get.back(result: {'confirmed': false});
         }
 
         // ⭐ Widget ---------------------------------
@@ -88,7 +112,7 @@ class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
                                                                     child: Icon(Icons.front_hand_outlined, size: KxScale(context).sp(60), color: getFigmaColor(context, 'Schemes/Error'))
                                                                 ),
                                                                 SizedBox(height: Gap(context).gap(30)),
-                                                                Text('Reset Progress', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                                Text(sessionMode == SessionMode.practice ? 'Stop Practice' : 'Stop Challenge', style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                                         color: getFigmaColor(context, 'Schemes/Error'),
                                                                         fontWeight: FontWeight.w600
                                                                     )
@@ -97,7 +121,7 @@ class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
                                                                 SizedBox(
                                                                     width: MediaQuery.of(context).size.width * 0.8,
                                                                     child: Center(
-                                                                        child: Text('Are you sure you want to reset your progress in this practice?',
+                                                                        child: Text('Are you sure you want to end this practice?',
                                                                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                                                 color: getFigmaColor(context, 'Schemes/On Surface')
                                                                             ),
@@ -125,7 +149,7 @@ class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
                                                                             ),
                                                                             SizedBox(width: Gap(context).gap(14)),
                                                                             Expanded(
-                                                                                child: Text("You've made it to 88%! If you reset your progress, it will return to 0%.",
+                                                                                child: Text("Congratulations on reaching ${(typingProgress * 100).toStringAsFixed(0)}%! If you choose to stop now, your progress won't be saved in your statistics.",
                                                                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                                                         color: getFigmaColor(context, 'Schemes/Error')
                                                                                     )
@@ -146,8 +170,8 @@ class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
                                                                                     backgroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/On Error')),
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Error'))
                                                                                 ),
-                                                                                onPressed: () => handlePracticeStop(),
-                                                                                child: Text('Yes, Reset it', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                                                onPressed: () => handleSessionStop(),
+                                                                                child: Text('Yes, Stop it', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                                                         color: getFigmaColor(context, 'Schemes/Error')
                                                                                     )
                                                                                 )
@@ -161,7 +185,7 @@ class _PracticeStopPageState extends ConsumerState<PracticeStopPage> {
                                                                                     foregroundColor: WidgetStateProperty.all(getFigmaColor(context, 'Schemes/Surface Variant')),
                                                                                     padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 0, vertical: Gap(context).gap(16)))
                                                                                 ),
-                                                                                onPressed: () => handlePracticeStopDenied(),
+                                                                                onPressed: () => handleSessionStopDenied(),
                                                                                 child: Text('No', style: Theme.of(context).textTheme.bodyLarge)
                                                                             )
                                                                         )

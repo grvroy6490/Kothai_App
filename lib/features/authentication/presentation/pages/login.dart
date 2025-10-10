@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/auth/auth_provider.dart';
+import 'package:kothai_app/domain/usecases/show_modal.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/signup.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -30,25 +31,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // 🚀 METHODS --------------------------------
     void _handleSignup(){
         Navigator.of(context).pop();
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: getFigmaColor(context, 'Schemes/Background'),       // optional
-            shape: const RoundedRectangleBorder( // optional
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24))
-            ),
-            builder: (context) {
-                return FractionallySizedBox(
-                    heightFactor: 0.8,// 80% of screen
-                    child: Padding(                   // keeps content above keyboard if needed
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom
-                        ),
-                        child: SignupPage()
-                    )
-                );
-            }
-        );
+        showAppModalWithChild(context: context, child: SignupPage(), heightFactor: 0.8);
     }
 
     // 👇 HANDLE LOGIN
@@ -76,7 +59,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             final messenger = ScaffoldMessenger.of(context);
 
             final credential = await ref.read(authServiceProvider).signInWithEmailAndPassword(email, password);
-            print(credential);
 
             // Close the loading dialog attached to root navigator
             if (!loaderDismissed) {
@@ -90,7 +72,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             Navigator.of(context, rootNavigator: true).pop(); // close loading
 
             // Close the signup sheet and notify success
-            Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('You are successfully Logged In!'), backgroundColor: Colors.green)
             );

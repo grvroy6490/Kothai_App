@@ -5,7 +5,7 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 
 class PracticeResetPause extends ConsumerWidget {
     void Function(TextEditingController) handlePause;
@@ -19,7 +19,7 @@ class PracticeResetPause extends ConsumerWidget {
 
         // 🌐 PROVIDERS ------------------------------
         final practiceConfig = ref.watch(practiceConfigurationProvider);
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final sessionState = ref.watch(sessionStatusControllerProvider);
 
         // 🚀 METHODS ---------------------------------
 

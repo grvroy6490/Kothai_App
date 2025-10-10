@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
@@ -12,7 +13,7 @@ import 'package:kothai_app/features/typing_session/presentation/riverpod/control
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_handler_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/animated_context_board.dart';
@@ -43,12 +44,20 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
     int _lastLen = 0;
     late VoidCallback _controllerListener;
     late DifficultyCriteriaEntity? difficultyCriteria;
+    late AudioPlayer _audioPlayer;
 
     @override
     void initState() {
         super.initState();
 
-        _controllerListener = () {
+        // Initialize audio player and preload the sound if enabled
+        _audioPlayer = AudioPlayer();
+        _preloadKeypressSoundIfEnabled();
+
+        // Roll a new paragraph explicitly when starting
+        ref.read(textContentControllerProvider.notifier).rollNewContent();
+
+        _controllerListener = () async {
             if (!mounted) return;
 
             final textNow = widget.controller.text;
@@ -58,6 +67,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
 
             // 2) compute deltas and call onKey for new chars
             final ctrl = ref.read(sessionControllerProvider.notifier);
+            final progress = ref.read(typingProgressProvider);
 
             // If user pasted multiple chars, process each new char
             if (textNow.length > _lastLen) {
@@ -66,11 +76,18 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                     // Guard against paragraph shorter than input
                     final expected = (i < paragraph.length) ? paragraph[i] : null;
                     final correct = expected != null && received == expected;
-                    ctrl.onKey(correct: correct);
+                    await ctrl.onKey(correct: correct);
+
+                    // Play keypress sound if enabled
+                    _playKeypressSoundIfEnabled();
                 }
             }
             // If user deleted (backspace), we won’t alter metrics here.
             // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
+
+            if (progress >= 1.0) {
+                widget.controller.clear();
+            }
 
             _lastLen = textNow.length;
             setState(() {
@@ -83,15 +100,47 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
     @override
     void dispose() {
         widget.controller.removeListener(_controllerListener);
+        _audioPlayer.dispose();
         super.dispose();
+    }
+
+    // Method to preload keypress sound if enabled
+    void _preloadKeypressSoundIfEnabled() async {
+        final config = ref.read(practiceConfigurationProvider);
+        if (config.soundEnabled) {
+            try {
+                await _audioPlayer.setAsset('assets/sounds/single keypad click.wav');
+            } catch (e) {
+                _logger.e('Error preloading keypress sound: $e');
+            }
+        }
+    }
+
+    // Method to play keypress sound if enabled
+    void _playKeypressSoundIfEnabled() {
+        final config = ref.read(practiceConfigurationProvider);
+        if (config.soundEnabled) {
+            try {
+                // Reset to beginning and play immediately
+                _audioPlayer.seek(Duration.zero);
+                _audioPlayer.play();
+            } catch (e) {
+                _logger.e('Error playing keypress sound: $e');
+            }
+        }
     }
 
     @override
     Widget build(BuildContext ctx) {
         // 🌐 PROVIDERS ------------------------------
         final textContent = ref.watch(textContentControllerProvider);
-        final sessionController = ref.read(sessionHandlerControllerProvider.notifier); // Session Controller
-        final sessionState = ref.watch(sessionHandlerControllerProvider);
+        final sessionStatusController = ref.read(
+            sessionStatusControllerProvider.notifier
+        ); // Session Controller
+        final sessionEngineController = ref.read(
+            sessionControllerProvider.notifier
+        );
+        final sessionState = ref.watch(sessionStatusControllerProvider);
         final typingProgress = ref.watch(typingProgressProvider);
         final practiceConfig = ref.watch(
             practiceConfigurationProvider.select((config) => config.difficulty)
@@ -100,29 +149,50 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
         // _logger.f(textContent);
 
         // 📃 DECLARATION ----------------------------
-        final practiceStatus = sessionState.mode == SessionMode.practice ? sessionState.status : false;
+        final practiceStatus = sessionState.mode == SessionMode.practice
+            ? sessionState.status
+            : false;
         paragraph = textContent != null ? textContent.content : placeholderText;
-        difficultyCriteria = widget.gamificationData?.difficultyCriteria // Getting difficulty criteria based on difficulty config
-            .where((criteria) => criteria.type.toLowerCase() == practiceConfig.name.toString().toLowerCase())
+        difficultyCriteria = widget
+            .gamificationData
+            ?.difficultyCriteria // Getting difficulty criteria based on difficulty config
+            .where(
+                (criteria) =>
+                criteria.type.toLowerCase() ==
+                    practiceConfig.name.toString().toLowerCase()
+            )
             .firstOrNull;
 
         // 🚀 METHODS ---------------------------------
 
         // 👇 HANDLE START
-        void handleStartMain() {
-            sessionController.updateMode(SessionMode.practice);
-            sessionController.updateStatus(SessionStatusEnum.start);
+        void handleStartMain() async {
+            sessionStatusController.reset();
+            sessionStatusController.updateMode(SessionMode.practice);
+            await ref.read(textContentControllerProvider.notifier).rollNewContent();
+            sessionStatusController.updateStatus(SessionStatusEnum.start);
+            await sessionEngineController.start();
         }
 
         // 👇 HANDLE TEXT FIELD FOCUS
-        ref.listen(sessionHandlerControllerProvider, (prev, next) {
-                if (next.mode == SessionMode.practice && next.status == SessionStatusEnum.start) {
+        ref.listen(sessionStatusControllerProvider, (prev, next) {
+                if (next.mode == SessionMode.practice &&
+                    next.status == SessionStatusEnum.start) {
                     // focus the text field
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                             widget.focusNode.requestFocus();
                         });
                 } else {
                     widget.focusNode.unfocus();
+                }
+            });
+
+        // 👇 HANDLE SOUND SETTING CHANGES
+        ref.listen(practiceConfigurationProvider, (prev, next) {
+                if (prev?.soundEnabled != next.soundEnabled) {
+                    if (next.soundEnabled) {
+                        _preloadKeypressSoundIfEnabled();
+                    }
                 }
             });
 
@@ -172,12 +242,12 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                                     ),
 
                                     Positioned.fill(
-                                        top: MediaQuery.of(context).size.height * 0.3,
+                                        top: MediaQuery.of(context).size.height * 1.1,
                                         child: IgnorePointer(
                                             ignoring:
                                             true, // <- key change: don't intercept taps/scrolls
                                             child: Opacity(
-                                                opacity: 1,
+                                                opacity: 0,
                                                 child: TextFormField(
                                                     maxLines: 2,
                                                     controller: widget.controller,

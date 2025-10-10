@@ -5,10 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
+import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/core/utils/time_utils.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/reset/practice_reset_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/stop/practice_stop_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/reset/session_reset_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/star_burst_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/stats_badge.dart';
 
@@ -25,23 +31,36 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
     Widget build(BuildContext context) {
         // 📃 DECLARATION ----------------------------
         // 🌐 PROVIDERS ------------------------------
-        // final engine = ref.watch(sessionStateNotifierProvider);
-        // final metrics = ref.watch(metricsNotifierProvider);
-        // final practiceConfig = ref.watch(practiceConfigurationProvider);
-        // final progress = ref.watch(practiceProgressProvider);
+        final sessionEngineController = ref.read(sessionControllerProvider.notifier);
+        final sessionEngineWatcher = ref.watch(sessionControllerProvider);
+        final practiceConfig = ref.watch(practiceConfigurationProvider);
+        final metricsStateController = ref.watch(metricsStateControllerProvider);
+        final typingProgress = ref.watch(typingProgressProvider);
 
         // 🚀 METHODS --------------------------------
-        void handlePracticeStopConfirmation(){
-            Get.to(() => PracticeStopPage(), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        void handlePracticeStopConfirmation() async {
+            final result = await Get.to(
+                () => const SessionStopPage(),
+                arguments: {
+                    'from': 'pause',
+                    'controller': widget.controller,
+                },
+                transition: Transition.fadeIn,
+                curve: Curves.easeInOutQuad,
+            );
+            if (result is Map && result['confirmed'] == true) {
+                // Also hide the pause page on confirmed stop
+                Get.back();
+            }
         }
 
         void handlePracticeResume(){
-            // ref.read(practiceSessionControllerProvider.notifier).resume();
+            sessionEngineController.resume();
             Get.back();
         }
 
         void handlePracticeResetConfirmation(){
-            Get.to(() => PracticeResetPage(controller: widget.controller), arguments: 'fromPause', transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+            Get.to(() => SessionResetPage(controller: widget.controller), arguments: kPause, transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
         }
 
         // ⭐ Widget ---------------------------------
@@ -100,7 +119,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.text_fields,
                                                                 label: 'WPM',
-                                                                value: /*practiceConfig.wpmEnabled ? metrics.wpm.toStringAsFixed(0) :*/ '--' // TODO: Need to set these metrics values
+                                                                value: practiceConfig.wpmEnabled ? metricsStateController.wpm.toStringAsFixed(0) : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -108,7 +127,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.my_location,
                                                                 label: 'Accuracy',
-                                                                value: /*practiceConfig.accuracyEnabled ? '${(metrics.accuracy*100).toStringAsFixed(0)}%' :*/ '--' // TODO: Need to set these metrics values
+                                                                value: practiceConfig.accuracyEnabled ? '${(metricsStateController.accuracy*100).toStringAsFixed(0)}%' : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -116,7 +135,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: FontAwesomeIcons.clock,
                                                                 label: 'Time',
-                                                                value: /*practiceConfig.timerEnabled ? formatDuration(engine.elapsed) :*/ '--' // TODO: Need to set these metrics values
+                                                                value: practiceConfig.timerEnabled ? formatDuration(sessionEngineWatcher.elapsed) : '--'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             StatsBadge(
@@ -124,7 +143,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                                                     context, 'State Layers/Background/Opacity-60'),
                                                                 icon: Icons.rotate_right,
                                                                 label: 'Progress',
-                                                                value: /*'${(progress * 100).toStringAsFixed(1)}%'*/ '--' // TODO: Need to set these metrics values
+                                                                value: '${(typingProgress * 100).toStringAsFixed(0)}%'
                                                             ),
                                                             SizedBox(height: Gap(context).gap(15)),
                                                             _iconLabelButton(
