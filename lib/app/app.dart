@@ -58,9 +58,12 @@ class App extends ConsumerWidget {
                         textTheme: AppTypographyScaled.of(context, fontFamily: 'Inter')
                     );
 
+                    final themedChild = child == null
+                        ? const SizedBox.shrink()
+                        : Theme(data: withScaledText, child: child);
                     return MediaQuery(
                         data: mq.copyWith(textScaler: clamped),
-                        child: Theme(data: withScaledText, child: child!)
+                        child: themedChild
                     );
                 },
 

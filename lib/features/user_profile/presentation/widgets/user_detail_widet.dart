@@ -47,9 +47,20 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                         height: 50,
                                                         fit: BoxFit.cover,
                                                         errorBuilder: (context, error, stackTrace) {
-                                                            return Text(widget.auth.hasValue && widget.auth.value?.displayName != null
-                                                                    ? widget.auth.value!.displayName!.split(' ').map((e) => e.isNotEmpty ? e[0] : '').join()
-                                                                    : 'GU',
+                                                            final u = widget.auth.value;
+                                                            final name = u?.displayName?.trim();
+                                                            String initials;
+                                                            if (name != null && name.isNotEmpty) {
+                                                                final parts = name.split(RegExp(r'\s+'));
+                                                                initials = parts.where((e) => e.isNotEmpty).take(2).map((e) => e[0]).join().toUpperCase();
+                                                            } else {
+                                                                final email = u?.email;
+                                                                initials = (email != null && email.isNotEmpty)
+                                                                    ? email[0].toUpperCase()
+                                                                    : 'GU';
+                                                            }
+                                                            return Text(
+                                                                initials,
                                                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                                     color: getFigmaColor(context, 'Schemes/On Primary Container')
                                                                 )
@@ -69,9 +80,20 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                     )
                                                 )    
                                                 :
-                                                Text(widget.auth.hasValue && widget.auth.value?.displayName != null
-                                                        ? widget.auth.value!.displayName!.split(' ').map((e) => e.isNotEmpty ? e[0] : '').join()
-                                                        : 'GU',
+                                                Text(() {
+                                                        final u = widget.auth.value;
+                                                        final name = u?.displayName?.trim();
+                                                        if (name != null && name.isNotEmpty) {
+                                                            final parts = name.split(RegExp(r'\s+'));
+                                                            final firstTwo = parts.where((e) => e.isNotEmpty).take(2).map((e) => e[0]).join();
+                                                            return firstTwo.toUpperCase();
+                                                        }
+                                                        final email = u?.email;
+                                                        if (email != null && email.isNotEmpty) {
+                                                            return email[0].toUpperCase();
+                                                        }
+                                                        return 'GU';
+                                                    }(),
                                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                         color: getFigmaColor(context, 'Schemes/On Primary Container')
                                                     )

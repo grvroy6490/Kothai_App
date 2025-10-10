@@ -7,7 +7,8 @@ Future<T?> showAppModalBottomSheet<T>({
     double heightFactor = 0.5,
     bool isScrollControlled = true,
     Color? backgroundColor,
-    ShapeBorder? shape
+    ShapeBorder? shape,
+    bool useRootNavigator = true
 }) {
     final bg = backgroundColor ?? getFigmaColor(context, 'Schemes/Background');
     final shp = shape ?? const RoundedRectangleBorder(
@@ -17,6 +18,7 @@ Future<T?> showAppModalBottomSheet<T>({
     return showModalBottomSheet<T>(
         context: context,
         isScrollControlled: isScrollControlled,
+        useRootNavigator: useRootNavigator,
         backgroundColor: bg,
         shape: shp,
         builder: (ctx) => FractionallySizedBox(
@@ -37,7 +39,8 @@ Future<T?> showAppModalWithChild<T>({
     double heightFactor = 0.5,
     bool isScrollControlled = true,
     Color? backgroundColor,
-    ShapeBorder? shape
+    ShapeBorder? shape,
+    bool useRootNavigator = true
 }) {
     return showAppModalBottomSheet<T>(
         context: context,
@@ -45,6 +48,7 @@ Future<T?> showAppModalWithChild<T>({
         heightFactor: heightFactor,
         isScrollControlled: isScrollControlled,
         backgroundColor: backgroundColor,
-        shape: shape
+        shape: shape,
+        useRootNavigator: useRootNavigator
     );
 }

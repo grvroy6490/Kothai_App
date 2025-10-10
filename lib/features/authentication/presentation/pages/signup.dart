@@ -8,6 +8,7 @@ import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/auth/auth_provider.dart';
 import 'package:kothai_app/domain/usecases/show_modal.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/login.dart';
+import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart' as auth_stream;
 import 'package:kothai_app/features/authentication/presentation/widgets/form-text-field.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
@@ -32,12 +33,17 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   // 🚀 METHODS --------------------------------
     void _handleLogin(){
+        // Capture a stable root context before popping current sheet
+        final rootCtx = Navigator.of(context, rootNavigator: true).context;
         Navigator.of(context).pop();
-        showAppModalBottomSheet(
-            context: context,
-            builder: (_) => const LoginPage(),
-            heightFactor: 0.65
-        );
+        Future.microtask(() {
+            showAppModalBottomSheet(
+                context: rootCtx,
+                builder: (_) => const LoginPage(),
+                heightFactor: 0.65,
+                useRootNavigator: true
+            );
+        });
     }
 
     // 👇 HANDLE SIGNUP
@@ -56,6 +62,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             builder: (_) => const Center(child: CircularProgressIndicator())
         );
 
+        bool loaderDismissed = false;
+        final messenger = ScaffoldMessenger.of(context);
+
         try {
             // Create account (signup), not sign-in
             await ref.read(authServiceProvider).createUserWithEmailAndPassword(email, password);
@@ -65,6 +74,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             if (user != null) {
                 if (username.isNotEmpty && user.displayName != username) {
                     await user.updateDisplayName(username);
+                    await user.reload();
                 }
                 // TODO: Implement this
                 // final prefs = ref.read(sharedPrefsServiceProvider);
@@ -74,32 +84,55 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 // }
             }
 
-            if (!mounted) return;
-            Navigator.of(context, rootNavigator: true).pop(); // close loading
+            if (!loaderDismissed) {
+                if (mounted) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                }
+                loaderDismissed = true;
+            }
 
-            // Close the signup sheet and notify success
+            if (!mounted) return;
+            // Ensure downstream listeners rebuild with updated displayName
+            ref.invalidate(auth_stream.authUserProvider);
+            // Close the signup sheet (bottom sheet) after success
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
+            // Notify success via captured messenger to avoid deactivated context
+            messenger.showSnackBar(
                 const SnackBar(content: Text('You are successfully signed up!'), backgroundColor: Colors.green)
             );
         } on FirebaseAuthException catch (e) {
             if (mounted) {
-                Navigator.of(context, rootNavigator: true).pop(); // close loading
-                final msg = switch (e.code) {
-                    'email-already-in-use' => 'Account exists. Please sign in.',
-                    'weak-password' => 'Password too weak.',
-                    _ => 'Sign up failed: ${e.code}'
-                };
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(msg), backgroundColor: Colors.red)
-                );
+                if (!loaderDismissed) {
+                    Navigator.of(context, rootNavigator: true).pop(); // close loading
+                    loaderDismissed = true;
+                }
+                if (e.code == 'email-already-in-use') {
+                    messenger.showSnackBar(
+                        const SnackBar(content: Text('Account exists. Please sign in.'), backgroundColor: Colors.orange)
+                    );
+                    _handleLogin();
+                } else {
+                    final msg = switch (e.code) {
+                        'weak-password' => 'Password too weak.',
+                        _ => 'Sign up failed: ${e.code}'
+                    };
+                    messenger.showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+                }
             }
         } catch (e) {
             if (mounted) {
-                Navigator.of(context, rootNavigator: true).pop(); // close loading
-                ScaffoldMessenger.of(context).showSnackBar(
+                if (!loaderDismissed) {
+                    Navigator.of(context, rootNavigator: true).pop(); // close loading
+                    loaderDismissed = true;
+                }
+                messenger.showSnackBar(
                     const SnackBar(content: Text('An unexpected error occurred.'), backgroundColor: Colors.red)
                 );
+            }
+        } finally {
+            if (mounted && !loaderDismissed) {
+                Navigator.of(context, rootNavigator: true).pop();
+                loaderDismissed = true;
             }
         }
     }

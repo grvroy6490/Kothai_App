@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/auth/auth_provider.dart';
+import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart' as auth_stream;
 import 'package:kothai_app/domain/usecases/show_modal.dart';
 import 'package:kothai_app/features/authentication/presentation/pages/signup.dart';
 
@@ -24,19 +25,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final TextEditingController _passwordController = TextEditingController();
     final FocusNode _focusNode = FocusNode();
     final FocusNode _passwordFocusNode = FocusNode();
-    final _formKey = GlobalKey<FormState>();
+    final _formloginKey = GlobalKey<FormState>();
     String? _passwordError;
     bool _loggingIn = false;
 
     // 🚀 METHODS --------------------------------
     void _handleSignup(){
+        final rootCtx = Navigator.of(context, rootNavigator: true).context;
         Navigator.of(context).pop();
-        showAppModalWithChild(context: context, child: SignupPage(), heightFactor: 0.8);
+        Future.microtask(() {
+            showAppModalWithChild(
+                context: rootCtx,
+                child: const SignupPage(),
+                heightFactor: 0.8,
+                useRootNavigator: true
+            );
+        });
     }
 
     // 👇 HANDLE LOGIN
     Future<void> _loginWithEmailAndPassword() async{
-        if (!_formKey.currentState!.validate()) return;
+        if (!_formloginKey.currentState!.validate()) return;
 
         FocusScope.of(context).unfocus();
         SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -69,10 +78,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             }
 
             if (!mounted) return;
-            Navigator.of(context, rootNavigator: true).pop(); // close loading
 
-            // Close the signup sheet and notify success
-            ScaffoldMessenger.of(context).showSnackBar(
+            // Ensure auth stream consumers refresh
+            ref.invalidate(auth_stream.authUserProvider);
+            // Close the login bottom sheet
+            Navigator.of(context).pop();
+            // Notify success using captured messenger (stable context)
+            messenger.showSnackBar(
                 const SnackBar(content: Text('You are successfully Logged In!'), backgroundColor: Colors.green)
             );
 
@@ -112,7 +124,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     setState(() {
                             _passwordError = fieldError;
                         });
-                    _formKey.currentState?.validate();
+                    _formloginKey.currentState?.validate();
                     _passwordFocusNode.requestFocus();
                 }
                 if (snack != null) {
@@ -196,7 +208,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 children: [
                                     SizedBox(height: Gap(context).gap(20)),
                                     Form(
-                                        key: _formKey,
+                                        key: _formloginKey,
                                         child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [

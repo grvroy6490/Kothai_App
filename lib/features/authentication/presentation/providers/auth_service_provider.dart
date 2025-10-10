@@ -6,6 +6,7 @@ import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider
 
 // Stream of the current Firebase user; null when signed out
 final authUserProvider = StreamProvider<User?>((ref) {
+        // Emits on sign-in/out, token refresh, and profile changes (displayName, photoURL)
         return FirebaseAuth.instance.userChanges();
     });
 
