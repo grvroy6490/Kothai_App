@@ -1,0 +1,1 @@
+enum BadgeType { general, xp, streak, speed, accuracy }

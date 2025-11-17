@@ -8,5 +8,6 @@ enum SessionStatusEnum {
   resume,
   showStop,
   showReset,
-  complete
+  complete,
+  restore
 }

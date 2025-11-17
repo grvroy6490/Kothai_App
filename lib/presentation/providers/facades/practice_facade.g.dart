@@ -6,7 +6,7 @@ part of 'practice_facade.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$practiceFacadeHash() => r'72ae7eabb046bec0f72637f907b770b8c733495d';
+String _$practiceFacadeHash() => r'4e087c758bb63213ef1962f02429c4cd4d7e5e19';
 
 /// See also [PracticeFacade].
 @ProviderFor(PracticeFacade)

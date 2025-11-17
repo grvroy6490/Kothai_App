@@ -22,6 +22,8 @@ const String kStreakCurrentKey = 'streak.current.v1';
 const String kStreakBestKey = 'streak.best.v1';
 const String kStreakLastYmdKey = 'streak.last_ymd.v1';
 const String kStreakDaysKey = 'streak.days.v1'; // Set of completed days
+const String kStreakWindowStartKey =
+    'streak.window_start.v1'; // 7-day window start date (yyyy-MM-dd)
 
 const String kEasyChallenge = 'easy_challenge.v1';
 const String kMediumChallenge = 'medium_challenge.v1';

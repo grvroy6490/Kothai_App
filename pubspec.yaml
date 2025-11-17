@@ -1,7 +1,7 @@
 name: kothai_app
 description: "Learn Tamil by Typing!"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 2.0.0+1
+version: 2.1.0+1
 
 environment:
   sdk: ^3.9.2
@@ -48,6 +48,8 @@ dependencies:
   unorm_dart: ^0.3.2
   just_audio: ^0.10.5
   lottie: ^3.3.2
+  fluttertoast: ^9.0.0
+  flutter_staggered_grid_view: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -110,6 +112,10 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/sounds/
+    - assets/badges/bronze/
+    - assets/badges/silver/
+    - assets/badges/gold/
+    - assets/badges/platinum/
 
   fonts:
     - family: NotoSansTamil

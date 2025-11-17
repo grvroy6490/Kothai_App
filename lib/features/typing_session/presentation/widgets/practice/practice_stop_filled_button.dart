@@ -16,6 +16,7 @@ class PracticeStopFilledButton extends ConsumerWidget {
     @override
     Widget build(BuildContext context, ref) {
         // 🌐 PROVIDERS ------------------------------
+        SessionMode sessionMode = ref.read(sessionStatusControllerProvider).mode;
 
         // 🚀 METHODS --------------------------------
         void handleStop() {
@@ -33,7 +34,7 @@ class PracticeStopFilledButton extends ConsumerWidget {
         // ⭐ Widget ---------------------------------
         return FilledButton.icon(
             onPressed: () => handleStop(),
-            label: Text('Stop Practice',
+            label: Text(sessionMode == SessionMode.practice ? 'Stop Practice' : 'Stop Challenge',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: getFigmaColor(context, 'Schemes/Error')
                 )

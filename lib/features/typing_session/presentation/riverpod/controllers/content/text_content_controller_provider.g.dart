@@ -88,7 +88,7 @@ final getPreloadedTextsProvider =
 // ignore: unused_element
 typedef GetPreloadedTextsRef = AutoDisposeFutureProviderRef<List<TextContent>>;
 String _$textContentControllerHash() =>
-    r'91bd8a51691644b12cd4dc66b4af8ee3a04d83f2';
+    r'acdcac0859ba3362ff47351adf1145a2409a5ce1';
 
 /// See also [TextContentController].
 @ProviderFor(TextContentController)

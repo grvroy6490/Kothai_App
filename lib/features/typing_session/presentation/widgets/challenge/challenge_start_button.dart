@@ -317,7 +317,7 @@ class _State extends ConsumerState<ChallengeStartButton>
                                                                 width: 60
                                                             )
                                                         ),
-                                                        SizedBox(height: Gap(context).gap(3)),
+                                                        SizedBox(height: isCurrentChallengeBlocked ? Gap(context).gap(3) : Gap(context).gap(20)),
 
                                                         isCurrentChallengeBlocked
                                                             ?

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
@@ -22,124 +21,152 @@ import 'package:kothai_app/features/typing_session/presentation/widgets/practice
 import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
 
 class PracticePage extends ConsumerStatefulWidget {
-    const PracticePage({super.key});
+  const PracticePage({super.key});
 
-    @override
-    ConsumerState<PracticePage> createState() => _PracticePageState();
+  @override
+  ConsumerState<PracticePage> createState() => _PracticePageState();
 }
 
 class _PracticePageState extends ConsumerState<PracticePage> {
-    final TextEditingController _controller = TextEditingController();
-    final FocusNode _focusNode = FocusNode();
-    late GamificationEntity? gamificationData;
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  late GamificationEntity? gamificationData;
 
-    @override
-    void initState() {
-        super.initState();
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 📃 DECLARATION ----------------------------
+    final controller = _controller;
+    final focusNode = _focusNode;
+    final sessionStatusController = ref.watch(sessionStatusControllerProvider);
+    final sessionEngineController = ref.read(
+      sessionControllerProvider.notifier,
+    );
+    final practiceStatus = sessionStatusController.mode == SessionMode.practice
+        ? sessionStatusController.status
+        : false;
+
+    // 🌐 PROVIDERS ------------------------------
+    final keyboardRenderer = ref.watch(
+      keyboardRendererProvider,
+    ); // 👈 KEYBOARD RENDERER
+    final isKeyboardVisible = ref.watch(
+      keyboardStatusProvider,
+    ); // 👈 KEYBOARD STATUS PROVIDER
+    final keyboardController = ref.watch(
+      keyboardControllerProvider(controller),
+    );
+    gamificationData = ref.watch(gamificationDataControllerProvider);
+
+    // 🚀 METHODS ---------------------------------
+    void showNotifications() async {
+      // final records = await ref.read(sessionDaoProvider).list();
+      // for (final r in records) {
+      //   debugPrint(r.);
+      // }
     }
 
-    @override
-    void dispose() {
-        _controller.dispose();
-        _focusNode.dispose();
-        super.dispose();
+    void handlePracticePause(TextEditingController controller) {
+      sessionEngineController.pause();
+      Get.to(
+        () => PracticePausePage(controller: controller),
+        transition: Transition.fadeIn,
+        curve: Curves.easeInOutQuad,
+      );
     }
 
-    @override
-    Widget build(BuildContext context) {
-        // 📃 DECLARATION ----------------------------
-        final controller = _controller;
-        final focusNode = _focusNode;
-        final sessionStatusController = ref.watch(sessionStatusControllerProvider);
-        final sessionEngineController = ref.read(sessionControllerProvider.notifier);
-        final practiceStatus = sessionStatusController.mode == SessionMode.practice ? sessionStatusController.status : false;
+    void handlePracticeReset(TextEditingController controller) {
+      Get.to(
+        () => SessionResetPage(controller: controller),
+        arguments: kReset,
+        transition: Transition.fadeIn,
+        curve: Curves.easeInOutQuad,
+      );
+    }
 
-        // 🌐 PROVIDERS ------------------------------
-        final keyboardRenderer = ref.watch(keyboardRendererProvider); // 👈 KEYBOARD RENDERER
-        final isKeyboardVisible = ref.watch(keyboardStatusProvider); // 👈 KEYBOARD STATUS PROVIDER
-        final keyboardController = ref.watch(keyboardControllerProvider(controller));
-        gamificationData = ref.watch(gamificationDataControllerProvider);
+    // ⭐ Widget --------------------------------------
+    return Scaffold(
+      backgroundColor: getFigmaColor(context, 'Schemes/Background'),
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: getFigmaColor(context, 'Schemes/Background'),
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Practice',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+          ),
+        ),
+        actions: appBarActions(
+          context,
+          practiceStatus != SessionStatusEnum.start,
+          showNotifications,
+          controller,
+        ), // 👈 PRACTICE APP BAR ACTIONS
+      ),
+      bottomNavigationBar: BottomNavigationBarWidget(),
+      body: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
 
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            PracticeEditorPage(
+              controller: controller,
+              focusNode: focusNode,
+              gamificationData: gamificationData,
+            ), // 👈 EDITOR PAGE
 
-        // 🚀 METHODS ---------------------------------
-        void showNotifications() async {
-            // final records = await ref.read(sessionDaoProvider).list();
-            // for (final r in records) {
-            //   debugPrint(r.);
-            // }
-        }
-
-        void handlePracticePause(TextEditingController controller){
-          sessionEngineController.pause();
-          Get.to(() => PracticePausePage(controller: controller), transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
-        }
-
-        void handlePracticeReset(TextEditingController controller){
-            Get.to(() => SessionResetPage(controller: controller), arguments: kReset, transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
-        }
-
-        // ⭐ Widget --------------------------------------
-        return Scaffold(
-            backgroundColor: getFigmaColor(context, 'Schemes/Background'),
-            appBar: AppBar(
-                surfaceTintColor: Colors.transparent,
-                backgroundColor: getFigmaColor(context, 'Schemes/Background'),
-                automaticallyImplyLeading: false,
-                title: Text('Practice', style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                    )
+            AnimatedSlide(
+              // 👈 KEYBOARD DRAWER
+              offset: isKeyboardVisible ? Offset.zero : const Offset(0, 1),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeInOutQuad,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PracticeResetPause(
+                      handlePause: handlePracticePause,
+                      handleReset: handlePracticeReset,
+                      controller: controller,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Gap(context).gap(8),
+                        vertical: Gap(context).gap(10),
+                      ),
+                      width: double.infinity,
+                      color: getFigmaColor(
+                        context,
+                        'Schemes/Surface Container',
+                      ),
+                      child: Keyboard(
+                        controller: keyboardController,
+                        renderer: keyboardRenderer,
+                      ),
+                    ),
+                  ],
                 ),
-                actions: appBarActions(
-                    context,
-                    practiceStatus != SessionStatusEnum.start,
-                    showNotifications,
-                    controller
-                ) // 👈 PRACTICE APP BAR ACTIONS
+              ),
             ),
-            bottomNavigationBar: BottomNavigationBarWidget(),
-            body: SizedBox(
-                height: double.infinity,
-                width: double.infinity,
-
-                child: Stack(
-                    clipBehavior: Clip.hardEdge,
-                    children: [
-                        PracticeEditorPage(
-                            controller: controller,
-                            focusNode: focusNode,
-                            gamificationData: gamificationData
-                        ), // 👈 EDITOR PAGE
-
-                        AnimatedSlide( // 👈 KEYBOARD DRAWER
-                            offset: isKeyboardVisible ? Offset.zero : const Offset(0, 1),
-                            duration: const Duration(milliseconds: 600),
-                            curve: Curves.easeInOutQuad,
-                            child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                        PracticeResetPause(
-                                            handlePause: handlePracticePause,
-                                            handleReset: handlePracticeReset,
-                                            controller: controller
-                                        ),
-                                        Container(
-                                            padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(8), vertical: Gap(context).gap(10)),
-                                            width: double.infinity,
-                                            color:  getFigmaColor(context, 'Schemes/Surface Container'),
-                                            child: Keyboard(controller: keyboardController, renderer: keyboardRenderer)
-                                        )
-                                    ]
-                                )
-                            )
-                        )
-                    ]
-                )
-            )
-        );
-    }
-
-
+          ],
+        ),
+      ),
+    );
+  }
 }

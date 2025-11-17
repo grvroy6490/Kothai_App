@@ -23,7 +23,7 @@ final textApiServiceProvider = AutoDisposeProvider<TextApiService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TextApiServiceRef = AutoDisposeProviderRef<TextApiService>;
-String _$textRepositoryHash() => r'2b5342d96c03d940f7747b485a40dabea6998c35';
+String _$textRepositoryHash() => r'146ecfb06f4a2b3dc14de52417d49dd5179c246e';
 
 /// See also [textRepository].
 @ProviderFor(textRepository)

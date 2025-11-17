@@ -1,1 +1,1 @@
-enum DifficultyEnum { easy, medium, hard }
+enum DifficultyEnum { easy, medium, hard, special }

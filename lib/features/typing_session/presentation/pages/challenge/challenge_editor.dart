@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
@@ -68,10 +67,10 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                     await ctrl.onKey(correct: correct);
                 }
             }
-            // If user deleted (backspace), we won’t alter metrics here.
+            // If user deleted (backspace), we won't alter metrics here.
             // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
 
-            if(progress >= 1.0){
+            if (progress >= 1.0) {
                 widget.controller.clear();
             }
 
@@ -93,23 +92,35 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
         final textContent = ref.watch(textContentControllerProvider);
-        final sessionController = ref.read(sessionStatusControllerProvider.notifier); // Session Controller
+        final sessionController = ref.read(
+            sessionStatusControllerProvider.notifier
+        ); // Session Controller
         final sessionState = ref.watch(sessionStatusControllerProvider);
-        final challengeDifficulty = ref.watch(challengeDifficultyControllerProvider);
+        final challengeDifficulty = ref.watch(
+            challengeDifficultyControllerProvider
+        );
         final typingProgress = ref.watch(typingProgressProvider);
 
-
-        final challengeStatus = sessionState.mode == SessionMode.challenge ? sessionState.status : false;
+        final challengeStatus = sessionState.mode == SessionMode.challenge
+            ? sessionState.status
+            : false;
         paragraph = textContent != null ? textContent.content : placeholderText;
-        difficultyCriteria = widget.gamificationData?.difficultyCriteria // Getting difficulty criteria based on difficulty config
-            .where((criteria) => criteria.type.toLowerCase() == challengeDifficulty.name.toString().toLowerCase())
+        difficultyCriteria = widget
+            .gamificationData
+            ?.difficultyCriteria // Getting difficulty criteria based on difficulty config
+            .where(
+                (criteria) =>
+                criteria.type.toLowerCase() ==
+                    challengeDifficulty.name.toString().toLowerCase()
+            )
             .firstOrNull;
 
         // 🚀 METHODS ---------------------------------
 
         // 👇 HANDLE TEXT FIELD FOCUS
         ref.listen(sessionStatusControllerProvider, (prev, next) {
-                if (next.mode == SessionMode.challenge && next.status == SessionStatusEnum.start) {
+                if (next.mode == SessionMode.challenge &&
+                    next.status == SessionStatusEnum.start) {
                     // focus the text field
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                             widget.focusNode.requestFocus();
@@ -196,7 +207,6 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                                             )
                                         )
                                     )
-
                                 ]
                             )
                         )

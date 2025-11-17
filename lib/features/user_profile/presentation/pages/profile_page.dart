@@ -7,7 +7,10 @@ import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/auth/auth_provider.dart';
 import 'package:kothai_app/di/providers/navigation/navigation_provider.dart';
 import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart';
+import 'package:kothai_app/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:kothai_app/features/user_profile/presentation/widgets/badge_display.dart';
+import 'package:kothai_app/features/user_profile/presentation/widgets/user_badge_gallery.dart';
 import 'package:kothai_app/features/user_profile/presentation/widgets/user_detail_widet.dart';
 import 'package:kothai_app/features/user_profile/presentation/widgets/user_settings.dart';
 import 'package:logger/logger.dart';
@@ -27,16 +30,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         // 🌐 PROVIDERS ------------------------------
         final _auth = ref.watch(authUserProvider);
         final isLoggedIn = ref.watch(isLoggedInProvider);
+        final badges = ref.read(badgeControllerProvider);
 
-
-        // _logger.d(_auth);
+        // _logger.d(_auth.value?.email != null);
 
         // 📃 DECLARATION ----------------------------
         final idx = ref.watch(selectNavProvider);
         final nav = ref.read(selectNavProvider.notifier);
         final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
-
-
 
         // ⭐ Widget ---------------------------------
         return Scaffold(
@@ -65,22 +66,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ]
                             );
                         },
-                        child: _auth.hasValue // !auth.hasValue // TODO: update auth
-                            ? FilledButton.icon(
-                                onPressed: (){
-                                },
-                                label: Text('Share Progress',
-                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                        color: getFigmaColor(context, 'Schemes/On Surface')
-                                    )
-                                ),
-                                icon: Icon(Icons.share),
-                                style: ButtonStyle(
-                                    iconColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'Schemes/On Surface')),
-                                    backgroundColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'State Layers/On Surface/Opacity-08'))
-                                )
-                            )
-                            : FilledButton.icon(
+                        child:  _auth.value?.email != null // TODO: update auth
+                            ?  FilledButton.icon(
                                 onPressed: (){
                                 },
                                 label: Text('Save your progress',
@@ -89,6 +76,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                     )
                                 ),
                                 icon: Icon(Icons.cloud_upload_rounded),
+                                style: ButtonStyle(
+                                    iconColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'Schemes/On Surface')),
+                                    backgroundColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'State Layers/On Surface/Opacity-08'))
+                                )
+                            )
+
+                            : FilledButton.icon(
+                                onPressed: (){
+                                },
+                                label: Text('Share Progress',
+                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                        color: getFigmaColor(context, 'Schemes/On Surface')
+                                    )
+                                ),
+                                icon: Icon(Icons.share),
                                 style: ButtonStyle(
                                     iconColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'Schemes/On Surface')),
                                     backgroundColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'State Layers/On Surface/Opacity-08'))
@@ -131,6 +133,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         child: Column(
                             children: [
                                 UserDetailWidet(auth: _auth),
+
+                                SizedBox(height: Gap(context).gap(10)),
+
+                                BadgeDisplay(),
+
+                                SizedBox(height: Gap(context).gap(10)),
+
+                                UserBadgeGallery(badges: badges),
 
                                 SizedBox(height: Gap(context).gap(10)),
                                 // SETTING CONTAINER

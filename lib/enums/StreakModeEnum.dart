@@ -1,0 +1,4 @@
+
+enum StreakModeEnum {
+  normal, restore
+}

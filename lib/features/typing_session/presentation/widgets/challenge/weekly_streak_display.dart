@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/challenge/restore_streak/restore_streak_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/streak_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/utils/streak_utils.dart';
@@ -16,7 +18,18 @@ class WeekilyStreakDisplay extends StatefulWidget {
 
 class _WeekilyStreakDisplayState extends State<WeekilyStreakDisplay> {
     final _logger = Logger();
+    bool _testInitialized = false;
     // 📃 DECLARATION ----------------------------
+
+    void _handleMissingStreakTap(WidgetRef ref, DateTime dayDate) {
+        // _logger.f('Tapped on missing streak for date: ${StreakUtils.ymd(dayDate)}');
+        Get.to(
+            () => RestoreStreakPage(),
+            arguments: {"day": dayDate},
+            transition: Transition.fade,
+            curve: Curves.easeInOut
+        );
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -24,29 +37,156 @@ class _WeekilyStreakDisplayState extends State<WeekilyStreakDisplay> {
         return Consumer(
             builder: (context, ref, _) {
                 final streak = ref.watch(streakControllerProvider);
-                // _logger.f('Current streak: ${streak.current}');
-                // _logger.f('Completed days: ${streak.completedDays}');
+                // _logger.f('Current streak: ${streak.best}');
+                // _logger.f('Streak completed: ${streak.streakCompleted.length} items');
 
-                // Get last 7 days completion status (oldest to newest)
-                final last7 = StreakUtils.getLast7DaysCompletion(streak.completedDays);
+                // 🧪 TESTING: Set up test scenario (only run once)
+                // Creates: Today completed, yesterday missing, 2 days ago completed, 3 days ago completed, 4 days ago missing, 5 days ago completed
+                if (_testInitialized) {
+                    _testInitialized = true;
+                    Future.microtask(() async {
+                            await ref.read(streakControllerProvider.notifier).resetStreak();
+
+                            // Day 1 (today) - completed
+                            await ref.read(streakControllerProvider.notifier).markActiveToday();
+
+                            // Day 2 (yesterday) - missing (skip it to create gap)
+
+                            // Day 3 (2 days ago) - completed
+                            final twoDaysAgo = DateTime.now().subtract(Duration(days: 2));
+                            await ref
+                                .read(streakControllerProvider.notifier)
+                                .addStreakForDay(twoDaysAgo);
+
+                            // Day 4 (3 days ago) - completed
+                            final threeDaysAgo = DateTime.now().subtract(Duration(days: 3));
+                            await ref
+                                .read(streakControllerProvider.notifier)
+                                .addStreakForDay(threeDaysAgo);
+
+                            // Day 5 (4 days ago) - missing (skip it to create gap)
+
+                            // Day 6 (5 days ago) - completed
+                            final fiveDaysAgo = DateTime.now().subtract(Duration(days: 5));
+                            await ref
+                                .read(streakControllerProvider.notifier)
+                                .addStreakForDay(fiveDaysAgo);
+
+                            // Day 7 (6 days ago) - upcoming (not added)
+
+                            // _logger.f(
+                            //     '✅ Test setup: Today completed, yesterday missing, 2 days ago completed, 3 days ago completed, 4 days ago missing, 5 days ago completed'
+                            // );
+                        });
+                }
+
+                // Get 7-day window status as objects: {streak: int, date: String} (oldest to newest)
+                // streak > 0 = completed, streak = -1 = missing, streak = 0 = upcoming
+                final last7Status = StreakUtils.getLast7DaysStatus(
+                    streak.streakCompleted,
+                    streak.windowStartDate
+                );
+
+                // _logger.d(last7Status);
 
                 // Reverse the array so UI shows from left to right (newest to oldest)
-                final reversedLast7 = last7.reversed.toList();
+                final reversedLast7Status = last7Status.toList();
 
-                // _logger.f('Last 7 days completion (original): $last7');
-                // _logger.f('Last 7 days completion (reversed): $reversedLast7');
+                // Get the actual dates for the 7-day window (newest to oldest)
+                final last7Days = <DateTime>[];
+                if (streak.windowStartDate != null) {
+                    final windowStart = DateTime.tryParse(streak.windowStartDate!);
+                    if (windowStart != null) {
+                        final windowStartOnly = DateTime(
+                            windowStart.year,
+                            windowStart.month,
+                            windowStart.day
+                        );
+                        // Generate 7 days from window start (oldest to newest), then reverse
+                        last7Days.addAll(
+                            List.generate(7, (index) {
+                                    return windowStartOnly.add(Duration(days: 6 - index));
+                                }).reversed.toList()
+                        );
+                    }
+                }
+
+                // If no window start, generate empty dates
+                if (last7Days.isEmpty) {
+                    final today = DateTime.now().toLocal();
+                    final todayDateOnly = DateTime(today.year, today.month, today.day);
+                    last7Days.addAll(
+                        List.generate(7, (index) {
+                                return todayDateOnly.subtract(Duration(days: 6 - index));
+                            }).reversed.toList()
+                    );
+                }
+
+                // Find today's index in the reversed array (newest to oldest)
+                final today = DateTime.now().toLocal();
+                final todayDateDash =
+                    '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+                // Find today's index in the reversed array
+                int todayIndex = reversedLast7Status.indexWhere(
+                    (statusObj) => statusObj['date'] == todayDateDash
+                );
+                if (todayIndex == -1) {
+                    // Today is not in the window (window hasn't started or has expired)
+                    todayIndex = 0;
+                }
+
+                final todayStatusObj = reversedLast7Status[todayIndex];
+                final todayStatus = todayStatusObj['streak'] as int;
+
+                // Determine which badge should be expanded
+                // Priority: Find the first completed day after today (skipping missing days)
+                // If today is completed, find the next completed day after index 0
+                int expandIndex;
+                if (todayStatus > 0) {
+                    // Today is completed, find the first completed day after today (index > 0)
+                    final nextCompletedIndex = reversedLast7Status.indexWhere(
+                        (statusObj) {
+                            final status = statusObj['streak'] as int;
+                            return status > 0;
+                        },
+                        1 // Start searching from index 1 (skip today)
+                    );
+                    if (nextCompletedIndex != -1) {
+                        // Found a completed day after today (e.g., 3rd day at index 2)
+                        expandIndex = nextCompletedIndex;
+                    } else {
+                        // No other completed days, expand today
+                        expandIndex = todayIndex;
+                    }
+                } else {
+                    // Today is not completed, find the first completed day
+                    final firstCompletedIndex = reversedLast7Status.indexWhere((
+                            statusObj
+                        ) {
+                            final status = statusObj['streak'] as int;
+                            return status > 0;
+                        });
+                    expandIndex = firstCompletedIndex == -1 ? 0 : firstCompletedIndex;
+                }
+
+                // _logger.f('Last 7 days status (original): $last7Status');
+                // _logger.f('Last 7 days status (reversed): $reversedLast7Status');
+                // _logger.f(
+                //     'Today index: $todayIndex, Today status: $todayStatus, Expand index: $expandIndex'
+                // );
                 // _logger.f('Current streak: ${streak.current}');
-                // _logger.f('Completed days set: ${streak.completedDays}');
+                // _logger.f(
+                //     'Streak completed list: ${streak.streakCompleted.length} items'
+                // );
 
-                // Debug: Show which days are completed
-                final last7Days = StreakUtils.getLast7Days();
-                // for (int i = 0; i < 7; i++) {
-                //     _logger.f('Day $i (${last7Days[i]}): completed=${last7[i]}');
-                // }
-
-                // Days remaining to reach 7-day streak (bounded 0..7)
-                final currentForGoal = streak.current.clamp(0, 7);
-                final daysRemaining = (7 - currentForGoal).clamp(0, 7);
+                // Calculate days remaining based on completed days count
+                // Count how many days are completed (streak > 0)
+                final completedCount = reversedLast7Status.where((statusObj) {
+                        final status = statusObj['streak'] as int;
+                        return status > 0;
+                    }).length;
+                final daysRemaining = (7 - completedCount).clamp(0, 7);
 
                 return Column(
                     children: [
@@ -54,51 +194,46 @@ class _WeekilyStreakDisplayState extends State<WeekilyStreakDisplay> {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: List.generate(7, (index) {
-                                    // Find the first completed day to make it non-collapsed
-                                    // If no streak, make the first day (index 0) non-collapsed
-                                    final firstCompletedIndex = reversedLast7.indexWhere(
-                                        (completed) => completed
-                                    );
-                                    final shouldExpand = firstCompletedIndex == -1
-                                        ? index ==
-                                            0 // No streak, expand first day
-                                        : index ==
-                                            firstCompletedIndex; // Expand first completed day
+                                    // Get status from object: {streak: int, date: String}
+                                    final dayStatusObj = reversedLast7Status[index];
+                                    final dayStatus = dayStatusObj['streak'] as int;
+                                    final isCompleted = dayStatus > 0;
+                                    final isMissing = dayStatus == -1;
 
-                                    // Calculate the day number based on streak position
-                                    // The day number should represent the streak day (1st, 2nd, etc.)
-                                    int dayNumber;
-                                    if (streak.current == 0) {
-                                        // No streak, show position numbers (1-7)
-                                        dayNumber = index;
+                                    // Expand the badge at expandIndex
+                                    final shouldExpand = index == expandIndex;
+
+                                    // Calculate the day number: index 0 = day 1, index 1 = day 2, etc.
+                                    // The day number represents the position in the 7-day window (1-7)
+                                    final dayNumber = index;
+
+                                    // Determine badge status from integer status
+                                    final dayDate = last7Days[index];
+                                    StreakBadgeStatus badgeStatus;
+                                    if (isCompleted) {
+                                        badgeStatus = StreakBadgeStatus.completed;
+                                    } else if (isMissing) {
+                                        badgeStatus = StreakBadgeStatus.missing;
                                     } else {
-                                        // For streaks, calculate which day in the streak this represents
-                                        if (reversedLast7[index]) {
-                                            // This day is completed, find its position in the streak
-                                            int streakPosition = 0;
-                                            for (int i = 0; i <= index; i++) {
-                                                if (reversedLast7[i]) streakPosition++;
-                                            }
-                                            dayNumber =
-                                            streakPosition - 1; // Convert to 0-based for display
-                                        } else {
-                                            // This day is not completed, show next available position
-                                            int completedBeforeThis = 0;
-                                            for (int i = 0; i < index; i++) {
-                                                if (reversedLast7[i]) completedBeforeThis++;
-                                            }
-                                            dayNumber = completedBeforeThis;
-                                        }
+                                        badgeStatus = StreakBadgeStatus.upcoming;
                                     }
 
                                     // _logger.f(
-                                    //   'Badge $index: completed=${reversedLast7[index]}, dayNumber=$dayNumber, shouldExpand=$shouldExpand',
+                                    //   'Badge $index: completed=${reversedLast7[index]}, dayNumber=$dayNumber, shouldExpand=$shouldExpand, status=$badgeStatus',
                                     // );
 
-                                    return StreakBadge(
-                                        completed: reversedLast7[index],
-                                        day: dayNumber, // Use calculated day number
-                                        isCollapsed: !shouldExpand
+                                    return SizedBox(
+                                        child: StreakBadge(
+                                            status: badgeStatus,
+                                            day: dayNumber, // Use calculated day number
+                                            isCollapsed: !shouldExpand,
+                                            onTap: badgeStatus == StreakBadgeStatus.missing
+                                                ? () {
+                                                    // Handle missing streak tap
+                                                    _handleMissingStreakTap(ref, dayDate);
+                                                }
+                                                : null
+                                        )
                                     );
                                 })
                         ),

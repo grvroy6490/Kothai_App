@@ -20,6 +20,13 @@
             "timeLimit": "3m",
             "xpMultiplier": 400,
             "difficultyMultiplier": 1.5
+        },
+        "special": {
+            "accuracy": 98,
+            "wpm": 40,
+            "timeLimit": "3m",
+            "xpMultiplier": 400,
+            "difficultyMultiplier": 1.5
         }
     },
     "levels": {

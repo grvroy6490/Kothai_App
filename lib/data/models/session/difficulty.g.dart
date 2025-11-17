@@ -41,6 +41,7 @@ const _$DifficultyEnumEnumMap = {
   DifficultyEnum.easy: 'easy',
   DifficultyEnum.medium: 'medium',
   DifficultyEnum.hard: 'hard',
+  DifficultyEnum.special: 'special',
 };
 
 const _$AccuracyThresholdEnumEnumMap = {

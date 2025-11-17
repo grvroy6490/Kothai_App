@@ -19,6 +19,7 @@ import 'package:kothai_app/features/typing_session/presentation/riverpod/control
 import 'package:kothai_app/features/typing_session/presentation/widgets/lottie_player.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/star_burst_badge.dart';
 import 'package:kothai_app/features/typing_session/usecases/score/score_calculation.dart';
+import 'package:logger/logger.dart';
 
 class SessionCompletePage extends ConsumerStatefulWidget {
     const SessionCompletePage({super.key});
@@ -29,12 +30,14 @@ class SessionCompletePage extends ConsumerStatefulWidget {
 }
 
 class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
+    final _logger = Logger();
+
+
     @override
     Widget build(BuildContext context) {
         // 📃 DECLARATION ----------------------------
 
         // 🌐 PROVIDERS ------------------------------
-        final sessionEngineWatcher = ref.watch(sessionControllerProvider);
         final sessionEngineController = ref.read(
             sessionControllerProvider.notifier
         );
@@ -42,7 +45,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
             sessionStatusControllerProvider.notifier
         );
         final sesstionStatusWatcher = ref.watch(sessionStatusControllerProvider);
-        final metricsStateController = ref.read(metricsStateControllerProvider);
+        final metricsStateController = ref.watch(metricsStateControllerProvider);
         final isLoggedIn = ref.watch(isLoggedInProvider);
         final gamificationDataController = ref.watch(
             gamificationDataControllerProvider
@@ -53,6 +56,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
             sessionEngineController.reset();
             sessionEngineController.stop();
             await ref.read(textContentControllerProvider.notifier).rollNewContent();
+            sessionEngineController.start();
             Get.back();
         }
 
@@ -75,8 +79,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
 
         void handleRepeat() async {
             // Complete the session to save challenge data
-            await sessionEngineController.complete();
-            sessionEngineController.reset();
+            ref.read(sessionControllerProvider.notifier).restart();
             Get.back();
         }
 
@@ -105,6 +108,8 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
 
             return xp;
         }
+
+        // _logger.d(metricsStateController.elapsedMs);
 
         // ⭐ Widget ---------------------------------
         return Scaffold(
@@ -296,7 +301,12 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
                                                             context,
                                                             Icons.schedule,
                                                             'Time Taken',
-                                                            formatDuration(sessionEngineWatcher.elapsed)
+                                                            formatDuration(
+                                                                Duration(
+                                                                    milliseconds:
+                                                                    metricsStateController.elapsedMs
+                                                                )
+                                                            )
                                                         )
                                                     )
                                                 )

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
@@ -44,15 +44,10 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
     int _lastLen = 0;
     late VoidCallback _controllerListener;
     late DifficultyCriteriaEntity? difficultyCriteria;
-    late AudioPlayer _audioPlayer;
 
     @override
     void initState() {
         super.initState();
-
-        // Initialize audio player and preload the sound if enabled
-        _audioPlayer = AudioPlayer();
-        _preloadKeypressSoundIfEnabled();
 
         // Roll a new paragraph explicitly when starting
         ref.read(textContentControllerProvider.notifier).rollNewContent();
@@ -82,7 +77,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                     _playKeypressSoundIfEnabled();
                 }
             }
-            // If user deleted (backspace), we won’t alter metrics here.
+            // If user deleted (backspace), we won't alter metrics here.
             // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
 
             if (progress >= 1.0) {
@@ -100,30 +95,16 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
     @override
     void dispose() {
         widget.controller.removeListener(_controllerListener);
-        _audioPlayer.dispose();
         super.dispose();
     }
 
-    // Method to preload keypress sound if enabled
-    void _preloadKeypressSoundIfEnabled() async {
-        final config = ref.read(practiceConfigurationProvider);
-        if (config.soundEnabled) {
-            try {
-                await _audioPlayer.setAsset('assets/sounds/single keypad click.wav');
-            } catch (e) {
-                _logger.e('Error preloading keypress sound: $e');
-            }
-        }
-    }
-
-    // Method to play keypress sound if enabled
+    // Method to play keypress sound if enabled (using system default)
     void _playKeypressSoundIfEnabled() {
         final config = ref.read(practiceConfigurationProvider);
         if (config.soundEnabled) {
             try {
-                // Reset to beginning and play immediately
-                _audioPlayer.seek(Duration.zero);
-                _audioPlayer.play();
+                // Use system default click sound for instant playback with no latency
+                SystemSound.play(SystemSoundType.click);
             } catch (e) {
                 _logger.e('Error playing keypress sound: $e');
             }
@@ -169,7 +150,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
         void handleStartMain() async {
             sessionStatusController.reset();
             sessionStatusController.updateMode(SessionMode.practice);
-            await ref.read(textContentControllerProvider.notifier).rollNewContent();
+            // await ref.read(textContentControllerProvider.notifier).rollNewContent();
             sessionStatusController.updateStatus(SessionStatusEnum.start);
             await sessionEngineController.start();
         }
@@ -184,15 +165,6 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                         });
                 } else {
                     widget.focusNode.unfocus();
-                }
-            });
-
-        // 👇 HANDLE SOUND SETTING CHANGES
-        ref.listen(practiceConfigurationProvider, (prev, next) {
-                if (prev?.soundEnabled != next.soundEnabled) {
-                    if (next.soundEnabled) {
-                        _preloadKeypressSoundIfEnabled();
-                    }
                 }
             });
 

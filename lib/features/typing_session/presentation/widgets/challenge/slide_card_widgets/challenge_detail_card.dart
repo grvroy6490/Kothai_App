@@ -50,7 +50,7 @@ class _ChallengeDetailCardState extends State<ChallengeDetailCard> {
                             horizontal: Gap(context).gap(30)
                         ),
                         decoration: BoxDecoration(
-                            image: DecorationImage(image: AssetImage(widget.image)),
+                            image: DecorationImage(image: AssetImage(widget.image), fit: BoxFit.fill),
                             borderRadius: BorderRadius.circular(16)
                         ),
                         child: widget.child

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,15 +6,18 @@ import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/constants/typing_session_constants.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
+import 'package:kothai_app/enums/StreakModeEnum.dart';
 import 'package:kothai_app/features/keyboard/presentation/keyboard.dart';
 import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
 import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_editor.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_home_screen.dart';
+import 'package:kothai_app/features/typing_session/presentation/pages/challenge/streak_challenge.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/session/reset/session_reset_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_ui_controller.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/streak_mode_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
@@ -38,6 +40,17 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
     late GamificationEntity? gamificationData;
 
     @override
+    void didChangeDependencies() {
+        super.didChangeDependencies();
+        // Reset to normal mode when challenge page becomes visible
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                    ref.read(streakModeProvider.notifier).setNormalMode();
+                }
+            });
+    }
+
+    @override
     void dispose() {
         _controller.dispose();
         _focusNode.dispose();
@@ -47,13 +60,24 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
     @override
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
-        final challengeDifficulty = ref.watch(challengeDifficultyControllerProvider); // 👈 CHALLENGE DIFFICULTY)
-        final selectedChallengeSlide = ref.watch(selectedChallengeUIControllerProvider);
+        final challengeDifficulty = ref.watch(
+            challengeDifficultyControllerProvider
+        ); // 👈 CHALLENGE DIFFICULTY)
+        final selectedChallengeSlide = ref.watch(
+            selectedChallengeUIControllerProvider
+        );
         final sessionState = ref.watch(sessionStatusControllerProvider);
-        final keyboardRenderer = ref.watch(keyboardRendererProvider); // 👈 KEYBOARD RENDERER
-        final isKeyboardVisible = ref.watch(keyboardStatusProvider); // 👈 KEYBOARD STATUS PROVIDER
-        final keyboardController = ref.watch(keyboardControllerProvider(_controller));
+        final keyboardRenderer = ref.watch(
+            keyboardRendererProvider
+        ); // 👈 KEYBOARD RENDERER
+        final isKeyboardVisible = ref.watch(
+            keyboardStatusProvider
+        ); // 👈 KEYBOARD STATUS PROVIDER
+        final keyboardController = ref.watch(
+            keyboardControllerProvider(_controller)
+        );
         gamificationData = ref.watch(gamificationDataControllerProvider);
+        final streakmode = ref.watch(streakModeProvider).mode;
         // final challengeProvider = ref.read(challengeSessionToPrefsProvider);
 
         // challengeProvider.clear(kEasyChallenge);
@@ -61,7 +85,9 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
         // challengeProvider.clear(kHardChallenge);
 
         // 📃 DECLARATION ----------------------------
-        final sessionStatus = sessionState.mode == SessionMode.challenge ? sessionState.status : null;
+        final sessionStatus = sessionState.mode == SessionMode.challenge
+            ? sessionState.status
+            : null;
 
         // 🚀 METHODS --------------------------------
         void showNotifications() async {
@@ -69,11 +95,16 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
             // prefs.remove(kStreakLastYmdKey);
         }
 
-        void handleChallengePause(TextEditingController controller){
+        void handleChallengePause(TextEditingController controller) {
         }
 
-        void handleChallengeReset(TextEditingController controller){
-            Get.to(() => SessionResetPage(controller: controller), arguments: kReset, transition: Transition.fadeIn, curve: Curves.easeInOutQuad);
+        void handleChallengeReset(TextEditingController controller) {
+            Get.to(
+                () => SessionResetPage(controller: controller),
+                arguments: kReset,
+                transition: Transition.fadeIn,
+                curve: Curves.easeInOutQuad
+            );
         }
 
         // ⭐ Widget ---------------------------------
@@ -85,8 +116,10 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                     ? getFigmaColor(context, 'Schemes/Surface Container')
                     : getFigmaColor(context, selectedChallengeSlide.bgColor),
                 automaticallyImplyLeading: false,
-                title: Text(sessionStatus == SessionStatusEnum.start
-                        ? challengeDifficulty.name[0].toUpperCase() + challengeDifficulty.name.substring(1)
+                title: Text(
+                    sessionStatus == SessionStatusEnum.start
+                        ? challengeDifficulty.name[0].toUpperCase() +
+                            challengeDifficulty.name.substring(1)
                         : 'Challenge',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: getFigmaColor(context, 'Schemes/On Surface Variant')
@@ -98,11 +131,11 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                     showNotifications,
                     _controller
                 )
-            ),// 👈 PRACTICE APP BAR ACTIONS
+            ), // 👈 PRACTICE APP BAR ACTIONS
             bottomNavigationBar: BottomNavigationBarWidget(controller: _controller),
 
             body: LayoutBuilder(
-                builder: (context, constraints){
+                builder: (context, constraints) {
                     return Stack(
                         children: [
                             AnimatedCrossFade(
@@ -111,7 +144,9 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                                         maxHeight: constraints.maxHeight,
                                         maxWidth: constraints.maxWidth
                                     ),
-                                    child: ChallengeHomeScreen()
+                                    child: streakmode == StreakModeEnum.restore
+                                        ? StreakChallenge()
+                                        : ChallengeHomeScreen()
                                 ),
                                 secondChild: ConstrainedBox(
                                     constraints: BoxConstraints(
@@ -124,11 +159,14 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                                         focusNode: _focusNode
                                     )
                                 ),
-                                crossFadeState: sessionStatus == SessionStatusEnum.start ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                                crossFadeState: sessionStatus == SessionStatusEnum.start
+                                    ? CrossFadeState.showSecond
+                                    : CrossFadeState.showFirst,
                                 duration: Duration(milliseconds: 600)
                             ),
 
-                            AnimatedSlide( // 👈 KEYBOARD DRAWER
+                            AnimatedSlide(
+                                // 👈 KEYBOARD DRAWER
                                 offset: isKeyboardVisible ? Offset.zero : const Offset(0, 1),
                                 duration: const Duration(milliseconds: 600),
                                 curve: Curves.easeInOutQuad,
@@ -144,10 +182,19 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                                                 controller: _controller
                                             ),
                                             Container(
-                                                padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(8), vertical: Gap(context).gap(10)),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: Gap(context).gap(8),
+                                                    vertical: Gap(context).gap(10)
+                                                ),
                                                 width: double.infinity,
-                                                color:  getFigmaColor(context, 'Schemes/Surface Container'),
-                                                child: Keyboard(controller: keyboardController, renderer: keyboardRenderer)
+                                                color: getFigmaColor(
+                                                    context,
+                                                    'Schemes/Surface Container'
+                                                ),
+                                                child: Keyboard(
+                                                    controller: keyboardController,
+                                                    renderer: keyboardRenderer
+                                                )
                                             )
                                         ]
                                     )
