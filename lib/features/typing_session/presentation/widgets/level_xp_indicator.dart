@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
+import 'package:kothai_app/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 import 'package:logger/logger.dart';
@@ -58,8 +60,12 @@ class LevelXPIndicatior extends ConsumerWidget {
                 )
             ),
             clipBehavior: Clip.hardEdge,
-            child: Stack(
-                children: [
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() => XpMilestonesPage(), transition: Transition.fadeIn, curve: Curves.fastOutSlowIn, duration: Duration(milliseconds: 500));
+              },
+              child: Stack(
+                  children: [
                     //Background Progress Bar
                     // Background Progress Bar
                     Positioned.fill(
@@ -74,8 +80,8 @@ class LevelXPIndicatior extends ConsumerWidget {
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
                                             colors: [
-                                                getFigmaColor(context, 'Palettes/Secondary 90'),
-                                                getFigmaColor(context, 'Palettes/Primary 80')
+                                              getFigmaColor(context, 'Palettes/Secondary 90'),
+                                              getFigmaColor(context, 'Palettes/Primary 80')
                                             ]
                                         ),
                                         borderRadius: BorderRadius.circular(25)
@@ -98,83 +104,84 @@ class LevelXPIndicatior extends ConsumerWidget {
                             spacing: Gap(context).gap(5),
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                                Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: Gap(context).gap(5),
-                                        vertical: Gap(context).gap(8)
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        borderRadius: BorderRadius.circular(25)
-                                    ),
-                                    child: Stack(
-                                        children: [
-                                            SvgPicture.asset(
-                                                'assets/images/Gold_Icon.svg',
-                                                width: Gap(context).gap(16)
-                                            )
-                                        ]
-                                    )
-                                ),
+                              Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: Gap(context).gap(5),
+                                      vertical: Gap(context).gap(8)
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(25)
+                                  ),
+                                  child: Stack(
+                                      children: [
+                                        SvgPicture.asset(
+                                            'assets/images/Gold_Icon.svg',
+                                            width: Gap(context).gap(16)
+                                        )
+                                      ]
+                                  )
+                              ),
+
+                              Text(
+                                  'Level ${score.level}', // TODO: Need to get user level here
+                                  style: isCompact
+                                      ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                                      color: getFigmaColor(
+                                          context,
+                                          'Schemes/On Surface Variant'
+                                      )
+                                  )
+                                      : Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      color: getFigmaColor(
+                                          context,
+                                          'Schemes/On Surface Variant'
+                                      ),
+                                      fontWeight: FontWeight.w700
+                                  )
+                              ),
+                              Icon(
+                                  Icons.circle,
+                                  size: KxScale(context).sp(5),
+                                  color: Colors.white
+                              ),
+                              Text(
+                                  '${formatXP(score.totalXp)} XP',
+                                  style: isCompact
+                                      ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                                      color: getFigmaColor(
+                                          context,
+                                          'Schemes/On Surface Variant'
+                                      )
+                                  )
+                                      : Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      color: getFigmaColor(
+                                          context,
+                                          'Schemes/On Surface Variant'
+                                      ),
+                                      fontWeight: FontWeight.w700
+                                  )
+                              ),
+
+                              if (!isCompact) ...[
+                                Spacer(),
 
                                 Text(
-                                    'Level ${score.level}', // TODO: Need to get user level here
-                                    style: isCompact
-                                        ? Theme.of(context).textTheme.labelMedium?.copyWith(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Surface Variant'
-                                            )
-                                        )
-                                        : Theme.of(context).textTheme.labelLarge?.copyWith(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Surface Variant'
-                                            ),
-                                            fontWeight: FontWeight.w700
-                                        )
-                                ),
-                                Icon(
-                                    Icons.circle,
-                                    size: KxScale(context).sp(5),
-                                    color: Colors.white
-                                ),
-                                Text(
-                                    '${formatXP(score.totalXp)} XP',
-                                    style: isCompact
-                                        ? Theme.of(context).textTheme.labelMedium?.copyWith(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Surface Variant'
-                                            )
-                                        )
-                                        : Theme.of(context).textTheme.labelLarge?.copyWith(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Surface Variant'
-                                            ),
-                                            fontWeight: FontWeight.w700
-                                        )
-                                ),
-
-                                if (!isCompact) ...[
-                                    Spacer(),
-
-                                    Text(
-                                        '${formatXP(score.xpIntoLevel)} XP to next level',
-                                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Surface Variant'
-                                            ),
-                                            fontWeight: FontWeight.w700
-                                        )
+                                    '${formatXP(score.xpIntoLevel)} XP to next level',
+                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                        color: getFigmaColor(
+                                            context,
+                                            'Schemes/On Surface Variant'
+                                        ),
+                                        fontWeight: FontWeight.w700
                                     )
-                                ]
+                                )
+                              ]
                             ]
                         )
                     )
-                ]
+                  ]
+              ),
             )
         );
     }

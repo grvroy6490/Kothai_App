@@ -25,6 +25,7 @@ import 'package:kothai_app/features/typing_session/presentation/riverpod/control
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
+import 'package:kothai_app/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
 import 'package:kothai_app/features/typing_session/usecases/score/score_calculation.dart';
 import 'package:logger/logger.dart';
 // import 'package:logger/logger.dart';
@@ -36,6 +37,8 @@ part 'session_controller_provider.g.dart';
 @riverpod
 class SessionController extends _$SessionController {
   final _logger = Logger();
+  bool _isCompleting = false; // Guard to prevent duplicate completion calls
+
   @override
   SessionState build() {
     // Mirror the engine state so widgets watching `sessionControllerProvider`
@@ -74,12 +77,14 @@ class SessionController extends _$SessionController {
   }
 
   void reset() {
+    _isCompleting = false; // Reset completion flag when resetting
     ref.read(sessionStateNotifierProvider.notifier).reset();
     ref.read(metricsStateControllerProvider.notifier).reset();
     ref.read(userInputProvider.notifier).clear();
   }
 
   void restart() {
+    _isCompleting = false; // Reset completion flag when restarting
     ref.read(sessionStateNotifierProvider.notifier).restart();
     ref.read(metricsStateControllerProvider.notifier).reset();
     ref.read(userInputProvider.notifier).clear();
@@ -155,113 +160,128 @@ class SessionController extends _$SessionController {
   }
 
   Future<void> complete({bool challengePassed = false}) async {
-    final st = ref.read(sessionStateNotifierProvider);
-    final gamificationData = ref.read(gamificationDataControllerProvider);
-
-    DifficultyCriteriaEntity? difficultyCriteria;
-    if (gamificationData != null) {
-      difficultyCriteria = gamificationData.difficultyCriteria
-          .where(
-            (criteria) =>
-                criteria.type.toLowerCase() == _difficulty.name.toLowerCase(),
-          )
-          .firstOrNull;
+    // Prevent duplicate completion calls (e.g., when user pastes multiple chars)
+    if (_isCompleting) {
+      return;
     }
+    _isCompleting = true;
 
-    // Mark streak for today when challenge is completed (regardless of pass/fail)
-    if (_mode == SessionMode.challenge) {
-      // Mark streak for today - counts as completing a challenge day
-      await ref.read(streakControllerProvider.notifier).markActiveToday();
+    try {
+      final st = ref.read(sessionStateNotifierProvider);
+      final gamificationData = ref.read(gamificationDataControllerProvider);
 
-      // BADGE CHECK - Check streak badges after updating streak
-      final updatedStreak = ref.read(streakControllerProvider);
-      ref
-          .read(badgeControllerProvider.notifier)
-          .onStreakChanged(Get.context!, updatedStreak.current);
-
-      // Store the current challenge for 24H (regardless of pass/fail) to lock it
-      final challenge = ChallengeTrackingEntity(
-        difficulty: _difficulty,
-        timestamp: DateTime.now().toString(),
-      );
-
-      // Save challenge to lock it for 24 hours (even if failed)
-      if (_difficulty == DifficultyEnum.easy) {
-        await ref
-            .read(challengeSessionToPrefsProvider)
-            .save(challenge, kEasyChallenge);
-      } else if (_difficulty == DifficultyEnum.medium) {
-        await ref
-            .read(challengeSessionToPrefsProvider)
-            .save(challenge, kMediumChallenge);
-      } else if (_difficulty == DifficultyEnum.hard) {
-        await ref
-            .read(challengeSessionToPrefsProvider)
-            .save(challenge, kHardChallenge);
+      DifficultyCriteriaEntity? difficultyCriteria;
+      if (gamificationData != null) {
+        difficultyCriteria = gamificationData.difficultyCriteria
+            .where(
+              (criteria) =>
+                  criteria.type.toLowerCase() == _difficulty.name.toLowerCase(),
+            )
+            .firstOrNull;
       }
 
-      // Invalidate the challenge tracking providers to trigger UI update
-      ref.invalidate(hiddenChallengesProvider);
-      ref.invalidate(challengeCompletionTimestampsProvider);
+      // Mark streak for today when challenge is completed (regardless of pass/fail)
+      if (_mode == SessionMode.challenge) {
+        // Mark streak for today - counts as completing a challenge day
+        await ref.read(streakControllerProvider.notifier).markActiveToday();
 
-      // Only award badge if challenge passed
-      if (challengePassed) {
+        // BADGE CHECK - Check streak badges after updating streak
+        final updatedStreak = ref.read(streakControllerProvider);
         ref
             .read(badgeControllerProvider.notifier)
-            .onChallengeCompleted(Get.context!);
-        // _logger.f(challenge);
+            .onStreakChanged(Get.context!, updatedStreak.current);
+
+        // Store the current challenge for 24H (regardless of pass/fail) to lock it
+        final challenge = ChallengeTrackingEntity(
+          difficulty: _difficulty,
+          timestamp: DateTime.now().toString(),
+        );
+
+        // Save challenge to lock it for 24 hours (even if failed)
+        if (_difficulty == DifficultyEnum.easy) {
+          await ref
+              .read(challengeSessionToPrefsProvider)
+              .save(challenge, kEasyChallenge);
+        } else if (_difficulty == DifficultyEnum.medium) {
+          await ref
+              .read(challengeSessionToPrefsProvider)
+              .save(challenge, kMediumChallenge);
+        } else if (_difficulty == DifficultyEnum.hard) {
+          await ref
+              .read(challengeSessionToPrefsProvider)
+              .save(challenge, kHardChallenge);
+        }
+
+        // Invalidate the challenge tracking providers to trigger UI update
+        ref.invalidate(hiddenChallengesProvider);
+        ref.invalidate(challengeCompletionTimestampsProvider);
+
+        // Only award badge if challenge passed
+        if (challengePassed) {
+          ref
+              .read(badgeControllerProvider.notifier)
+              .onChallengeCompleted(Get.context!);
+          // _logger.f(challenge);
+        }
+
+        // Badge check for session completion (regardless of pass/fail)
+        ref
+            .read(badgeControllerProvider.notifier)
+            .onSessionComplete(
+              Get.context!,
+              accuracy: ref.read(metricsStateControllerProvider).accuracy,
+              wpm: ref.read(metricsStateControllerProvider).wpm,
+            );
       }
 
-      // Badge check for session completion (regardless of pass/fail)
+      final xp = _mode == SessionMode.practice
+          ? 50
+          : calculateXP(
+              totalChars: ref.read(metricsStateControllerProvider).totalChars,
+              difficultyMultiplier: difficultyCriteria,
+              wpm: ref.read(metricsStateControllerProvider).wpm,
+              accuracyPercent: ref
+                  .read(metricsStateControllerProvider)
+                  .accuracy,
+            );
+
+      // BADGE CHECK
       ref
           .read(badgeControllerProvider.notifier)
-          .onSessionComplete(
-            Get.context!,
-            accuracy: ref.read(metricsStateControllerProvider).accuracy,
-            wpm: ref.read(metricsStateControllerProvider).wpm,
+          .onXPChanged(Get.context!, xp.toInt());
+
+      // snapshot metrics
+      final m = ref.read(metricsStateControllerProvider);
+      final ended = DateTime.now();
+      final started = ended.subtract(st.elapsed);
+
+      final session = SessionEntity(
+        id: const Uuid().v4(),
+        mode: _mode,
+        difficulty: _difficulty,
+        startedAt: started,
+        endedAt: ended,
+        metrics: m.copyWith(elapsedMs: st.elapsed.inMilliseconds),
+      );
+
+      // save last session
+      await ref.read(lastSessionToPrefsProvider).save(session);
+      // save to local DB (FIFO = 7)
+      await ref.read(sessionLocalRepositoryProvider).add(session);
+
+      // Invalidate user stats to refresh the UI with new session data
+      ref.invalidate(userStatsProvider);
+
+      await ref
+          .read(scoreControllerProvider.notifier)
+          .award(
+            amount: xp.toInt(),
+            mode: _mode.toString(),
+            sessionId: session.id,
           );
+    } finally {
+      _isCompleting = false;
     }
-
-    final xp = _mode == SessionMode.practice
-        ? 50
-        : calculateXP(
-            totalChars: ref.read(metricsStateControllerProvider).totalChars,
-            difficultyMultiplier: difficultyCriteria,
-            wpm: ref.read(metricsStateControllerProvider).wpm,
-            accuracyPercent: ref.read(metricsStateControllerProvider).accuracy,
-          );
-
-    // BADGE CHECK
-    ref
-        .read(badgeControllerProvider.notifier)
-        .onXPChanged(Get.context!, xp.toInt());
-
-    // snapshot metrics
-    final m = ref.read(metricsStateControllerProvider);
-    final ended = DateTime.now();
-    final started = ended.subtract(st.elapsed);
-
-    final session = SessionEntity(
-      id: const Uuid().v4(),
-      mode: _mode,
-      difficulty: _difficulty,
-      startedAt: started,
-      endedAt: ended,
-      metrics: m.copyWith(elapsedMs: st.elapsed.inMilliseconds),
-    );
-
-    // save last session
-    await ref.read(lastSessionToPrefsProvider).save(session);
-    // save to local DB (FIFO = 7)
-    await ref.read(sessionLocalRepositoryProvider).add(session);
-
-    await ref
-        .read(scoreControllerProvider.notifier)
-        .award(
-          amount: xp.toInt(),
-          mode: _mode.toString(),
-          sessionId: session.id,
-        );
   }
 
   void onBackspace() {

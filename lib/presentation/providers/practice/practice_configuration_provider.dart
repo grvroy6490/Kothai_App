@@ -55,6 +55,9 @@ class PracticeSettingsNotifier extends StateNotifier<PracticeSettings> {
                 );
 
             // If you have more enums, handle them here.
+          case DifficultyEnum.special:
+            // TODO: Handle this case.
+            throw UnimplementedError();
         }
     }
 

@@ -60,7 +60,7 @@ class SwitchSettingsCard extends StatelessWidget {
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 mainAxisSpacing: 1,
-                                crossAxisSpacing: 1,
+                                // crossAxisSpacing: 1,
                                 childAspectRatio: 3.5 // wider cells for your Row(title + switch)
                             ),
                             itemCount: options.length,
@@ -76,7 +76,7 @@ class SwitchSettingsCard extends StatelessWidget {
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1, color: getFigmaColor(context, 'State Layers/On Surface Variant/Opacity-08')),
-                                            left: BorderSide(width: 1, color: getFigmaColor(context, 'State Layers/On Surface Variant/Opacity-08')),
+                                            left: (index.isEven) ? BorderSide(width: 1, color: getFigmaColor(context, 'State Layers/On Surface Variant/Opacity-08')) : BorderSide.none,
                                             bottom: BorderSide(width: 1, color: getFigmaColor(context, 'State Layers/On Surface Variant/Opacity-08'))
                                         )
                                     ),

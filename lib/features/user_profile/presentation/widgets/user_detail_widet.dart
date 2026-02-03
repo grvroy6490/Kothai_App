@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +21,12 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
     @override
     Widget build(BuildContext context) {
         return Container(
-            padding: EdgeInsets.only(top: Gap(context).gap(10), left: Gap(context).gap(0), right: Gap(context).gap(0), bottom: Gap(context).gap(0)),
+            padding: EdgeInsets.only(
+                top: Gap(context).gap(10),
+                left: Gap(context).gap(0),
+                right: Gap(context).gap(0),
+                bottom: Gap(context).gap(0)
+            ),
             decoration: BoxDecoration(
                 color: getFigmaColor(context, 'Schemes/Surface Container Lowest'),
                 borderRadius: BorderRadius.circular(24)
@@ -31,7 +35,10 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                     Padding(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(10)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: Gap(context).gap(16),
+                            vertical: Gap(context).gap(10)
+                        ),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -39,11 +46,18 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                     child: Row(
                                         children: [
                                             CircleAvatar(
-                                                backgroundColor: getFigmaColor(context, 'Schemes/Primary'),
+                                                backgroundColor: getFigmaColor(
+                                                    context,
+                                                    'Schemes/Primary'
+                                                ),
                                                 radius: 25,
-                                                foregroundColor: getFigmaColor(context, 'Schemes/On Primary Container'),
+                                                foregroundColor: getFigmaColor(
+                                                    context,
+                                                    'Schemes/On Primary Container'
+                                                ),
 
-                                                child: widget.auth.value?.photoURL != null ? ClipOval(
+                                                child: widget.auth.value?.photoURL != null
+                                                    ? ClipOval(
                                                         child: Image.network(
                                                             widget.auth.value!.photoURL!,
                                                             width: 50,
@@ -55,40 +69,67 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                                 String initials;
                                                                 if (name != null && name.isNotEmpty) {
                                                                     final parts = name.split(RegExp(r'\s+'));
-                                                                    initials = parts.where((e) => e.isNotEmpty).take(2).map((e) => e[0]).join().toUpperCase();
+                                                                    initials = parts
+                                                                        .where((e) => e.isNotEmpty)
+                                                                        .take(2)
+                                                                        .map((e) => e[0])
+                                                                        .join()
+                                                                        .toUpperCase();
                                                                 } else {
                                                                     final email = u?.email;
-                                                                    initials = (email != null && email.isNotEmpty)
+                                                                    initials =
+                                                                    (email != null && email.isNotEmpty)
                                                                         ? email[0].toUpperCase()
                                                                         : 'GU';
                                                                 }
                                                                 return Text(
                                                                     initials,
-                                                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                                        color: getFigmaColor(context, 'Schemes/On Primary Container')
-                                                                    )
+                                                                    style: Theme.of(context)
+                                                                        .textTheme
+                                                                        .titleLarge
+                                                                        ?.copyWith(
+                                                                            color: getFigmaColor(
+                                                                                context,
+                                                                                'Schemes/On Primary Container'
+                                                                            )
+                                                                        )
                                                                 );
                                                             },
-                                                            loadingBuilder: (context, child, loadingProgress) {
+                                                            loadingBuilder:
+                                                            (context, child, loadingProgress) {
                                                                 if (loadingProgress == null) {
                                                                     return child;
                                                                 }
                                                                 return CircularProgressIndicator(
-                                                                    value: loadingProgress.expectedTotalBytes != null
-                                                                        ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                                                    value:
+                                                                    loadingProgress
+                                                                        .expectedTotalBytes !=
+                                                                        null
+                                                                        ? loadingProgress
+                                                                            .cumulativeBytesLoaded /
+                                                                            (loadingProgress
+                                                                                .expectedTotalBytes ??
+                                                                                1)
                                                                         : null,
-                                                                    color: getFigmaColor(context, 'Schemes/On Primary Container')
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/On Primary Container'
+                                                                    )
                                                                 );
                                                             }
                                                         )
                                                     )
-                                                    :
-                                                    Text(() {
+                                                    : Text(
+                                                        () {
                                                             final u = widget.auth.value;
                                                             final name = u?.displayName?.trim();
                                                             if (name != null && name.isNotEmpty) {
                                                                 final parts = name.split(RegExp(r'\s+'));
-                                                                final firstTwo = parts.where((e) => e.isNotEmpty).take(2).map((e) => e[0]).join();
+                                                                final firstTwo = parts
+                                                                    .where((e) => e.isNotEmpty)
+                                                                    .take(2)
+                                                                    .map((e) => e[0])
+                                                                    .join();
                                                                 return firstTwo.toUpperCase();
                                                             }
                                                             final email = u?.email;
@@ -97,9 +138,13 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                             }
                                                             return 'GU';
                                                         }(),
-                                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                            color: getFigmaColor(context, 'Schemes/On Primary Container')
-                                                        )
+                                                        style: Theme.of(context).textTheme.titleLarge
+                                                            ?.copyWith(
+                                                                color: getFigmaColor(
+                                                                    context,
+                                                                    'Schemes/On Primary Container'
+                                                                )
+                                                            )
                                                     )
                                             ),
 
@@ -108,16 +153,55 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                        Text(widget.auth.hasValue && widget.auth.value?.displayName != null ?  widget.auth.value!.displayName.toString() : 'Guest User',
-                                                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                                                color: getFigmaColor(context, 'Schemes/On Surface')
-                                                            )
+                                                        Text(
+                                                            () {
+                                                                final user = widget.auth.value;
+                                                                if (user == null) {
+                                                                    return 'Guest User';
+                                                                }
+                                                                // Use displayName if available, otherwise use email username, otherwise fallback
+                                                                final displayName = user.displayName?.trim();
+                                                                if (displayName != null &&
+                                                                    displayName.isNotEmpty) {
+                                                                    return displayName;
+                                                                }
+                                                                // Fallback to email username (part before @)
+                                                                final email = user.email;
+                                                                if (email != null && email.isNotEmpty) {
+                                                                    final emailUsername = email.split('@').first;
+                                                                    // Capitalize first letter of each word
+                                                                    return emailUsername
+                                                                        .split('.')
+                                                                        .map((word) {
+                                                                                if (word.isEmpty) return word;
+                                                                                return word[0].toUpperCase() +
+                                                                                    word.substring(1);
+                                                                            })
+                                                                        .join(' ');
+                                                                }
+                                                                return 'Guest User';
+                                                            }(),
+                                                            style: Theme.of(context).textTheme.titleLarge
+                                                                ?.copyWith(
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/On Surface'
+                                                                    )
+                                                                )
                                                         ),
 
-                                                        Text(widget.auth.hasValue && widget.auth.value?.email != null ? widget.auth.value!.email.toString() : 'Login or Signup to save your progress',
-                                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                                color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                                                            )
+                                                        Text(
+                                                            widget.auth.hasValue &&
+                                                                widget.auth.value?.email != null
+                                                                ? widget.auth.value!.email.toString()
+                                                                : 'Login or Signup to save your progress',
+                                                            style: Theme.of(context).textTheme.bodySmall
+                                                                ?.copyWith(
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/On Surface Variant'
+                                                                    )
+                                                                )
                                                         )
                                                     ]
                                                 )
@@ -129,7 +213,10 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                 SizedBox(width: Gap(context).gap(15)),
 
                                 PopupMenuButton<String>(
-                                    icon: Icon(Icons.more_vert, color: getFigmaColor(context, 'Schemes/On Surface Variant')),
+                                    icon: Icon(
+                                        Icons.more_vert,
+                                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    ),
                                     onSelected: (String result) async {
                                         // Handle the selection
                                         switch (result) {
@@ -137,7 +224,7 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 showAppModalWithChild(
                                                     context: context,
                                                     child: LoginPage(),
-                                                    heightFactor: 0.65
+                                                    heightFactor: 0.67
                                                 );
                                                 break;
 
@@ -145,7 +232,7 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 showAppModalWithChild(
                                                     context: context,
                                                     child: SignupPage(),
-                                                    heightFactor: 0.8
+                                                    heightFactor: 0.84
                                                 );
                                                 break;
 
@@ -163,7 +250,8 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 break;
                                         }
                                     },
-                                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                    itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
                                         //if (auth.value == null) ...const [
                                         if (widget.auth.value == null) ...const [
                                             PopupMenuItem<String>(
@@ -188,19 +276,16 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
 
                     SizedBox(height: Gap(context).gap(20)),
                     Padding(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(16), vertical: Gap(context).gap(0)),
-                        child: LevelXPIndicatior(
-                            width: double.infinity,
-                            isCompact: false
-                        )
+                        padding: EdgeInsets.symmetric(
+                            horizontal: Gap(context).gap(16),
+                            vertical: Gap(context).gap(0)
+                        ),
+                        child: LevelXPIndicatior(width: double.infinity, isCompact: false)
                     ),
 
                     SizedBox(height: Gap(context).gap(20)),
 
-                    Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: UserScore()
-                    )
+                    Padding(padding: const EdgeInsets.all(5), child: UserScore())
                 ]
             )
         );

@@ -9,7 +9,7 @@ class SelectNavNotifier extends Notifier<int> {
             case 0: return '/practice';
             case 1: return '/challenge';
             case 2: return '/profile';
-            case 3: return '/';
+            case 3: return '/more';
             default: return '/practice';
         }
     }

@@ -4,6 +4,7 @@
 import 'package:get/get.dart';
 import 'package:kothai_app/app/app.dart';
 import 'package:kothai_app/core/errors/default_404.dart';
+import 'package:kothai_app/features/more/presentation/pages/more/more_settings_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
@@ -44,8 +45,13 @@ List<GetPage<dynamic>> routes = [
         page: () => ProfilePage()
     ),
     GetPage(
+        name: '/more',
+        page: () => MoreSettingsPage(),
+        children: []
+    ),
+    GetPage(
         name: '/error',
-        page: () => Default404(error: 'Page Not Found!',)
+        page: () => Default404(error: 'Page Not Found!')
     )
 ];
 

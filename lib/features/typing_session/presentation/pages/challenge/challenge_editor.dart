@@ -150,7 +150,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
 
                         Container(
                             decoration: BoxDecoration(
-                                color: getFigmaColor(context, 'Schemes/Surface Container'),
+                                color: getFigmaColor(context, 'Schemes/Background'),
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(24))
                             ),
                             child: Stack(

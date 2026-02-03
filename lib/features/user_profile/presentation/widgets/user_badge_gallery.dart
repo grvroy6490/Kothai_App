@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/features/badges/data/model/badge_entity.dart';
 import 'package:kothai_app/features/badges/data/repositories_impl/badge_repository.dart';
 import 'package:kothai_app/features/badges/domain/enums/badge_type_enum.dart';
+import 'package:kothai_app/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
 
 class UserBadgeGallery extends ConsumerStatefulWidget {
     final Set<String> badges;
@@ -56,7 +58,7 @@ class _UserBadgeGalleryState extends ConsumerState<UserBadgeGallery> {
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
                             horizontal: Gap(context).gap(10),
-                            vertical: Gap(context).gap(8)
+                            // vertical: Gap(context).gap(8)
                         ),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,6 +74,7 @@ class _UserBadgeGalleryState extends ConsumerState<UserBadgeGallery> {
 
                                 IconButton(
                                     onPressed: () {
+                                        Get.to(() => AchievementGalleryPage(), transition: Transition.fadeIn, curve: Curves.fastOutSlowIn, duration: Duration(milliseconds: 500));
                                     },
                                     icon: Icon(
                                         Icons.arrow_forward,

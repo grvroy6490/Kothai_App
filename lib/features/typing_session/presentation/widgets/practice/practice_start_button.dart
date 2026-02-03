@@ -25,8 +25,8 @@ class PracticeStartButton extends StatelessWidget {
                             alignment: Alignment.bottomCenter,
                             child: ClipRRect(
                                 borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(150),
-                                    topRight: Radius.circular(150)
+                                    topLeft: Radius.circular(MediaQuery.of(context).size.width * 0.5),
+                                    topRight: Radius.circular(MediaQuery.of(context).size.width * 0.5)
                                 ),
                                 child: BackdropFilter(
                                     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -48,9 +48,9 @@ class PracticeStartButton extends StatelessWidget {
                                                     ).withAlpha(0)
                                                 ]
                                             ),
-                                            borderRadius: const BorderRadius.only(
-                                                topLeft: Radius.circular(150),
-                                                topRight: Radius.circular(150)
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(MediaQuery.of(context).size.width * 0.5),
+                                                topRight: Radius.circular(MediaQuery.of(context).size.width * 0.5)
                                             ),
                                             border: Border(
                                                 top: BorderSide(

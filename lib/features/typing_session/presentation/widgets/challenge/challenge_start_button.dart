@@ -189,8 +189,8 @@ class _State extends ConsumerState<ChallengeStartButton>
                             alignment: Alignment.bottomCenter,
                             child: ClipRRect(
                                 borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(150),
-                                    topRight: Radius.circular(150)
+                                    topLeft: Radius.circular(MediaQuery.of(context).size.width * 0.5),
+                                    topRight: Radius.circular(MediaQuery.of(context).size.width * 0.5)
                                 ),
                                 child: BackdropFilter(
                                     filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
@@ -212,9 +212,9 @@ class _State extends ConsumerState<ChallengeStartButton>
                                                     ).withAlpha(100)
                                                 ]
                                             ),
-                                            borderRadius: const BorderRadius.only(
-                                                topLeft: Radius.circular(150),
-                                                topRight: Radius.circular(150)
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(MediaQuery.of(context).size.width * 0.5),
+                                                topRight: Radius.circular(MediaQuery.of(context).size.width * 0.5)
                                             ),
                                             border: Border(
                                                 top: BorderSide(
@@ -228,60 +228,6 @@ class _State extends ConsumerState<ChallengeStartButton>
                             )
                         ),
 
-                        Positioned(
-                            top: 8,
-                            child: AnimatedOpacity(
-                                duration: Duration(milliseconds: 400),
-                                opacity: widget.currentIndex == 1 ? 1 : 0.2,
-                                child: CustomPaint(
-                                    size: const Size(250 / 4, 20),
-                                    painter: BendLinePainter(
-                                        color: getFigmaColor(context, 'Extended Colors/Blue')
-                                    )
-                                )
-                            )
-                        ),
-
-                        Positioned(
-                            top: 16,
-                            left: 68,
-                            child: Transform.rotate(
-                                angle: -0.75,
-                                alignment: Alignment.centerRight,
-                                child: AnimatedOpacity(
-                                    duration: Duration(milliseconds: 400),
-                                    opacity: widget.currentIndex == 0 ? 1 : 0.2,
-                                    child: CustomPaint(
-                                        size: const Size(250 / 4, 20),
-                                        painter: BendLinePainter(
-                                            color: getFigmaColor(
-                                                context,
-                                                'Schemes/On Green Container'
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-
-                        Positioned(
-                            top: 16,
-                            right: 68,
-                            child: Transform.rotate(
-                                angle: 0.75,
-                                alignment: Alignment.centerLeft,
-                                child: AnimatedOpacity(
-                                    duration: Duration(milliseconds: 400),
-                                    opacity: widget.currentIndex == 2 ? 1 : 0.2,
-                                    child: CustomPaint(
-                                        size: const Size(250 / 4, 20),
-                                        painter: BendLinePainter(
-                                            color: getFigmaColor(context, 'Schemes/Tertiary')
-                                        )
-                                    )
-                                )
-                            )
-                        ),
 
                         // ICON / START BUTTON
                         Center(
@@ -317,7 +263,7 @@ class _State extends ConsumerState<ChallengeStartButton>
                                                                 width: 60
                                                             )
                                                         ),
-                                                        SizedBox(height: isCurrentChallengeBlocked ? Gap(context).gap(3) : Gap(context).gap(20)),
+                                                        SizedBox(height: isCurrentChallengeBlocked ? Gap(context).gap(3) : Gap(context).gap(23)),
 
                                                         isCurrentChallengeBlocked
                                                             ?
@@ -381,6 +327,58 @@ class _State extends ConsumerState<ChallengeStartButton>
                                             );
                                         }
                                     ),
+
+                                    SizedBox(height: Gap(context).gap(15)),
+
+                                    Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                            Opacity(
+                                                opacity: widget.currentIndex == 0 ? 1 : 0.5,
+                                                child: Container(
+                                                    width: Gap(context).gap(60),
+                                                    height: Gap(context).gap(5),
+                                                    decoration: BoxDecoration(
+                                                        color: widget.currentIndex == 0 ? getFigmaColor(context, 'Schemes/Green') : getFigmaColor(context, 'Schemes/On Green Container'),
+                                                        borderRadius: BorderRadius.circular(Gap(context).gap(2)),
+                                                        border: Border.all(width: 1, color: getFigmaColor(context, 'Schemes/On Green Container'))
+                                                    )
+                                                )
+                                            ),
+
+                                            SizedBox(width: Gap(context).gap(10)),
+
+                                            Opacity(
+                                                opacity: widget.currentIndex == 1 ? 1 : 0.5,
+                                                child: Container(
+                                                    width: Gap(context).gap(60),
+                                                    height: Gap(context).gap(5),
+                                                    decoration: BoxDecoration(
+                                                        color: widget.currentIndex == 1 ? getFigmaColor(context, 'Extended Colors/Blue Container') : getFigmaColor(context, 'Extended Colors/Blue'),
+                                                        borderRadius: BorderRadius.circular(Gap(context).gap(2)),
+                                                        border: Border.all(width: 1, color: getFigmaColor(context, 'Extended Colors/Blue'))
+                                                    )
+                                                )
+                                            ),
+
+                                            SizedBox(width: Gap(context).gap(10)),
+
+                                            Opacity(
+                                                opacity: widget.currentIndex == 2 ? 1 : 0.5,
+                                                child: Container(
+                                                    width: Gap(context).gap(60),
+                                                    height: Gap(context).gap(5),
+                                                    decoration: BoxDecoration(
+                                                        color: widget.currentIndex == 2 ? getFigmaColor(context, 'Schemes/Tertiary Container') : getFigmaColor(context, 'Schemes/Tertiary'),
+                                                        borderRadius: BorderRadius.circular(Gap(context).gap(2)),
+                                                        border: Border.all(width: 1, color: getFigmaColor(context, 'Schemes/Tertiary'))
+                                                    )
+                                                )
+                                            )
+                                        ]
+                                    ),
+
+                                    SizedBox(height: Gap(context).gap(5)),
                                     // STREAK BADGES
                                     SizedBox(
                                         width: double.infinity,

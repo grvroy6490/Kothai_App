@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
 import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
 import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:vibration/vibration.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
@@ -14,16 +15,11 @@ class TamilKeyboard extends KeyboardController {
     String? _heldLeftDiacritic;
     Ref? _ref;
 
-
-
     TamilKeyboard(super.text);
-
 
     void setRef(Ref ref) {
         _ref = ref;
     }
-
-
 
     @override
     void backspace(String value) {
@@ -37,20 +33,19 @@ class TamilKeyboard extends KeyboardController {
 
         // If there's a selection, delete the selected text
         if (selection.start != selection.end) {
-            final newText = textValue.replaceRange(
-                selection.start,
-                selection.end,
-                ''
-            );
+            // Clamp start and end to valid range [0, textValue.length]
+            final start = selection.start.clamp(0, textValue.length);
+            final end = selection.end.clamp(0, textValue.length);
+            final newText = textValue.replaceRange(start, end, '');
             text.value = TextEditingValue(
                 text: newText,
-                selection: TextSelection.collapsed(offset: selection.start)
+                selection: TextSelection.collapsed(offset: start)
             );
             return;
         }
 
         // If selection is collapsed, delete the character before the caret
-        final caretIndex = selection.start;
+        final caretIndex = selection.start.clamp(0, textValue.length);
         if (caretIndex <= 0) return;
 
         final newText = textValue.replaceRange(caretIndex - 1, caretIndex, '');
@@ -59,14 +54,10 @@ class TamilKeyboard extends KeyboardController {
             selection: TextSelection.collapsed(offset: caretIndex - 1)
         );
         // _ref?.read(sessionStateProvider.notifier).backspace();
-
-      
     }
 
     @override
     void insert(String value) {
-        final practiceConfig = _ref?.watch(practiceConfigurationProvider);
-
         // Handle left diacritic hold mechanism
         if (Letters.leftDiacriticLetters.contains(value)) {
             if (text.text.isNotEmpty) {
@@ -80,8 +71,18 @@ class TamilKeyboard extends KeyboardController {
             return;
         }
 
-        if (practiceConfig!.hapticEnabled) { // TODO: Check this settings
-            _vibrate();
+        // Check haptic based on session mode
+        if (_ref != null) {
+            final sessionStatus = _ref!.read(sessionStatusControllerProvider);
+            final sessionMode = sessionStatus.mode;
+
+            final hapticEnabled = sessionMode == SessionMode.challenge
+                ? _ref!.read(challengeConfigurationProvider).hapticEnabled
+                : _ref!.read(practiceConfigurationProvider).hapticEnabled;
+
+            if (hapticEnabled) {
+                _vibrate();
+            }
         }
 
         if (value == ' ' || value == '\n') {
@@ -186,8 +187,10 @@ class TamilKeyboard extends KeyboardController {
     void _insertText(String value) {
         final selection = text.selection;
         final textValue = text.text;
-        final start = selection.start;
-        final end = selection.end;
+        // Clamp start and end to valid range [0, textValue.length]
+        // start can be equal to length for insertion at the end
+        final start = selection.start.clamp(0, textValue.length);
+        final end = selection.end.clamp(0, textValue.length);
         final newText = textValue.replaceRange(start, end, value);
 
         final newOffset = start + value.length;
@@ -198,12 +201,14 @@ class TamilKeyboard extends KeyboardController {
     }
 
     void _vibrate() async {
-        if (await (Vibration.hasVibrator() ?? Future.value(false))) {
+        final hasVibrator = await Vibration.hasVibrator();
+        if (hasVibrator == true) {
             Vibration.vibrate(duration: 100);
         }
     }
 
-    void _notifyOnKey(String ch) { // TODO: Check this settings
+    void _notifyOnKey(String ch) {
+        // TODO: Check this settings
         final para = _ref?.read(textContentControllerProvider)?.content ?? '';
         final idx = text.text.length - 1;
         final expected = (idx >= 0 && idx < para.length) ? para[idx] : null;
@@ -215,5 +220,4 @@ class TamilKeyboard extends KeyboardController {
     String _normalizeAndInsert(String text) {
         return unorm.nfc(text);
     }
-
 }

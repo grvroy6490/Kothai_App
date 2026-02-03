@@ -8,6 +8,7 @@ import 'package:kothai_app/di/providers/auth/auth_provider.dart';
 import 'package:kothai_app/di/providers/navigation/navigation_provider.dart';
 import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart';
 import 'package:kothai_app/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:kothai_app/features/share/presentation/pages/share_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:kothai_app/features/user_profile/presentation/widgets/badge_display.dart';
 import 'package:kothai_app/features/user_profile/presentation/widgets/user_badge_gallery.dart';
@@ -84,6 +85,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                             : FilledButton.icon(
                                 onPressed: (){
+                                    showDialog(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        builder: (BuildContext context) {
+                                            return Center(
+                                                child: Material(
+                                                    type: MaterialType.transparency,
+                                                    child: Container(
+                                                        clipBehavior: Clip.hardEdge,
+                                                        margin: EdgeInsets.symmetric(horizontal: 10),
+                                                        padding: EdgeInsets.all(5),
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius: BorderRadius.circular(20)
+                                                        ),
+                                                        child: SharePage()
+                                                    )
+                                                )
+                                            );
+                                        }
+                                    );
                                 },
                                 label: Text('Share Progress',
                                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -116,7 +138,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             size: KxScale(context).sp(18),
                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                         )
-                    )
+                    ),
+                    SizedBox(width: 15)
                 ]
             ),
             bottomNavigationBar: BottomNavigationBarWidget(),
@@ -142,56 +165,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                                 UserBadgeGallery(badges: badges),
 
-                                SizedBox(height: Gap(context).gap(10)),
-                                // SETTING CONTAINER
-                                UserSettings(),
-
-                                SizedBox(height: Gap(context).gap(10)),
-                                // SETTING CONTAINER
-                                Container(
-                                    padding: EdgeInsets.only(top: Gap(context).gap(10), bottom: Gap(context).gap(10), left: Gap(context).gap(16), right: Gap(context).gap(16)),
-                                    decoration: BoxDecoration(
-                                        color: getFigmaColor(context, 'Schemes/Surface Container'),
-                                        borderRadius: BorderRadius.circular(24)
-                                    ),
-                                    child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
-
-                                        child: Row(
-                                            children: [
-                                                Icon(
-                                                    Icons.help,
-                                                    color: true ? getFigmaColor(context, 'Schemes/On Surface Variant') : getFigmaColor(context, 'Schemes/On Surface Variant')
-                                                ),
-                                                SizedBox(width: 10),
-                                                Expanded(
-                                                    child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                            Text('Help',
-                                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                                    color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                                                    fontWeight: FontWeight.w600
-                                                                )
-                                                            ),
-                                                            Text('Schemes/On Surface Variant',
-                                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                                    color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                                                                )
-                                                            )
-                                                        ]
-                                                    )
-                                                ),
-                                                SizedBox(width: 10),
-                                                IconButton(
-                                                    onPressed: (){
-                                                    },
-                                                    icon: Icon(Icons.chevron_right, size: KxScale(context).sp(30), color: getFigmaColor(context, 'Schemes/On Surface'))
-                                                )
-                                            ]
-                                        )
-                                    )
-                                )
+                                SizedBox(height: Gap(context).gap(10))
 
                             ]
                         )

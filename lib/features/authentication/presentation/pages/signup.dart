@@ -40,7 +40,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             showAppModalBottomSheet(
                 context: rootCtx,
                 builder: (_) => const LoginPage(),
-                heightFactor: 0.65,
+                heightFactor: 0.67,
                 useRootNavigator: true
             );
         });

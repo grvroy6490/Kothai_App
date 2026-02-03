@@ -139,6 +139,12 @@ class StreakBadge extends StatelessWidget {
                 borderRadius: BorderRadius.circular(Gap(context).gap(25)),
                 child: badgeContent
             );
+        } else {
+            return InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(Gap(context).gap(25)),
+                child: badgeContent
+            );
         }
 
         return badgeContent;

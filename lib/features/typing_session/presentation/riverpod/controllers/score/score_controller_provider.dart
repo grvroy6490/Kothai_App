@@ -24,13 +24,22 @@ class ScoreController extends _$ScoreController {
 
     Future<void> _load() async {
         var totals = await ref.read(scoreLocalRepositoryProvider).loadScores();
-        final levels = await ref.read(gamificationDataControllerProvider)?.levels;
-        final nextLevel = levels?.firstWhere(
+        final gamification = ref.read(gamificationDataControllerProvider);
+        final levels = gamification == null ? null : await gamification.levels;
+
+        if (levels == null || levels.isEmpty) {
+            // _logger.w('No gamification levels available, leaving xpNextLevel unchanged.');
+            state = totals;
+            return;
+        }
+
+        final nextLevel = levels.firstWhere(
             (level) => level.totalXp > totals.totalXp,
             orElse: () => levels.last
         );
+
         totals = totals.copyWith(
-            xpNextLevel: nextLevel!.totalXp,
+            xpNextLevel: nextLevel.totalXp
         );
         state = totals;
     }
@@ -51,7 +60,6 @@ class ScoreController extends _$ScoreController {
         );
         await ref.read(scoreLocalRepositoryProvider).addEntryToDB(entry);
 
-
         // 2) update totals & level (linear 200xp/level)
         final levels = await ref.read(gamificationDataControllerProvider)!.levels;
         final nextTotal = state.totalXp + amount;
@@ -71,7 +79,7 @@ class ScoreController extends _$ScoreController {
             totalXp: nextTotal,
             level: int.parse(currentLevel.level),
             xpIntoLevel: into,
-            xpNextLevel: nextLevel.totalXp,
+            xpNextLevel: nextLevel.totalXp
         );
 
         state = updated;

@@ -6,12 +6,14 @@ class StatCard extends StatelessWidget {
     final String value;
     final String label;
     final IconData icon;
+    final double iconSize;
 
     const StatCard({
         super.key,
         required this.value,
         required this.label,
-        required this.icon
+        required this.icon,
+        this.iconSize = 18
     });
 
     @override
@@ -48,13 +50,13 @@ class StatCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Container(
-                                width: 20,
-                                height: 20,
+                                width: iconSize + 2,
+                                height: iconSize + 2,
                                 decoration: BoxDecoration(
                                     color: getFigmaColor(context, 'State Layers/On Primary Container/Opacity-08'),
                                     borderRadius: BorderRadius.circular(30)
                                 ),
-                                child: Icon(icon, color: Colors.deepPurple, size: 18)
+                                child: Icon(icon, color: Colors.deepPurple, size: iconSize)
                             )
                         ]
                     ),

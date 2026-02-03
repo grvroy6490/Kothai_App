@@ -1,5 +1,5 @@
 const String kPracticeSettingsPrefsKey = 'practice_settings.v1';
-
+const String kChallengeSettingsPrefsKey = 'challenge_settings.v1';
 const String kTypingSessionsPrefsKey =
     'typing_sessions_v1'; // change if schema changes
 

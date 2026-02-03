@@ -20,11 +20,11 @@ import 'package:logger/logger.dart';
 class App extends ConsumerWidget {
     const App({super.key}); 
 
-    // void clear() async {
-    //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //     print('worked');
-    //     prefs.clear();
-    // }
+    void clear() async {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        print('worked');
+        prefs.clear();
+    }
 
     @override
     Widget build(BuildContext context, ref) {

@@ -30,27 +30,29 @@ class MetricsStatBadge extends StatelessWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                        SizedBox(
+                            child: Text(value ?? '0',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: getFigmaColor(context, 'Schemes/Primary')
+                                )
+                            )
+                        ),
+                        SizedBox(height: Gap(context).gap(5)),
                         Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                                Icon(icon ?? Icons.text_fields, size: KxScale(context).sp(14), color: getFigmaColor(context, 'Schemes/Primary')),
-                                SizedBox(width: Gap(context).gap(10)),
-                                Text(value ?? '0',
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        color: getFigmaColor(context, 'Schemes/Primary')
+                                Icon(icon ?? Icons.text_fields, size: KxScale(context).sp(14), color: getFigmaColor(context, 'Schemes/On Surface Variant')),
+                                SizedBox(width: Gap(context).gap(5)),
+                                Text(label ?? '',
+                                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                        color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                     )
                                 )
+
                             ]
-                        ),
-                        SizedBox(height: Gap(context).gap(5)),
-                        SizedBox(
-                            child: Text(label ?? '',
-                                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                                )
-                            )
                         )
+
                     ]
                 )
             )

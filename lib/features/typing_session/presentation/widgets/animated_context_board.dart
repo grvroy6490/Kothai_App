@@ -14,329 +14,499 @@ import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters
 import 'package:vibration/vibration.dart';
 
 class AnimatedContentBoard extends ConsumerStatefulWidget {
-    final String paragraph;
-    AnimatedContentBoard({super.key, required this.paragraph});
+  final String paragraph;
+  AnimatedContentBoard({super.key, required this.paragraph});
 
-    @override
-    ConsumerState<AnimatedContentBoard> createState() =>
-    _AnimatedContentBoardState();
+  @override
+  ConsumerState<AnimatedContentBoard> createState() =>
+      _AnimatedContentBoardState();
 }
 
 class _AnimatedContentBoardState extends ConsumerState<AnimatedContentBoard> {
-    @override
-    Widget build(BuildContext context) {
-        // 🌐 PROVIDERS ------------------------------
-        final sessionStatus = ref.watch(sessionStatusControllerProvider);
-        final userInput = ref.watch(userInputProvider);
+  @override
+  Widget build(BuildContext context) {
+    // 🌐 PROVIDERS ------------------------------
+    final sessionStatus = ref.watch(sessionStatusControllerProvider);
+    final userInput = ref.watch(userInputProvider);
 
-        // 📃 DECLARATION ----------------------------
-        final isPracticeStart = sessionStatus.status == SessionStatusEnum.start;
+    // 📃 DECLARATION ----------------------------
+    final isPracticeStart = sessionStatus.status == SessionStatusEnum.start;
 
-        // ⭐ Widget ---------------------------------
-        return AnimatedSize(
-            duration: Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-                width: double.infinity,
-                height: isPracticeStart
-                    ? MediaQuery.of(context).size.height * 0.35
-                    : MediaQuery.of(
-                        context
-                    ).size.height, // 👈 Update height animation here
-                // decoration: BoxDecoration(color: Colors.white24),
-                child: TypingArea(
-                    paragraph: widget.paragraph,
-                    userInput: userInput
-                ) // Typing Area
-            )
-        );
-    }
+    // ⭐ Widget ---------------------------------
+    return AnimatedSize(
+      duration: Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: double.infinity,
+        height: isPracticeStart
+            ? MediaQuery.of(context).size.height * 0.35
+            : MediaQuery.of(
+                context,
+              ).size.height, // 👈 Update height animation here
+        // decoration: BoxDecoration(color: Colors.white24),
+        child: TypingArea(
+          paragraph: widget.paragraph,
+          userInput: userInput,
+        ), // Typing Area
+      ),
+    );
+  }
 }
 
 class TypingArea extends ConsumerStatefulWidget {
-    final String paragraph;
-    final String userInput;
-    TypingArea({super.key, required this.paragraph, required this.userInput});
+  final String paragraph;
+  final String userInput;
+  TypingArea({super.key, required this.paragraph, required this.userInput});
 
-    @override
-    ConsumerState<TypingArea> createState() => _TypingAreaState();
+  @override
+  ConsumerState<TypingArea> createState() => _TypingAreaState();
 }
 
 class _TypingAreaState extends ConsumerState<TypingArea>
     with SingleTickerProviderStateMixin {
-    final logger = Logger();
-    String? _previousInput;
-    late AnimationController _cursorController;
-    late Animation<double> _cursorAnimation;
+  final logger = Logger();
+  String? _previousInput;
+  late AnimationController _cursorController;
+  late Animation<double> _cursorAnimation;
 
-    @override
-    void initState() {
-        super.initState();
-        _previousInput = null;
-        // Initialize cursor blinking animation
-        _cursorController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 530)
-        )..repeat(reverse: true);
-        _cursorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(parent: _cursorController, curve: Curves.easeInOut)
-        );
+  @override
+  void initState() {
+    super.initState();
+    _previousInput = null;
+    // Initialize cursor blinking animation
+    _cursorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 530),
+    )..repeat(reverse: true);
+    _cursorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _cursorController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _cursorController.dispose();
+    super.dispose();
+  }
+
+  /// Checks if a character cluster is a combined letter form
+  /// Combined forms are: mei + special diacritic combo (like கொ, கோ, கௌ)
+  /// Or mei + left diacritic + right diacritic (3-character combination)
+  bool _isCombinedLetterForm(String cluster) {
+    // Normalize the cluster to ensure consistent comparison
+    final normalizedCluster = unorm.nfc(cluster);
+
+    // Check if cluster contains a special diacritic combo character (ொ, ோ, ௌ)
+    // along with a mei letter (like கொ, கோ, கௌ)
+    bool hasMei = false;
+    bool hasSpecialDiacriticCombo = false;
+
+    // Check if cluster contains any mei letter
+    for (final mei in Letters.meiLetters) {
+      if (normalizedCluster.contains(mei)) {
+        hasMei = true;
+        break;
+      }
     }
 
-    @override
-    void dispose() {
-        _cursorController.dispose();
-        super.dispose();
+    // Check if cluster contains any special diacritic combo character
+    // Normalize each combo to ensure proper matching
+    for (final combo in Letters.diacriticCombos.values) {
+      final normalizedCombo = unorm.nfc(combo);
+      // Check if the normalized cluster contains the normalized combo
+      if (normalizedCluster.contains(normalizedCombo)) {
+        hasSpecialDiacriticCombo = true;
+        break;
+      }
+      // Also check if any rune in the cluster matches the combo
+      final clusterRunes = normalizedCluster.runes.toSet();
+      final comboRunes = normalizedCombo.runes.toSet();
+      if (clusterRunes.intersection(comboRunes).isNotEmpty) {
+        hasSpecialDiacriticCombo = true;
+        break;
+      }
     }
 
-    /// Checks if a character cluster is a combined letter form
-    /// Combined forms are: mei + special diacritic combo (like கொ, கோ, கௌ)
-    /// Or mei + left diacritic + right diacritic (3-character combination)
-    bool _isCombinedLetterForm(String cluster) {
-        // Normalize the cluster to ensure consistent comparison
-        final normalizedCluster = unorm.nfc(cluster);
-
-        // Check if cluster contains a special diacritic combo character (ொ, ோ, ௌ)
-        // along with a mei letter (like கொ, கோ, கௌ)
-        bool hasMei = false;
-        bool hasSpecialDiacriticCombo = false;
-
-        // Check if cluster contains any mei letter
-        for (final mei in Letters.meiLetters) {
-            if (normalizedCluster.contains(mei)) {
-                hasMei = true;
-                break;
-            }
-        }
-
-        // Check if cluster contains any special diacritic combo character
-        // Normalize each combo to ensure proper matching
-        for (final combo in Letters.diacriticCombos.values) {
-            final normalizedCombo = unorm.nfc(combo);
-            // Check if the normalized cluster contains the normalized combo
-            if (normalizedCluster.contains(normalizedCombo)) {
-                hasSpecialDiacriticCombo = true;
-                break;
-            }
-            // Also check if any rune in the cluster matches the combo
-            final clusterRunes = normalizedCluster.runes.toSet();
-            final comboRunes = normalizedCombo.runes.toSet();
-            if (clusterRunes.intersection(comboRunes).isNotEmpty) {
-                hasSpecialDiacriticCombo = true;
-                break;
-            }
-        }
-
-        // If it has mei + special diacritic combo, it's a combined form
-        if (hasMei && hasSpecialDiacriticCombo) {
-            return true;
-        }
-
-        // Check if the cluster contains mei + left diacritic + right diacritic
-        // This is a 3-character combination
-        final runes = normalizedCluster.runes.toList();
-        if (runes.length < 3) {
-            return false; // Simple characters have 1-2 code points
-        }
-
-        // Check the string directly for presence of components
-        bool hasLeftDiacritic = false;
-        bool hasRightDiacritic = false;
-
-        // Check if cluster contains any left diacritic
-        for (final leftDiacritic in Letters.leftDiacriticLetters) {
-            if (normalizedCluster.contains(leftDiacritic)) {
-                hasLeftDiacritic = true;
-                break;
-            }
-        }
-
-        // Check if cluster contains any right diacritic
-        for (final rightDiacritic in Letters.rightDiacriticLetters) {
-            if (normalizedCluster.contains(rightDiacritic)) {
-                hasRightDiacritic = true;
-                break;
-            }
-        }
-
-        // Combined form requires all three: mei + left diacritic + right diacritic
-        return hasMei && hasLeftDiacritic && hasRightDiacritic;
+    // If it has mei + special diacritic combo, it's a combined form
+    if (hasMei && hasSpecialDiacriticCombo) {
+      return true;
     }
 
-    /// Checks if a character is a space
-    bool _isSpace(String char) {
-        return char.trim().isEmpty && char.isNotEmpty;
+    // Check if the cluster contains mei + left diacritic + right diacritic
+    // This is a 3-character combination
+    final runes = normalizedCluster.runes.toList();
+    if (runes.length < 3) {
+      return false; // Simple characters have 1-2 code points
     }
 
-    @override
-    Widget build(BuildContext context) {
-        // 🌐 PROVIDERS ------------------------------
-        final practiceConfig = ref.watch(practiceConfigurationProvider);
-        final normalizedPara = unorm.nfc(widget.paragraph);
-        final normalizedInput = unorm.nfc(widget.userInput);
+    // Check the string directly for presence of components
+    bool hasLeftDiacritic = false;
+    bool hasRightDiacritic = false;
 
-        // 🚀 METHODS --------------------------------
-        // Handle haptic / vibration based on practice config
-        // Detect errors at character level by comparing input with paragraph
-        if (practiceConfig.hapticOnError) {
-            if (_previousInput != null) {
-                final paraClusters = normalizedPara.characters.toList();
-                final inputClusters = normalizedInput.characters.toList();
-                final previousInputClusters = _previousInput!.characters.toList();
-
-                // Check if input length increased (new character typed)
-                if (inputClusters.length > previousInputClusters.length) {
-                    final newInputIndex = inputClusters.length - 1;
-
-                    // Check if the newly typed character is incorrect
-                    if (newInputIndex < paraClusters.length) {
-                        final expectedChar = paraClusters[newInputIndex];
-                        final typedChar = inputClusters[newInputIndex];
-                        final isIncorrect = typedChar != expectedChar;
-
-                        if (isIncorrect) {
-                            // Vibrate when an incorrect character is detected
-                            WidgetsBinding.instance.addPostFrameCallback((_) async {
-                                    if (mounted) {
-                                        final hasVibrator = await Vibration.hasVibrator();
-                                        if (hasVibrator == true) {
-                                            Vibration.vibrate(duration: 200);
-                                        }
-                                    }
-                                });
-                        }
-                    }
-                }
-                // If input decreased (backspace), update tracking but don't vibrate
-            }
-            // Update previous input for next comparison (always, even on first build)
-            _previousInput = normalizedInput;
-        } else {
-            // Reset tracking when haptic is disabled
-            _previousInput = null;
-        }
-
-        // ⭐ Widget ---------------------------------
-        return SingleChildScrollView(
-            padding: EdgeInsets.only(bottom: Gap(context).gap(8)),
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                    horizontal: Gap(context).gap(16),
-                    vertical: Gap(context).gap(14)
-                ),
-                child: AnimatedBuilder(
-                    animation: _cursorAnimation,
-                    builder: (context, _) {
-                        return RichText(
-                            key: ValueKey(widget.paragraph),
-                            text: TextSpan(
-                                children: _buildTextSpans(
-                                    widget.paragraph,
-                                    widget.userInput,
-                                    practiceConfig,
-                                    _cursorAnimation.value
-                                ), // TODO: Pass Practice config here
-                                style: TextStyle(
-                                    color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                    fontSize: KxScale(context).sp(
-                                        practiceConfig.contentFontSize.value
-                                    ), // 👈 CONTENT FONT SIZE SETTINGS // TODO: add practice config text font size
-                                    height: 1.5,
-                                    fontFamily: 'NotoSansTamil'
-                                )
-                            )
-                        );
-                    }
-                )
-            )
-        );
+    // Check if cluster contains any left diacritic
+    for (final leftDiacritic in Letters.leftDiacriticLetters) {
+      if (normalizedCluster.contains(leftDiacritic)) {
+        hasLeftDiacritic = true;
+        break;
+      }
     }
 
-    List<TextSpan> _buildTextSpans(
-        String paragraph,
-        String input,
-        PracticeConfig practiceConfig,
-        double cursorOpacity
-    ) {
-        // Normalize both to NFC form
-        final normalizedPara = unorm.nfc(paragraph);
-        final normalizedInput = unorm.nfc(input);
+    // Check if cluster contains any right diacritic
+    for (final rightDiacritic in Letters.rightDiacriticLetters) {
+      if (normalizedCluster.contains(rightDiacritic)) {
+        hasRightDiacritic = true;
+        break;
+      }
+    }
 
+    // Combined form requires all three: mei + left diacritic + right diacritic
+    return hasMei && hasLeftDiacritic && hasRightDiacritic;
+  }
+
+  /// Checks if a character is a space
+  bool _isSpace(String char) {
+    return char.trim().isEmpty && char.isNotEmpty;
+  }
+
+  /// Checks if a character cluster is a 2-character combination (mei + right diacritic)
+  /// Examples: "யா", "ளை", "லி"
+  bool _isTwoCharDiacriticCombination(String cluster) {
+    final normalizedCluster = unorm.nfc(cluster);
+    final runes = normalizedCluster.runes.toList();
+
+    // Must have exactly 2 runes (mei + right diacritic)
+    if (runes.length != 2) {
+      return false;
+    }
+
+    // Check if first character is a mei letter
+    final firstChar = String.fromCharCode(runes[0]);
+    final hasMei = Letters.meiLetters.contains(firstChar);
+
+    // Check if second character is a right diacritic
+    final secondChar = String.fromCharCode(runes[1]);
+    final hasRightDiacritic = Letters.rightDiacriticLetters.contains(
+      secondChar,
+    );
+
+    return hasMei && hasRightDiacritic;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 🌐 PROVIDERS ------------------------------
+    final practiceConfig = ref.watch(practiceConfigurationProvider);
+    final normalizedPara = unorm.nfc(widget.paragraph);
+    final normalizedInput = unorm.nfc(widget.userInput);
+
+    // 🚀 METHODS --------------------------------
+    // Handle haptic / vibration based on practice config
+    // Detect errors at character level by comparing input with paragraph
+    if (practiceConfig.hapticOnError) {
+      if (_previousInput != null) {
         final paraClusters = normalizedPara.characters.toList();
         final inputClusters = normalizedInput.characters.toList();
+        final previousInputClusters = _previousInput!.characters.toList();
 
-        final spans = <TextSpan>[];
-        int inputIndex = 0;
-        final currentInputLength = inputClusters.length;
+        // Check if input length increased (new character typed)
+        if (inputClusters.length > previousInputClusters.length) {
+          final newInputIndex = inputClusters.length - 1;
 
-        for (int i = 0; i < paraClusters.length; i++) {
-            final paraChar = paraClusters[i];
-            final typed = (inputIndex < inputClusters.length)
-                ? inputClusters[inputIndex]
-                : null;
+          // Check if the newly typed character is incorrect
+          if (newInputIndex < paraClusters.length) {
+            final expectedChar = paraClusters[newInputIndex];
+            final typedChar = inputClusters[newInputIndex];
+            final isIncorrect = typedChar != expectedChar;
 
-            final isCorrect = typed != null && typed == paraChar;
-            final isSpace = _isSpace(paraChar);
-            final isCombinedForm = _isCombinedLetterForm(paraChar);
-
-            // Determine text color based on three-color system
-            Color textColor;
-            if (typed == null) {
-                // Not yet typed - grey
-                textColor = Colors.grey.shade400;
-            } else if (practiceConfig.blindMode) {
-                // Blind mode - neutral grey
-                textColor = Colors.grey.shade600;
-            } else if (isSpace) {
-                // Space character - neutral blue-grey for clarity
-                textColor = isCorrect ? Colors.blueGrey.shade400 : Colors.red;
-            } else if (isCorrect && isCombinedForm) {
-                // Correct combined letter form - orange
-                textColor = getFigmaColor(context, 'Schemes/Secondary');
-            } else if (isCorrect) {
-                // Correct simple character - green
-                textColor = Colors.green;
-            } else {
-                // Incorrect - red
-                textColor = Colors.red;
+            if (isIncorrect) {
+              // Vibrate when an incorrect character is detected
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                if (mounted) {
+                  final hasVibrator = await Vibration.hasVibrator();
+                  if (hasVibrator == true) {
+                    Vibration.vibrate(duration: 200);
+                  }
+                }
+              });
             }
-
-            // For spaces, add a visual indicator using underline decoration
-            // Keep the space character to maintain proper layout
-            spans.add(
-                TextSpan(
-                    text: paraChar,
-                    style: TextStyle(
-                        color: textColor,
-                        decoration: isSpace
-                            ? TextDecoration.underline
-                            : TextDecoration.none,
-                        decorationColor: isSpace ? textColor : null,
-                        decorationThickness: isSpace ? 1.5 : null
-                    )
-                )
-            );
-
-            inputIndex++;
+          }
         }
-
-        // Add blinking cursor indicator at the current typing position
-        if (currentInputLength < paraClusters.length) {
-            spans.insert(
-                currentInputLength,
-                TextSpan(
-                    text: '|',
-                    style: TextStyle(
-                        color: Colors.blue.shade600.withOpacity(cursorOpacity),
-                        fontWeight: FontWeight.bold
-                    )
-                )
-            );
-        }
-
-        return spans;
+        // If input decreased (backspace), update tracking but don't vibrate
+      }
+      // Update previous input for next comparison (always, even on first build)
+      _previousInput = normalizedInput;
+    } else {
+      // Reset tracking when haptic is disabled
+      _previousInput = null;
     }
+
+    // ⭐ Widget ---------------------------------
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: Gap(context).gap(8)),
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: Gap(context).gap(16),
+          vertical: Gap(context).gap(14),
+        ),
+        child: AnimatedBuilder(
+          animation: _cursorAnimation,
+          builder: (context, _) {
+            return RichText(
+              key: ValueKey(widget.paragraph),
+              text: TextSpan(
+                children: _buildTextSpans(
+                  context,
+                  widget.paragraph,
+                  widget.userInput,
+                  practiceConfig,
+                  _cursorAnimation.value,
+                ), // TODO: Pass Practice config here
+                style: TextStyle(
+                  color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                  fontSize: KxScale(context).sp(
+                    practiceConfig.contentFontSize.value,
+                  ), // 👈 CONTENT FONT SIZE SETTINGS // TODO: add practice config text font size
+                  height: 1.5,
+                  fontFamily: 'NotoSansTamil',
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  List<InlineSpan> _buildTextSpans(
+    BuildContext context,
+    String paragraph,
+    String input,
+    PracticeConfig practiceConfig,
+    double cursorOpacity,
+  ) {
+    // Normalize both to NFC form
+    final normalizedPara = unorm.nfc(paragraph);
+    final normalizedInput = unorm.nfc(input);
+
+    final paraClusters = normalizedPara.characters.toList();
+    final inputClusters = normalizedInput.characters.toList();
+
+    final spans = <InlineSpan>[];
+    int inputIndex = 0;
+    final currentInputLength = inputClusters.length;
+    bool isInWaitingState =
+        false; // Track if we're waiting from a previous iteration
+
+    for (int i = 0; i < paraClusters.length; i++) {
+      final paraChar = paraClusters[i];
+
+      // First, check if we have typed input at this position
+      // If we're already in a waiting state, don't use the same typed character for other paraChars
+      final typed = (!isInWaitingState && inputIndex < inputClusters.length)
+          ? inputClusters[inputIndex]
+          : null;
+
+      // Check if we're waiting for a 2-character diacritic combination to complete
+      bool isWaitingForSecondChar = false;
+
+      // Check if the expected character is a 2-char combination (mei + right diacritic)
+      // Examples: பி, வீ, வி, etc.
+      if (_isTwoCharDiacriticCombination(paraChar) && typed != null) {
+        // Check if typed matches the full combination (complete)
+        if (typed == paraChar) {
+          // Combination is complete, proceed normally
+          isWaitingForSecondChar = false;
+        } else {
+          // Check if typed is just the mei part (single rune) and we're at the end of input
+          // This means user is actively typing and might be in the process of completing the combination
+          final paraRunes = paraChar.runes.toList();
+          if (paraRunes.length == 2) {
+            final expectedMei = String.fromCharCode(paraRunes[0]);
+            final typedRunes = typed.runes.toList();
+
+            // Only wait if:
+            // 1. Typed is a single rune (just the mei part)
+            // 2. Typed mei matches expected mei
+            // 3. We're at the last typed character (user is actively typing)
+            if (typedRunes.length == 1) {
+              final typedChar = String.fromCharCode(typedRunes[0]);
+              final isLastTypedChar = inputIndex == currentInputLength - 1;
+
+              if (typedChar == expectedMei &&
+                  Letters.meiLetters.contains(typedChar) &&
+                  isLastTypedChar) {
+                // User is typing the mei, waiting for the diacritic
+                isWaitingForSecondChar = true;
+                isInWaitingState = true; // Mark that we're in waiting state
+              }
+            }
+            // If typed has multiple runes or doesn't match, it's a complete (but possibly incorrect) character
+          }
+        }
+      }
+
+      final isCorrect =
+          typed != null && typed == paraChar && !isWaitingForSecondChar;
+      final isSpace = _isSpace(paraChar);
+      final isCombinedForm = _isCombinedLetterForm(paraChar);
+      // If waiting for second char, cursor should stay on this character
+      // Otherwise, show cursor if this is the next character to type (and not already typed)
+      final isUpcoming =
+          isWaitingForSecondChar || (i == currentInputLength && typed == null);
+
+      // Determine text color and background based on three-color system
+      Color textColor;
+      Color? backgroundColor;
+      TextDecoration? decoration;
+      Color? decorationColor;
+      double? decorationThickness;
+
+      // In blind mode, only show cursor - everything else is neutral
+      if (practiceConfig.blindMode) {
+        if (isUpcoming || isWaitingForSecondChar) {
+          // Upcoming character - blue with blinking underscore cursor underneath
+          textColor = Colors.blue.shade600;
+          backgroundColor = null;
+          decoration = TextDecoration.none;
+        } else {
+          // All typed characters and untyped characters - neutral grey, no highlighting
+          textColor = Colors.grey.shade600;
+          backgroundColor = null;
+          decoration = TextDecoration.none;
+        }
+      } else {
+        // Normal mode with full highlighting
+        if (isWaitingForSecondChar) {
+          // Waiting for second character of 2-char combination - show partial with secondary color
+          textColor = getFigmaColor(context, 'Schemes/Secondary');
+          backgroundColor = getFigmaColor(
+            context,
+            'State Layers/Secondary/Opacity-10',
+          );
+          decoration = TextDecoration.none;
+        } else if (isUpcoming) {
+          // Upcoming character - blue with blinking underscore cursor underneath
+          textColor = Colors.blue.shade600;
+          backgroundColor = null;
+          decoration = TextDecoration.none;
+        } else if (typed == null) {
+          // Not yet typed - grey
+          textColor = Colors.grey.shade400;
+          backgroundColor = null;
+          decoration = TextDecoration.none;
+        } else if (isSpace) {
+          // Space character - neutral blue-grey for clarity
+          textColor = isCorrect ? Colors.blueGrey.shade400 : Colors.red;
+          backgroundColor = isCorrect
+              ? Colors.green.shade100
+              : Colors.red.shade100;
+          decoration = TextDecoration.none;
+          decorationColor = isSpace ? textColor : null;
+          decorationThickness = 1.5;
+        } else if (isCorrect) {
+          // Correct character (combined or simple) - dark green with light green background
+          textColor = Colors.green.shade700;
+          backgroundColor = getFigmaColor(
+            context,
+            'State Layers/Success/Opacity-10',
+          );
+          decoration = TextDecoration.none;
+        } else if (!isCorrect && isCombinedForm) {
+          // Incorrect combined letter form - secondary color (orange)
+          textColor = getFigmaColor(context, 'Schemes/Secondary');
+          backgroundColor = getFigmaColor(
+            context,
+            'State Layers/Secondary/Opacity-10',
+          );
+          decoration = TextDecoration.none;
+        } else {
+          // Incorrect simple character - red with light red background
+          textColor = Colors.red.shade700;
+          backgroundColor = getFigmaColor(
+            context,
+            'State Layers/Error/Opacity-10',
+          );
+          decoration = TextDecoration.none;
+        }
+      }
+
+      // For upcoming character or waiting for second char, use WidgetSpan to add underscore cursor underneath
+      if (isUpcoming || isWaitingForSecondChar) {
+        // Always show the full expected character (paraChar) so user can see what to type
+        // including the pulli/diacritic. The waiting state is just a visual indicator (secondary color).
+        final charToShow = paraChar;
+
+        spans.add(
+          WidgetSpan(
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Text(
+                  charToShow,
+                  style: TextStyle(
+                    color: textColor,
+                    backgroundColor: backgroundColor,
+                    fontSize: KxScale(
+                      context,
+                    ).sp(practiceConfig.contentFontSize.value),
+                    height: 1.5,
+                    fontFamily: 'NotoSansTamil',
+                  ),
+                ),
+                Positioned(
+                  bottom: -2,
+                  child: Opacity(
+                    opacity: cursorOpacity,
+                    child: Text(
+                      '_',
+                      style: TextStyle(
+                        color: Colors.blue.shade600,
+                        fontWeight: FontWeight.bold,
+                        fontSize: KxScale(
+                          context,
+                        ).sp(practiceConfig.contentFontSize.value),
+                        height: 1.0,
+                        fontFamily: 'NotoSansTamil',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        // Show the expected character (paraChar) - this ensures the full expected character
+        // like "ற்" is visible even when user types just 'ற'
+        spans.add(
+          TextSpan(
+            text: paraChar,
+            style: TextStyle(
+              color: textColor,
+              backgroundColor: backgroundColor,
+              decoration: decoration,
+              decorationColor: decorationColor,
+              decorationThickness: decorationThickness,
+            ),
+          ),
+        );
+      }
+
+      // Advance inputIndex after processing this paraChar
+      // CRITICAL: When waiting, we DON'T advance inputIndex so we can match the combined
+      // character when the user types the diacritic. The keyboard combines 'த' + '்' into 'த்',
+      // so inputClusters[inputIndex] will update from 'த' to 'த்' on next render.
+      if (!isWaitingForSecondChar) {
+        inputIndex++;
+        isInWaitingState = false; // Reset waiting state when we advance
+      }
+      // When waiting, inputIndex stays the same, and isInWaitingState prevents
+      // using the same typed character for subsequent paraChars
+    }
+
+    return spans;
+  }
 }

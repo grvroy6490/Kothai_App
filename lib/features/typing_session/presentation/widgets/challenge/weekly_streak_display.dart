@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:kothai_app/features/more/presentation/pages/streak_board/streak_board_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/pages/challenge/restore_streak/restore_streak_page.dart';
 import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/streak_badge.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
@@ -232,7 +233,7 @@ class _WeekilyStreakDisplayState extends State<WeekilyStreakDisplay> {
                                                     // Handle missing streak tap
                                                     _handleMissingStreakTap(ref, dayDate);
                                                 }
-                                                : null
+                                                : () => Get.to(() => StreakBoardPage(), transition: Transition.fadeIn, curve: Curves.fastOutSlowIn, duration: Duration(milliseconds: 500))
                                         )
                                     );
                                 })

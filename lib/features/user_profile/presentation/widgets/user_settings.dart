@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kothai_app/core/config/ui/scale.dart';
 import 'package:kothai_app/core/theme/figma_color.dart';
 import 'package:kothai_app/di/providers/theme/theme_provider.dart';
+import 'package:kothai_app/features/typing_session/domain/entities/challenge/challenge_config.dart';
+import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_config_provider.dart';
 import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
 
 class UserSettings extends ConsumerStatefulWidget {
@@ -16,62 +18,67 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
 
     @override
     Widget build(BuildContext context) {
-        final practiceConfig = ref.watch(practiceConfigurationProvider);
+        // 🌐 PROVIDERS ------------------------------
+        final config = ref.watch(challengeConfigurationProvider);
+
+        // 📃 DECLARATION ----------------------------
+        final ChallengeConfig configuration = ChallengeConfig(
+            soundEnabled: config.soundEnabled,
+            hapticEnabled: config.hapticEnabled,
+            darkMode: config.darkMode,
+            notificationsEnabled: config.notificationsEnabled
+        );
 
         // 🚀 METHODS --------------------------------
         void toggleSound(val){
+            ref.read(challengeConfigurationProvider.notifier).toggleSound();
         }
 
         void toggleVibration(val){
+            ref.read(challengeConfigurationProvider.notifier).toggleHaptics();
+        }
+
+        void toggleDarkMode(val){
+            ref.read(challengeConfigurationProvider.notifier).toggleDarkMode();
+        }
+
+        void toggleNotifications(val){
+            ref.read(challengeConfigurationProvider.notifier).toggleNotifications();
         }
 
         return Container(
-            padding: EdgeInsets.only(top: Gap(context).gap(10), left: Gap(context).gap(16), right: Gap(context).gap(16)),
             decoration: BoxDecoration(
-                color: getFigmaColor(context, 'Schemes/Surface Container'),
                 borderRadius: BorderRadius.circular(24)
             ),
             child: Column(
                 children: [
-                    Container(
-                        width:double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
-                        child: Text('Settings',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                color: getFigmaColor(context, 'Schemes/On Surface'),
-                                fontWeight: FontWeight.w800,
-                                height: 1
-                            )
-                        )
-                    ),
-                    Divider(),
-                    SizedBox(height: Gap(context).gap(8)),
 
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
+                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: practiceConfig.soundEnabled ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
+                            color: configuration.soundEnabled ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
                         ),
                         child: Row(
                             children: [
                                 Icon(
                                     Icons.volume_up,
-                                    color: practiceConfig.soundEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    size: Gap(context).gap(23),
+                                    color: configuration.soundEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
-                                SizedBox(width: 10),
+                                SizedBox(width: 15),
                                 Expanded(
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                             Text('Sound Effects',
                                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    color: practiceConfig.soundEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                    color: configuration.soundEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
                                                     fontWeight: FontWeight.w600
                                                 )
                                             ),
                                             Text('Play sounds when typing',
-                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                 )
                                             )
@@ -79,7 +86,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                     )
                                 ),
                                 SizedBox(width: 10),
-                                _switchButton(context, practiceConfig.soundEnabled, toggleSound  )
+                                _switchButton(context, configuration.soundEnabled, toggleSound  )
                             ]
                         )
                     ),
@@ -87,30 +94,31 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                     SizedBox(height: 15),
 
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
+                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: false ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
+                            color: configuration.hapticEnabled ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
                         ),
                         child: Row(
                             children: [
                                 Icon(
                                     Icons.vibration,
-                                    color: false ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    size: Gap(context).gap(23),
+                                    color: configuration.hapticEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
-                                SizedBox(width: 10),
+                                SizedBox(width: 15),
                                 Expanded(
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                             Text('Vibration',
                                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    color: false ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                    color: configuration.hapticEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
                                                     fontWeight: FontWeight.w600
                                                 )
                                             ),
                                             Text('Vibrate on key press',
-                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                 )
                                             )
@@ -118,7 +126,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                     )
                                 ),
                                 SizedBox(width: 10),
-                                _switchButton(context, practiceConfig.hapticEnabled, toggleVibration)
+                                _switchButton(context, configuration.hapticEnabled, toggleVibration)
                             ]
                         )
                     ),
@@ -126,7 +134,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                     SizedBox(height: 15),
 
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
+                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
                             color: true ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
@@ -135,9 +143,10 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                             children: [
                                 Icon(
                                     Icons.dark_mode,
+                                    size: Gap(context).gap(23),
                                     color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
-                                SizedBox(width: 10),
+                                SizedBox(width: 15),
                                 Expanded(
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +158,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                                 )
                                             ),
                                             Text('Use dark theme',
-                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                 )
                                             )
@@ -170,7 +179,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                     SizedBox(height: 15),
 
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(10), vertical: Gap(context).gap(8)),
+                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
                             color: true ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
@@ -179,9 +188,10 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                             children: [
                                 Icon(
                                     Icons.notifications,
+                                    size: Gap(context).gap(23),
                                     color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
-                                SizedBox(width: 10),
+                                SizedBox(width: 15),
                                 Expanded(
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +203,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                                 )
                                             ),
                                             Text('Daily remainders and updates',
-                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                 )
                                             )
@@ -201,12 +211,56 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                     )
                                 ),
                                 SizedBox(width: 10),
-                                _switchButton(context, true, (val) => val = !val )
+                                _switchButton(context, configuration.notificationsEnabled, toggleNotifications )
                             ]
                         )
                     ),
 
-                    SizedBox(height: Gap(context).gap(10))
+                    SizedBox(height: Gap(context).gap(10)),
+
+                    Container(
+                        padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
+                        decoration: BoxDecoration(
+                            color: getFigmaColor(context, 'Schemes/Surface Container'),
+                            borderRadius: BorderRadius.circular(24)
+                        ),
+                        child: Row(
+                            children: [
+                                Icon(
+                                    Icons.help,
+                                    size: Gap(context).gap(23),
+                                    color: true ? getFigmaColor(context, 'Schemes/On Surface') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                ),
+                                SizedBox(width: 15),
+                                Expanded(
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                            Text('Help',
+                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                    color: getFigmaColor(context, 'Schemes/On Surface'),
+                                                    fontWeight: FontWeight.w600
+                                                )
+                                            ),
+                                            Text('Learn how to use this app',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                    color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                )
+                                            )
+                                        ]
+                                    )
+                                ),
+                                SizedBox(width: 10),
+                                IconButton(
+                                    onPressed: (){
+                                    },
+                                    icon: Icon(Icons.chevron_right, size: KxScale(context).sp(30), color: getFigmaColor(context, 'Schemes/On Surface'))
+                                )
+                            ]
+                        )
+                    ),
+
+                    SizedBox(height: Gap(context).gap(20))
 
                 ]
             )

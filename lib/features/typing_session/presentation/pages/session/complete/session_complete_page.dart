@@ -32,7 +32,6 @@ class SessionCompletePage extends ConsumerStatefulWidget {
 class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
     final _logger = Logger();
 
-
     @override
     Widget build(BuildContext context) {
         // 📃 DECLARATION ----------------------------
@@ -61,8 +60,8 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
         }
 
         void handleClose() async {
-            // Complete the session to save challenge data
-            await sessionEngineController.complete();
+            // Session is already completed before navigating to this page
+            // Just reset and navigate back
             sessionEngineController.reset();
             sesstionStatusController.updateMode(SessionMode.none);
             sesstionStatusController.updateStatus(SessionStatusEnum.stop);
@@ -174,7 +173,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
                                     )
                                 ),
 
-                                SizedBox(height: 40),
+                                SizedBox(height: 30),
 
                                 Stack(
                                     clipBehavior: Clip.hardEdge,
@@ -262,7 +261,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
                                     ]
                                 ),
 
-                                SizedBox(height: 40),
+                                SizedBox(height: 30),
 
                                 SizedBox(
                                     width: double.infinity,
@@ -315,7 +314,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
                                     )
                                 ),
 
-                                SizedBox(height: Gap(context).gap(30)),
+                                SizedBox(height: Gap(context).gap(20)),
 
                                 SizedBox(
                                     width: double.infinity,
@@ -368,7 +367,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
                                     )
                                 ),
 
-                                SizedBox(height: Gap(context).gap(30)),
+                                SizedBox(height: Gap(context).gap(20)),
 
                                 Container(
                                     width: double.infinity,
@@ -454,7 +453,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
 
                                 SizedBox(
                                     width: Gap(context).gap(230),
-                                    height: Gap(context).gap(150),
+                                    height: Gap(context).gap(120),
                                     child: ClipRRect(
                                         borderRadius: BorderRadius.vertical(
                                             top: Radius.circular(150)

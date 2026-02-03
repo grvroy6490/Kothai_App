@@ -195,14 +195,13 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                     ).createShader(bounds),
                                     child: Text(
                                         _getChallengeText(slideIndex, hiddenChallenges),
-                                        textScaleFactor: 1.0,
                                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                                             color: getFigmaColor(
                                                 context,
                                                 'State Layers/On Background/Opacity-16'
                                             ),
                                             fontFamily: 'NotoSansTamil',
-                                            fontSize: 38,
+                                            fontSize: 38 * MediaQuery.of(context).textScaleFactor,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: -0.9,
                                         ),
