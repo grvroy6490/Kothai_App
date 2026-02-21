@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/lottie_player.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/star_burst_badge.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/widgets/lottie_player.dart';
+import 'package:visai/features/typing_session/presentation/widgets/star_burst_badge.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class PracticeRandomizePage extends ConsumerStatefulWidget {

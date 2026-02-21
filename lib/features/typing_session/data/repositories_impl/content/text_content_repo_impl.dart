@@ -1,11 +1,11 @@
 
 
-import 'package:kothai_app/core/constants/typing_session_constants.dart';
-import 'package:kothai_app/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/content/text_content.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/repositories/content/text_content_repo.dart';
-import 'package:kothai_app/features/typing_session/usecases/content/text_content_cache.dart';
+import 'package:visai/core/constants/typing_session_constants.dart';
+import 'package:visai/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
+import 'package:visai/features/typing_session/domain/entities/content/text_content.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/repositories/content/text_content_repo.dart';
+import 'package:visai/features/typing_session/usecases/content/text_content_cache.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

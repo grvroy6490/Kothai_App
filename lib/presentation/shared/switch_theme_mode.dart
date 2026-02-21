@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/presentation/providers/theme_provider.dart';
+import 'package:visai/presentation/providers/theme_provider.dart';
 
 class SwitchThemeMode extends StatelessWidget {
   const SwitchThemeMode({super.key});

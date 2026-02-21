@@ -1,7 +1,7 @@
-import 'package:kothai_app/data/repositories_impl/session/session_history_repository_impl.dart';
-import 'package:kothai_app/domain/repositories/session/session_history_repository.dart';
+import 'package:visai/data/repositories_impl/session/session_history_repository_impl.dart';
+import 'package:visai/domain/repositories/session/session_history_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kothai_app/data/models/session/typing_session.dart';
+import 'package:visai/data/models/session/typing_session.dart';
 
 part 'session_history_provider.g.dart';
 

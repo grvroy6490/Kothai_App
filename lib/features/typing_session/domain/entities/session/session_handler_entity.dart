@@ -1,8 +1,8 @@
 
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
 
 part 'session_handler_entity.freezed.dart';
 

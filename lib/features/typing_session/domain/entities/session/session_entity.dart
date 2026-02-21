@@ -1,9 +1,9 @@
 
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/metrics/metrics_entity.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/entities/metrics/metrics_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 
 part 'session_entity.freezed.dart';
 part 'session_entity.g.dart';

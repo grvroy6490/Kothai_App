@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/PracticePageWidget.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PracticeResetPauseSettings.dart';
-import 'package:kothai_app/presentation/shared/keyboard/keyboard.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:visai/presentation/screens/practice-page/PracticePageWidget.dart';
+import 'package:visai/presentation/screens/practice-page/components/PracticeResetPauseSettings.dart';
+import 'package:visai/presentation/shared/keyboard/keyboard.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 
 class PracticeScreen extends ConsumerStatefulWidget {
     const PracticeScreen({super.key});

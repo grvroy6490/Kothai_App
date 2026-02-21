@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/di/providers/theme/theme_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/settings/practice_settings_page.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/settings/practice_settings_page.dart';
 
 class PracticeSettingButtons extends ConsumerWidget {
     const PracticeSettingButtons({super.key});

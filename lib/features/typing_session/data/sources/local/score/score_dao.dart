@@ -1,6 +1,6 @@
 
 
-import 'package:kothai_app/features/typing_session/domain/entities/score/score_entity.dart';
+import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ScoreDao {

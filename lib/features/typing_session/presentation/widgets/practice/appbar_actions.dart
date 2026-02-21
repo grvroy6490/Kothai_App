@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/level_xp_indicator.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practice_stop_filled_button.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/practice_stop_filled_button.dart';
 
 List<Widget> appBarActions(
     ctx,

@@ -2,14 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/constants/auth_constants.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/di/providers/auth/auth_provider.dart';
-import 'package:kothai_app/domain/usecases/show_modal.dart';
-import 'package:kothai_app/features/authentication/presentation/pages/login.dart';
-import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart' as auth_stream;
-import 'package:kothai_app/features/authentication/presentation/widgets/form-text-field.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/constants/auth_constants.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/domain/usecases/show_modal.dart';
+import 'package:visai/features/authentication/presentation/pages/login.dart';
+import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart' as auth_stream;
+import 'package:visai/features/authentication/presentation/widgets/form-text-field.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
     const SignupPage({super.key});

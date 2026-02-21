@@ -1,4 +1,4 @@
-import 'package:kothai_app/features/typing_session/domain/entities/metrics/metrics_entity.dart';
+import 'package:visai/features/typing_session/domain/entities/metrics/metrics_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metrics_state_controller_provider.g.dart';

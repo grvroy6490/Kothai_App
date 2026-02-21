@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
 
 part 'text_paragraph.freezed.dart';
 

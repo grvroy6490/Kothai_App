@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
-import 'package:kothai_app/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 import 'package:logger/logger.dart';
 
 class LevelXPIndicatior extends ConsumerWidget {

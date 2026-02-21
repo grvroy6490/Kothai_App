@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/keyboard_type_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/keyboard_type_enum.dart';
 
 class KeyModel {
   final String id;

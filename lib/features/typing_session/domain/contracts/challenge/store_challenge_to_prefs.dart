@@ -1,6 +1,6 @@
 
 
-import 'package:kothai_app/features/typing_session/domain/entities/challenge/challenge_tracking_entity.dart';
+import 'package:visai/features/typing_session/domain/entities/challenge/challenge_tracking_entity.dart';
 
 
 abstract class StoreChallengeToPrefs {

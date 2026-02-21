@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/enums/KeyboardLayoutTypeEnum.dart';
+import 'package:visai/enums/KeyboardLayoutTypeEnum.dart';
 
 class KeyboardLayout {
   final int rows;

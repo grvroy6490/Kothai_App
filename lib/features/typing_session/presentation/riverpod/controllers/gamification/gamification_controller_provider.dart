@@ -1,8 +1,8 @@
 
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/gamification/gamification_repo_provider.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/gamification/gamification_repo_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gamification_controller_provider.g.dart';

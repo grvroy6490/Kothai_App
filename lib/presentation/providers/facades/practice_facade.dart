@@ -1,10 +1,10 @@
 
 
-import 'package:kothai_app/data/models/session/difficulty.dart';
-import 'package:kothai_app/enums/SessionMode.dart';
-import 'package:kothai_app/presentation/providers/session/difficulty_provider.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
-import 'package:kothai_app/presentation/providers/session/typing_session_provider.dart';
+import 'package:visai/data/models/session/difficulty.dart';
+import 'package:visai/enums/SessionMode.dart';
+import 'package:visai/presentation/providers/session/difficulty_provider.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/providers/session/typing_session_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'practice_facade.g.dart';

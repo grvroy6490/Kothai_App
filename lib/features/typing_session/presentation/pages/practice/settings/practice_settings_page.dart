@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/config_switch_option.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/text_size_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/blind_mode.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/segmented_buttons.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/settings_title_bar.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/switch_settings_card.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/config_switch_option.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/text_size_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/settings/blind_mode.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/settings/segmented_buttons.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/settings/settings_title_bar.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/settings/switch_settings_card.dart';
 
 class PracticeSettingsPage extends ConsumerStatefulWidget {
     const PracticeSettingsPage({super.key});

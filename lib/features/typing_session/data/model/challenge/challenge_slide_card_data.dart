@@ -1,5 +1,5 @@
-import 'package:kothai_app/features/typing_session/domain/entities/challenge/challenge_ui_entity.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/entities/challenge/challenge_ui_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 
 
 

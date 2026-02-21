@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/badges/data/model/badge_entity.dart';
-import 'package:kothai_app/features/badges/data/repositories_impl/badge_repository.dart';
-import 'package:kothai_app/features/badges/domain/enums/badge_type_enum.dart';
-import 'package:kothai_app/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
-import 'package:kothai_app/presentation/shared/app_bar_compact.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/badges/data/model/badge_entity.dart';
+import 'package:visai/features/badges/data/repositories_impl/badge_repository.dart';
+import 'package:visai/features/badges/domain/enums/badge_type_enum.dart';
+import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:visai/presentation/shared/app_bar_compact.dart';
 
 class AchievementGalleryPage extends ConsumerStatefulWidget {
     const AchievementGalleryPage({super.key});

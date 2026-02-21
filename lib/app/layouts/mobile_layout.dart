@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
-import 'package:kothai_app/features/splash/splash_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
+import 'package:visai/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
+import 'package:visai/features/splash/splash_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/practice_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
 
 
 class MobileLayout extends StatefulWidget {

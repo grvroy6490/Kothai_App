@@ -1,8 +1,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider, PhoneAuthProvider;
-import 'package:kothai_app/core/constants/auth_constants.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/core/constants/auth_constants.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 
 // Stream of the current Firebase user; null when signed out
 final authUserProvider = StreamProvider<User?>((ref) {

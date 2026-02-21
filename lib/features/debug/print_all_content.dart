@@ -1,8 +1,8 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-// import 'package:kothai_app/features/typing_session/presentation/providers/content/text_providers.dart';
-// import 'package:kothai_app/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
+// import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+// import 'package:visai/features/typing_session/presentation/providers/content/text_providers.dart';
+// import 'package:visai/features/typing_session/presentation/providers/practice/practise_config_provider.dart';
 //
 // class PrintAllContent extends ConsumerStatefulWidget {
 //     const PrintAllContent({super.key});

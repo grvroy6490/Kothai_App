@@ -1,5 +1,5 @@
 
-import 'package:kothai_app/features/typing_session/domain/entities/session/session_entity.dart';
+import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
 
 abstract class SessionLocalDBRepository {
     Future<void> add(SessionEntity session);           // must enforce FIFO cap=7

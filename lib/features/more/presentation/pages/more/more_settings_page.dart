@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart';
-import 'package:kothai_app/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
-import 'package:kothai_app/features/more/presentation/pages/streak_board/streak_board_page.dart';
-import 'package:kothai_app/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
-import 'package:kothai_app/features/user_profile/presentation/widgets/user_settings.dart';
-import 'package:kothai_app/presentation/shared/app_bar_compact.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
+import 'package:visai/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
+import 'package:visai/features/more/presentation/pages/streak_board/streak_board_page.dart';
+import 'package:visai/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
+import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:visai/features/user_profile/presentation/widgets/user_settings.dart';
+import 'package:visai/presentation/shared/app_bar_compact.dart';
 
 class MoreSettingsPage extends ConsumerStatefulWidget {
     const MoreSettingsPage({super.key});

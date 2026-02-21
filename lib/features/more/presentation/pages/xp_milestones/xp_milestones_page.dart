@@ -2,16 +2,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/score/score_entity.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/score/score_repo_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
-import 'package:kothai_app/features/user_profile/presentation/widgets/stats_card.dart';
-import 'package:kothai_app/features/user_profile/presentation/widgets/user_badge_gallery.dart';
-import 'package:kothai_app/presentation/shared/app_bar_compact.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/score/score_repo_provider.dart';
+import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:visai/features/user_profile/presentation/widgets/stats_card.dart';
+import 'package:visai/features/user_profile/presentation/widgets/user_badge_gallery.dart';
+import 'package:visai/presentation/shared/app_bar_compact.dart';
 
 class XpMilestonesPage extends ConsumerStatefulWidget {
     const XpMilestonesPage({super.key});

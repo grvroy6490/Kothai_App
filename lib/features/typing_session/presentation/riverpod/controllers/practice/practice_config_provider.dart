@@ -4,16 +4,16 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/constants/typing_session_constants.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/accuracy_threshold_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_time_limit_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_wpm_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/expertise_mode_enums.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/text_length_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/text_size_enum.dart';
+import 'package:visai/core/constants/typing_session_constants.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/accuracy_threshold_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_time_limit_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_wpm_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/expertise_mode_enums.dart';
+import 'package:visai/features/typing_session/domain/enums/text_length_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/text_size_enum.dart';
 
 class PracticeConfigController extends Notifier<PracticeConfig> {
 

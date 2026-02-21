@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/presentation/providers/facades/practice_facade.dart';
-import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/providers/facades/practice_facade.dart';
+import 'package:visai/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 
 class PracticeStopButton extends ConsumerStatefulWidget {
     const PracticeStopButton({super.key});

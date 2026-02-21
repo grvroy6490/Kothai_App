@@ -1,7 +1,7 @@
-import 'package:kothai_app/domain/contracts/gamification/gamification_data_fetcher.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
-import 'package:kothai_app/domain/repositories/gamification/gamification_repository.dart';
-import 'package:kothai_app/domain/usecases/gamification/gamification_cache.dart';
+import 'package:visai/domain/contracts/gamification/gamification_data_fetcher.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/domain/repositories/gamification/gamification_repository.dart';
+import 'package:visai/domain/usecases/gamification/gamification_cache.dart';
 import 'package:logger/logger.dart';
 
 class GamificationRepoImpl extends GamificationRepository {

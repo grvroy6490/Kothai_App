@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:kothai_app/features/typing_session/data/sources/local/challenge/challenges_to_prefs.dart';
-import 'package:kothai_app/features/typing_session/domain/contracts/challenge/store_challenge_to_prefs.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/features/typing_session/data/sources/local/challenge/challenges_to_prefs.dart';
+import 'package:visai/features/typing_session/domain/contracts/challenge/store_challenge_to_prefs.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'challenge_tracking_provider.g.dart';

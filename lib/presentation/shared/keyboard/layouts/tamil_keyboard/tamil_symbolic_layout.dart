@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_controller.dart';
-import 'package:kothai_app/enums/KeyTypeEnum.dart';
-import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
-import 'package:kothai_app/presentation/shared/keyboard/key_button.dart';
-import 'package:kothai_app/presentation/shared/keyboard/key_model.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/letters.dart';
+import 'package:visai/core/abstracts/keyboard/keyboard_controller.dart';
+import 'package:visai/enums/KeyTypeEnum.dart';
+import 'package:visai/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:visai/presentation/shared/keyboard/key_button.dart';
+import 'package:visai/presentation/shared/keyboard/key_model.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/letters.dart';
 
 class TamilSymbolicKeyboardLayout extends ConsumerWidget {
     final KeyboardController controller;

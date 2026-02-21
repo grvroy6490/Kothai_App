@@ -1,7 +1,7 @@
 
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 
 part 'text_content.freezed.dart';
 part 'text_content.g.dart';

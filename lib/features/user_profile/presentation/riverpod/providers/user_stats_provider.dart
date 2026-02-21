@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
-import 'package:kothai_app/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
+import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 
 part 'user_stats_provider.g.dart';
 

@@ -1,4 +1,4 @@
-package org.dckap.kothaiapp
+package org.dckap.visai
 
 import io.flutter.embedding.android.FlutterActivity
 

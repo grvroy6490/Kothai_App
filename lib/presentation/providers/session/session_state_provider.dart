@@ -2,8 +2,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/domain/entities/session/session_state.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
+import 'package:visai/domain/entities/session/session_state.dart';
+import 'package:visai/presentation/providers/practice/practice_configuration_provider.dart';
 
 
 

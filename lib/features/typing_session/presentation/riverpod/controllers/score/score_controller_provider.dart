@@ -1,9 +1,9 @@
 
 
-import 'package:kothai_app/di/providers/auth/auth_provider.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/score/score_entity.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/score/score_repo_provider.dart';
+import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/score/score_repo_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';

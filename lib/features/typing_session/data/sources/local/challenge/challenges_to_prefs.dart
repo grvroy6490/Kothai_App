@@ -2,9 +2,9 @@
 
 import 'dart:convert';
 
-import 'package:kothai_app/features/typing_session/domain/contracts/challenge/store_challenge_to_prefs.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/challenge/challenge_tracking_entity.dart';
-import 'package:kothai_app/services/shared_preferences/shared_prefs_service.dart';
+import 'package:visai/features/typing_session/domain/contracts/challenge/store_challenge_to_prefs.dart';
+import 'package:visai/features/typing_session/domain/entities/challenge/challenge_tracking_entity.dart';
+import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 class ChallengeSessionToPrefs implements StoreChallengeToPrefs {
     final SharedPrefsService prefs;

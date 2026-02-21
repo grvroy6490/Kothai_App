@@ -3,10 +3,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/difficulty_segment_buttons.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/practise_settings_button.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/difficulty_segment_buttons.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/practise_settings_button.dart';
 
 class PracticeStartButton extends StatelessWidget {
     void Function() handleStart;

@@ -2,11 +2,11 @@
 
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/enums/difficulty/AccuracyThresholdEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyTimeLimitEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyWPM.dart';
-import 'package:kothai_app/enums/MulplierEnum.dart';
+import 'package:visai/enums/difficulty/AccuracyThresholdEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyTimeLimitEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyWPM.dart';
+import 'package:visai/enums/MulplierEnum.dart';
 
 part 'difficulty.freezed.dart';
 part 'difficulty.g.dart';

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/domain/entities/session/session_handler_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:characters/characters.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
 import 'package:vibration/vibration.dart';
 
 class AnimatedContentBoard extends ConsumerStatefulWidget {
@@ -169,6 +171,27 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     return char.trim().isEmpty && char.isNotEmpty;
   }
 
+  /// Checks if a character cluster is a special multi-character sequence
+  /// Examples: "க்ஷ", "ஸ்ரீ"
+  bool _isSpecialMultiCharSequence(String cluster) {
+    final normalizedCluster = unorm.nfc(cluster);
+    return Letters.specialKeys.contains(normalizedCluster);
+  }
+
+  /// Checks if typed is a partial match of the expected special sequence
+  /// Returns true if typed is a prefix of the expected sequence
+  bool _isPartialSpecialSequence(String expected, String typed) {
+    final normalizedExpected = unorm.nfc(expected);
+    final normalizedTyped = unorm.nfc(typed);
+
+    // Check if typed is a prefix of expected
+    if (normalizedExpected.startsWith(normalizedTyped) &&
+        normalizedTyped.length < normalizedExpected.length) {
+      return true;
+    }
+    return false;
+  }
+
   /// Checks if a character cluster is a 2-character combination (mei + right diacritic)
   /// Examples: "யா", "ளை", "லி"
   bool _isTwoCharDiacriticCombination(String cluster) {
@@ -197,6 +220,7 @@ class _TypingAreaState extends ConsumerState<TypingArea>
   Widget build(BuildContext context) {
     // 🌐 PROVIDERS ------------------------------
     final practiceConfig = ref.watch(practiceConfigurationProvider);
+    final sessionStatus = ref.watch(sessionStatusControllerProvider);
     final normalizedPara = unorm.nfc(widget.paragraph);
     final normalizedInput = unorm.nfc(widget.userInput);
 
@@ -262,6 +286,7 @@ class _TypingAreaState extends ConsumerState<TypingArea>
                   widget.paragraph,
                   widget.userInput,
                   practiceConfig,
+                  sessionStatus,
                   _cursorAnimation.value,
                 ), // TODO: Pass Practice config here
                 style: TextStyle(
@@ -285,6 +310,7 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     String paragraph,
     String input,
     PracticeConfig practiceConfig,
+    SessionHandler sessionStatus,
     double cursorOpacity,
   ) {
     // Normalize both to NFC form
@@ -312,9 +338,25 @@ class _TypingAreaState extends ConsumerState<TypingArea>
       // Check if we're waiting for a 2-character diacritic combination to complete
       bool isWaitingForSecondChar = false;
 
+      // First, check if the expected character is a special multi-character sequence
+      // Examples: "க்ஷ", "ஸ்ரீ"
+      if (_isSpecialMultiCharSequence(paraChar) && typed != null) {
+        if (typed == paraChar) {
+          // Special sequence is complete, proceed normally
+          isWaitingForSecondChar = false;
+        } else if (_isPartialSpecialSequence(paraChar, typed)) {
+          // Typed is a partial match of the special sequence
+          // Wait for the complete sequence
+          final isLastTypedChar = inputIndex == currentInputLength - 1;
+          if (isLastTypedChar) {
+            isWaitingForSecondChar = true;
+            isInWaitingState = true;
+          }
+        }
+      }
       // Check if the expected character is a 2-char combination (mei + right diacritic)
       // Examples: பி, வீ, வி, etc.
-      if (_isTwoCharDiacriticCombination(paraChar) && typed != null) {
+      else if (_isTwoCharDiacriticCombination(paraChar) && typed != null) {
         // Check if typed matches the full combination (complete)
         if (typed == paraChar) {
           // Combination is complete, proceed normally
@@ -365,7 +407,9 @@ class _TypingAreaState extends ConsumerState<TypingArea>
       double? decorationThickness;
 
       // In blind mode, only show cursor - everything else is neutral
-      if (practiceConfig.blindMode) {
+      // Blind mode should only apply to practice mode, not challenge mode
+      if (practiceConfig.blindMode &&
+          sessionStatus.mode == SessionMode.practice) {
         if (isUpcoming || isWaitingForSecondChar) {
           // Upcoming character - blue with blinking underscore cursor underneath
           textColor = Colors.blue.shade600;

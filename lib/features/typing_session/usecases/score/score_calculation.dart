@@ -1,6 +1,6 @@
 
 
-import 'package:kothai_app/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
+import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 
 double calculateXP(
     {required int totalChars, required DifficultyCriteriaEntity? difficultyMultiplier, required double accuracyPercent, required double wpm}) {

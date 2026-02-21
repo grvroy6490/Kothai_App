@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/Level_XP_Indicator.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PractiseStopButton.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/shared/switch_theme_mode.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
+import 'package:visai/presentation/screens/practice-page/components/Level_XP_Indicator.dart';
+import 'package:visai/presentation/screens/practice-page/components/PractiseStopButton.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/shared/switch_theme_mode.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 
 class PracticeHeader extends ConsumerStatefulWidget {
     const PracticeHeader({super.key});

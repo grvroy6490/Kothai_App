@@ -1,90 +1,39 @@
 {
-    "project_info": {
-        "project_number": "381212783799",
-        "project_id": "kothai-2425",
-        "storage_bucket": "kothai-2425.firebasestorage.app"
-    },
-    "client": [
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:381212783799:android:aa5ba667b871ab3ff60932",
-                "android_client_info": {
-                    "package_name": "org.dckap.kothai_app"
-                }
-            },
-            "oauth_client": [
-                {
-                    "client_id": "381212783799-e59qbcm3mc534puvaojdj3cj9qsh68rm.apps.googleusercontent.com",
-                    "client_type": 3
-                }
-            ],
-            "api_key": [
-                {
-                    "current_key": "AIzaSyCjj0u-GP2j26zN8qo6uz86MiFlzHBBgzk"
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": [
-                        {
-                            "client_id": "381212783799-e59qbcm3mc534puvaojdj3cj9qsh68rm.apps.googleusercontent.com",
-                            "client_type": 3
-                        },
-                        {
-                            "client_id": "381212783799-gg2dt1ob6cq5ca5jo91bcijkusrilicq.apps.googleusercontent.com",
-                            "client_type": 2,
-                            "ios_info": {
-                                "bundle_id": "org.dckap.kothaiapp"
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:381212783799:android:a2fa7f51f1a5b8dbf60932",
-                "android_client_info": {
-                    "package_name": "org.dckap.kothaiapp"
-                }
-            },
-            "oauth_client": [
-                {
-                    "client_id": "381212783799-8i7n8mnprp1g4sv5c38roq53ad4iisuh.apps.googleusercontent.com",
-                    "client_type": 1,
-                    "android_info": {
-                        "package_name": "org.dckap.kothaiapp",
-                        "certificate_hash": "2fa4f95320537a6ac0ecd60301d4d22df79ebb8c"
-                    }
-                },
-                {
-                    "client_id": "381212783799-e59qbcm3mc534puvaojdj3cj9qsh68rm.apps.googleusercontent.com",
-                    "client_type": 3
-                }
-            ],
-            "api_key": [
-                {
-                    "current_key": "AIzaSyCjj0u-GP2j26zN8qo6uz86MiFlzHBBgzk"
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": [
-                        {
-                            "client_id": "381212783799-e59qbcm3mc534puvaojdj3cj9qsh68rm.apps.googleusercontent.com",
-                            "client_type": 3
-                        },
-                        {
-                            "client_id": "381212783799-gg2dt1ob6cq5ca5jo91bcijkusrilicq.apps.googleusercontent.com",
-                            "client_type": 2,
-                            "ios_info": {
-                                "bundle_id": "org.dckap.kothaiapp"
-                            }
-                        }
-                    ]
-                }
-            }
+  "project_info": {
+    "project_number": "834995515353",
+    "project_id": "visai-97c45",
+    "storage_bucket": "visai-97c45.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834995515353:android:5dd4356543e0a0d895b3c8",
+        "android_client_info": {
+          "package_name": "org.dckap.visai"
         }
-    ],
-    "configuration_version": "1"
+      },
+      "oauth_client": [
+        {
+          "client_id": "834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsmJm0ugwh4Z4kH0M5zhHSuBDTaM9EsCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

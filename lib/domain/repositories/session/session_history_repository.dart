@@ -2,7 +2,7 @@
 
 
 
-import 'package:kothai_app/data/models/session/typing_session.dart';
+import 'package:visai/data/models/session/typing_session.dart';
 
 abstract class ISessionHistoryRepository {
     Future<List<TypingSession>> getAll();

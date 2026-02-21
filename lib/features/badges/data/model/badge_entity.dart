@@ -1,7 +1,7 @@
 
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/features/badges/domain/enums/badge_type_enum.dart';
+import 'package:visai/features/badges/domain/enums/badge_type_enum.dart';
 
 part 'badge_entity.freezed.dart';
 part 'badge_entity.g.dart';

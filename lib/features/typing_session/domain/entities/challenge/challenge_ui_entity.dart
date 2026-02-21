@@ -1,6 +1,6 @@
 
 
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 
 class ChallengeUiEntity {
     final DifficultyEnum name;

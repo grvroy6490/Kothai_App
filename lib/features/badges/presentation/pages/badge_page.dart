@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/badges/data/model/badge_entity.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/badges/data/model/badge_entity.dart';
 
 class BadgePage extends StatefulWidget {
     final BadgeEntity badge;

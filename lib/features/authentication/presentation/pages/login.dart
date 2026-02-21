@@ -3,11 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/di/providers/auth/auth_provider.dart';
-import 'package:kothai_app/domain/usecases/show_modal.dart';
-import 'package:kothai_app/features/authentication/presentation/pages/signup.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/domain/usecases/show_modal.dart';
+import 'package:visai/features/authentication/presentation/pages/signup.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends ConsumerStatefulWidget {

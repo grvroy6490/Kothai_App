@@ -1,7 +1,7 @@
 
 
-import 'package:kothai_app/features/badges/data/model/badge_entity.dart';
-import 'package:kothai_app/features/badges/domain/enums/badge_type_enum.dart';
+import 'package:visai/features/badges/data/model/badge_entity.dart';
+import 'package:visai/features/badges/domain/enums/badge_type_enum.dart';
 
 class BadgeRepository {
     static final allBadges = <BadgeEntity>[

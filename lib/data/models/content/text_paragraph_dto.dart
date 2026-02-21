@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/domain/entities/content/text_paragraph.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/domain/entities/content/text_paragraph.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
 
 part 'text_paragraph_dto.freezed.dart';
 part 'text_paragraph_dto.g.dart';

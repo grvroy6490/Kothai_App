@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
 
 class PracticeStatusNotifier extends StateNotifier<PracticeStatus> {
     PracticeStatusNotifier() : super(PracticeStatus.stop); // Initial state: not running

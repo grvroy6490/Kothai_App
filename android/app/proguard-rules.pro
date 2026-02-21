@@ -66,6 +66,13 @@
 -optimizationpasses 5
 -allowaccessmodification
 -repackageclasses ''
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-dontoptimize
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
+-dontpreverify
+-verbose
 
 # Keep Hive (local database)
 -keep class hive.** { *; }

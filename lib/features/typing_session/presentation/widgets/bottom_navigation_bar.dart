@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/di/providers/navigation/navigation_provider.dart';
-import 'package:kothai_app/domain/usecases/show_modal.dart';
-import 'package:kothai_app/features/authentication/presentation/pages/signup.dart';
-import 'package:kothai_app/features/more/presentation/pages/more/more_settings_page.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/streak_mode_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/navigation/navigation_provider.dart';
+import 'package:visai/domain/usecases/show_modal.dart';
+import 'package:visai/features/authentication/presentation/pages/signup.dart';
+import 'package:visai/features/more/presentation/pages/more/more_settings_page.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/streak_mode_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 
 class BottomNavigationBarWidget extends ConsumerWidget {
     final TextEditingController? controller;

@@ -7,13 +7,13 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/level_xp_indicator.dart';
-import 'package:kothai_app/features/user_profile/presentation/widgets/stats_card.dart';
-import 'package:kothai_app/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
-import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
+import 'package:visai/features/user_profile/presentation/widgets/stats_card.dart';
+import 'package:visai/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
+import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class SharePage extends ConsumerStatefulWidget {

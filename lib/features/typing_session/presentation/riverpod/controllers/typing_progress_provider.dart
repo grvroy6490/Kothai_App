@@ -1,8 +1,8 @@
 
 import 'package:characters/characters.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 

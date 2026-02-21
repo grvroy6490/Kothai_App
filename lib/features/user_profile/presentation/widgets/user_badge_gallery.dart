@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/badges/data/model/badge_entity.dart';
-import 'package:kothai_app/features/badges/data/repositories_impl/badge_repository.dart';
-import 'package:kothai_app/features/badges/domain/enums/badge_type_enum.dart';
-import 'package:kothai_app/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/badges/data/model/badge_entity.dart';
+import 'package:visai/features/badges/data/repositories_impl/badge_repository.dart';
+import 'package:visai/features/badges/domain/enums/badge_type_enum.dart';
+import 'package:visai/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
 
 class UserBadgeGallery extends ConsumerStatefulWidget {
     final Set<String> badges;

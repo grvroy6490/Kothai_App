@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_ui_controller.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/challenge_start_button.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/slide_card_widgets/challenge_detail_card.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_card_difficulty_xp_badges.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_stats_badges.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_ui_controller.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
+import 'package:visai/features/typing_session/presentation/widgets/challenge/challenge_start_button.dart';
+import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/challenge_detail_card.dart';
+import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_card_difficulty_xp_badges.dart';
+import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_stats_badges.dart';
 import 'package:logger/logger.dart';
 
 class ChallengeHomeScreen extends ConsumerStatefulWidget {

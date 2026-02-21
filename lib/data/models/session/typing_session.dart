@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/data/models/session/difficulty.dart';
-import 'package:kothai_app/data/models/session/metrics.dart';
-import 'package:kothai_app/enums/SessionMode.dart';
+import 'package:visai/data/models/session/difficulty.dart';
+import 'package:visai/data/models/session/metrics.dart';
+import 'package:visai/enums/SessionMode.dart';
 
 part 'typing_session.freezed.dart';
 part 'typing_session.g.dart';

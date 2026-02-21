@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:kothai_app/core/constants/gamification.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
-import 'package:kothai_app/services/shared_preferences/shared_prefs_service.dart';
+import 'package:visai/core/constants/gamification.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 import 'package:logger/logger.dart';
 
 class GamificationCache {

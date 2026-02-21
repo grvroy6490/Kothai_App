@@ -1,5 +1,5 @@
 import 'package:characters/characters.dart';
-import 'package:kothai_app/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
+import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 
 int graphemeCount(String s) => s.characters.length;
 

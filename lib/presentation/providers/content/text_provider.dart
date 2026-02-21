@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:kothai_app/application/use_cases/preload_typing_texts.dart';
-import 'package:kothai_app/data/datasources/content/text_api_service.dart';
-import 'package:kothai_app/data/repositories_impl/content/text_repository_impl.dart';
-import 'package:kothai_app/domain/entities/content/text_paragraph.dart';
-import 'package:kothai_app/domain/repositories/content/text_repository.dart';
-import 'package:kothai_app/presentation/providers/shared_prefs_provider.dart';
+import 'package:visai/application/use_cases/preload_typing_texts.dart';
+import 'package:visai/data/datasources/content/text_api_service.dart';
+import 'package:visai/data/repositories_impl/content/text_repository_impl.dart';
+import 'package:visai/domain/entities/content/text_paragraph.dart';
+import 'package:visai/domain/repositories/content/text_repository.dart';
+import 'package:visai/presentation/providers/shared_prefs_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'text_provider.g.dart';

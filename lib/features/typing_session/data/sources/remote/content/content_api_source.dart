@@ -1,8 +1,8 @@
 
 
 import 'package:dio/dio.dart';
-import 'package:kothai_app/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/content/text_content.dart';
+import 'package:visai/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
+import 'package:visai/features/typing_session/domain/entities/content/text_content.dart';
 
 class ContentApiSourceFetcher {
     final Dio dio;

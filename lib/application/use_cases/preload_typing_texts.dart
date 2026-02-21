@@ -1,4 +1,4 @@
-import 'package:kothai_app/domain/repositories/content/text_repository.dart';
+import 'package:visai/domain/repositories/content/text_repository.dart';
 
 class PreloadTypingTexts {
     final TextRepository repo;

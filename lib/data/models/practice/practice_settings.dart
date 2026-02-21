@@ -1,9 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kothai_app/enums/ConfigDisplayType.dart';
-import 'package:kothai_app/enums/ContentFontSize.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/enums/ModeEnum.dart';
-import 'package:kothai_app/enums/ContentLength.dart';
+import 'package:visai/enums/ConfigDisplayType.dart';
+import 'package:visai/enums/ContentFontSize.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/ModeEnum.dart';
+import 'package:visai/enums/ContentLength.dart';
 
 part 'practice_settings.freezed.dart';
 part 'practice_settings.g.dart';

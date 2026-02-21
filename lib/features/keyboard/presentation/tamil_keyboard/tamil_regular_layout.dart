@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
-import 'package:kothai_app/features/keyboard/presentation/key_model.dart';
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/keyboard_type_enum.dart';
-import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
-import 'package:kothai_app/features/keyboard/presentation/key_button.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_controller.dart';
+import 'package:visai/features/keyboard/presentation/key_model.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/typing_session/domain/enums/keyboard_type_enum.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
+import 'package:visai/features/keyboard/presentation/key_button.dart';
 
 class TamilRegularKeyboardLayout extends ConsumerWidget {
     final KeyboardController controller;
@@ -72,7 +72,7 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
         KeyModel(id: 'diacritic_${leftDiacriticLetters[2]}', type: KeyType.diacritic, label: leftDiacriticLetters[2], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[2])),
 
         /***********************************************/
-        ...meiLetters.sublist(13, meiLetters.length).map((letter) {
+        ...meiLetters.sublist(13, 17).map((letter) {
                 return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 
@@ -86,7 +86,14 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
     // Build the row lazily; safe to reference other fields.
     late final List<KeyModel> fifthRow = [
         KeyModel(id: 'symbol_comma', type: KeyType.symbolic, label: ',', onTap: (ctrl) => ctrl.insert(',')),
+
+
+
         KeyModel(id: 'symbol_${specialLetters[0]}', type: KeyType.symbolic, label: specialLetters[0], onTap: (ctrl) => ctrl.insert(specialLetters[0])),
+
+      ...meiLetters.sublist(18, meiLetters.length).map((letter) {
+        return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
+      }),
 
         /***********************************************/
         ...specialLetters.sublist(1, specialLetters.length).map((letter) {

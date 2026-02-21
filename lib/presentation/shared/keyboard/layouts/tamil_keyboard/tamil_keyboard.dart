@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_controller.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/letters.dart';
-import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:visai/core/abstracts/keyboard/keyboard_controller.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/letters.dart';
+import 'package:visai/presentation/providers/keyboard/keyboard_provider.dart';
 
 class TamilKeyboard extends KeyboardController {
     String? _heldLeftDiacritic;

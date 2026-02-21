@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:kothai_app/core/constants/typing_session_constants.dart';
-import 'package:kothai_app/domain/contracts/gamification/gamification_data_fetcher.dart';
-import 'package:kothai_app/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
-import 'package:kothai_app/domain/entities/levels/level_entity.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/core/constants/typing_session_constants.dart';
+import 'package:visai/domain/contracts/gamification/gamification_data_fetcher.dart';
+import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/domain/entities/levels/level_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:logger/logger.dart';
 
 class GamificationLocalSourceFetcher implements GamificationDataFetcher {

@@ -1,6 +1,6 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
 
 
 final sessionElapsedProvider = Provider<Duration>(

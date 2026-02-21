@@ -2,15 +2,15 @@
 
 
 import 'package:get/get.dart';
-import 'package:kothai_app/app/app.dart';
-import 'package:kothai_app/core/errors/default_404.dart';
-import 'package:kothai_app/features/more/presentation/pages/more/more_settings_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/challenge/challenge_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/practice_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
-import 'package:kothai_app/features/user_profile/presentation/pages/profile_page.dart';
+import 'package:visai/app/app.dart';
+import 'package:visai/core/errors/default_404.dart';
+import 'package:visai/features/more/presentation/pages/more/more_settings_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/challenge/challenge_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/session/complete/session_complete_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/practice_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
+import 'package:visai/features/user_profile/presentation/pages/profile_page.dart';
 
 
 List<GetPage<dynamic>> routes = [

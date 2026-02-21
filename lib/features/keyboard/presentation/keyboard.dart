@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_renderer.dart';
-import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_controller.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_renderer.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
 
 class Keyboard extends ConsumerWidget {
     final KeyboardController controller;

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:characters/characters.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
 import 'package:vibration/vibration.dart';
 
 class AnimatedContentBoard extends ConsumerStatefulWidget {

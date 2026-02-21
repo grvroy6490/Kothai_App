@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
-import 'package:kothai_app/presentation/providers/practice/prcatice_settings_visibility_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/practice-settings/PracticeSettings.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/EditorArea.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PracticeHeader.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
-import 'package:kothai_app/presentation/shared/footer_navigation_bar.dart';
-import 'package:kothai_app/presentation/shared/bottom_slide_modal.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
+import 'package:visai/presentation/providers/practice/prcatice_settings_visibility_provider.dart';
+import 'package:visai/presentation/screens/practice-page/practice-settings/PracticeSettings.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/screens/practice-page/components/EditorArea.dart';
+import 'package:visai/presentation/screens/practice-page/components/PracticeHeader.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/shared/footer_navigation_bar.dart';
+import 'package:visai/presentation/shared/bottom_slide_modal.dart';
 
 class PracticePage extends ConsumerStatefulWidget {
     final TextEditingController controller;

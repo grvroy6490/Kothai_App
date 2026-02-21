@@ -1,6 +1,6 @@
 
 
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
 
 class ConfigSwitchOption {
     final String title;

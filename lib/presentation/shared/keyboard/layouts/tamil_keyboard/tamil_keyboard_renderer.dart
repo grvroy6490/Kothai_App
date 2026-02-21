@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_controller.dart';
-import 'package:kothai_app/enums/KeyboardLayoutTypeEnum.dart';
-import 'package:kothai_app/presentation/shared/keyboard/keyboard_layout.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_renderer.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_numeric_layout.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_regualr_layout.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_symbolic_layout.dart';
+import 'package:visai/core/abstracts/keyboard/keyboard_controller.dart';
+import 'package:visai/enums/KeyboardLayoutTypeEnum.dart';
+import 'package:visai/presentation/shared/keyboard/keyboard_layout.dart';
+import 'package:visai/core/abstracts/keyboard/keyboard_renderer.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_numeric_layout.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_regualr_layout.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_symbolic_layout.dart';
 
 class TamilKeyboardRenderer implements KeyboardRenderer {
     final KeyboardLayout defaultLayout = const KeyboardLayout(6, 10);

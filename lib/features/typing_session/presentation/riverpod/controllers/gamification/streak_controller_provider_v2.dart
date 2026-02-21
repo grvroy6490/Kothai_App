@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/constants/typing_session_constants.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/core/constants/typing_session_constants.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:logger/logger.dart';
 
 

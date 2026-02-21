@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/domain/entities/session/session_state.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyWPM.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
-import 'package:kothai_app/presentation/providers/content/text_provider.dart';
-import 'package:kothai_app/presentation/providers/session/difficulty_provider.dart';
-import 'package:kothai_app/presentation/providers/session/session_selector.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/InfoBadge.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/StatBadge.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
-import 'package:kothai_app/presentation/shared/toast.dart';
+import 'package:visai/domain/entities/session/session_state.dart';
+import 'package:visai/enums/difficulty/DifficultyWPM.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
+import 'package:visai/presentation/providers/content/text_provider.dart';
+import 'package:visai/presentation/providers/session/difficulty_provider.dart';
+import 'package:visai/presentation/providers/session/session_selector.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/screens/practice-page/components/InfoBadge.dart';
+import 'package:visai/presentation/screens/practice-page/components/StatBadge.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/shared/toast.dart';
 
 class PracticeInfoBox extends ConsumerStatefulWidget {
     const PracticeInfoBox({super.key});

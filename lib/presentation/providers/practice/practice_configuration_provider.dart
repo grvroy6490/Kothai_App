@@ -1,20 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/data/models/practice/practice_settings.dart';
-import 'package:kothai_app/data/models/session/difficulty.dart';
-import 'package:kothai_app/enums/ConfigDisplayType.dart';
-import 'package:kothai_app/enums/ContentFontSize.dart';
-import 'package:kothai_app/enums/ContentLength.dart';
-import 'package:kothai_app/enums/MulplierEnum.dart';
-import 'package:kothai_app/enums/difficulty/AccuracyThresholdEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/enums/ModeEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyTimeLimitEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyWPM.dart';
-import 'package:kothai_app/presentation/providers/session/difficulty_provider.dart';
+import 'package:visai/data/models/practice/practice_settings.dart';
+import 'package:visai/data/models/session/difficulty.dart';
+import 'package:visai/enums/ConfigDisplayType.dart';
+import 'package:visai/enums/ContentFontSize.dart';
+import 'package:visai/enums/ContentLength.dart';
+import 'package:visai/enums/MulplierEnum.dart';
+import 'package:visai/enums/difficulty/AccuracyThresholdEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/ModeEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyTimeLimitEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyWPM.dart';
+import 'package:visai/presentation/providers/session/difficulty_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:kothai_app/core/constants/constants.dart';
+import 'package:visai/core/constants/constants.dart';
 
 
 class PracticeSettingsNotifier extends StateNotifier<PracticeSettings> {

@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:visai/core/theme/figma_color.dart';
 
 Widget switchButton(
     BuildContext context,

@@ -2,11 +2,11 @@
 
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/di/providers/db/db_provider.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:kothai_app/features/typing_session/data/repositories_impl/score/score_local_db_repo_impl.dart';
-import 'package:kothai_app/features/typing_session/data/sources/local/score/score_dao.dart';
-import 'package:kothai_app/features/typing_session/domain/repositories/score/score_local_db_repository.dart';
+import 'package:visai/di/providers/db/db_provider.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/features/typing_session/data/repositories_impl/score/score_local_db_repo_impl.dart';
+import 'package:visai/features/typing_session/data/sources/local/score/score_dao.dart';
+import 'package:visai/features/typing_session/domain/repositories/score/score_local_db_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'score_repo_provider.g.dart';

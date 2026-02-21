@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
-import 'package:kothai_app/features/keyboard/presentation/providers/keyboard_provider.dart';
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_controller.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
 import 'package:vibration/vibration.dart';
 
 class TamilKeyboard extends KeyboardController {

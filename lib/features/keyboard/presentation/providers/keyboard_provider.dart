@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_controller.dart';
-import 'package:kothai_app/features/keyboard/domain/contracts/keyboard_renderer.dart';
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/tamil_keyboard.dart';
-import 'package:kothai_app/features/keyboard/presentation/tamil_keyboard/tamil_keyboard_renderer.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/session/session_handler_entity.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/keyboard_layout_type_enum.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_controller.dart';
+import 'package:visai/features/keyboard/domain/contracts/keyboard_renderer.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/tamil_keyboard.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/tamil_keyboard_renderer.dart';
+import 'package:visai/features/typing_session/domain/entities/session/session_handler_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/keyboard_layout_type_enum.dart';
 
 import 'package:flutter/widgets.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_status_enum.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 
 // KEYBOARD NOTIFIER
 class KeyboardStatusController extends Notifier<bool> {

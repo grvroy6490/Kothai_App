@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/content/text_content.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/content_type_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/session_mode.dart';
-import 'package:kothai_app/features/typing_session/domain/repositories/content/text_content_repo.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/providers/content/text_content_repo_provider.dart';
+import 'package:visai/features/typing_session/domain/entities/content/text_content.dart';
+import 'package:visai/features/typing_session/domain/enums/content_type_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/features/typing_session/domain/repositories/content/text_content_repo.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/content/text_content_repo_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -58,8 +58,8 @@ class TextContentController extends _$TextContentController {
             .randomizedTexts(difficulty);
 
         if (list.isNotEmpty) {
-            // state = list.first;
-            state = TextContent(difficulty: DifficultyEnum.easy, content: "அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ ஃ க் ங் ச் ஞ் ட் ண் த் ந் ப் ம் ய் ர் ல் வ் ழ் ள் ற் ன் க கா கி கீ கு கூ கெ கே கை கொ கோ கௌ ச சா சி சீ சு சூ செ சே சை சொ சோ சௌ ட டா டி டீ டு டூ டெ டே டை டொ டோ டௌ த தா தி தீ து தூ தெ தே தை தொ தோ தௌ ப பா பி பீ பு பூ பெ பே பை பொ போ பௌ ம மா மி மீ மு மூ மெ மே மை மொ மோ மௌ ய யா யி யீ யு யூ யெ யே யை யொ யோ யௌ ர ரா ரி ரீ ரு ரூ ரெ ரே ரை ரொ ரோ ரௌ ல லா லி லீ லு லூ லெ லே லை லொ லோ லௌ வ வா வி வீ வு வூ வெ வே வை வொ வோ வௌ ழ ழா ழி ழீ ழு ழூ ழெ ழே ழை ழொ ழோ ழௌ ள ளா ளி ளீ ளு ளூ ளெ ளே ளை ளொ ளோ ளௌ ற றா றி றீ று றூ றெ றே றை றொ றோ றௌ ன னா னி னீ னு னூ னெ னே னை னொ னோ னௌ ஜ ஜா ஜி ஜீ ஜு ஜூ ஜெ ஜே ஜை ஜொ ஜோ ஜௌ ஷ ஷா ஷி ஷீ ஷு ஷூ ஷெ ஷே ஷை ஷொ ஷோ ஷௌ ஸ ஸா ஸி ஸீ ஸு ஸூ ஸெ ஸே ஸை ஸொ ஸோ ஸௌ ஹ ஹா ஹி ஹீ ஹு ஹூ ஹெ ஹே ஹை ஹொ ஹோ ஹௌ க்ஷ க்ஷா க்ஷி க்ஷீ க்ஷு க்ஷூ க்ஷெ க்ஷே க்ஷை க்ஷொ க்ஷோ க்ஷௌ ஸ்ரீ கௌரவமிக்கொழுக்கத்துடன் சௌகரியமற்றசூழலில் தௌரியமாய் செயல்படும் பௌராணிகவாக்கியங்கள் வௌவால்சுழற்சிபோல் மாறிக்கொண்டே இருந்தன கெகேகைகொகோகௌ செசேசைசொசோசௌ தெதேதைதொதோதௌ பெபேபைபொபோபௌ ஜெஜேஜைஜொஜோஜௌ ஷெஷேஷைஷொஷோஷௌ ஸெஸேஸைஸொஸோஸௌ ஹெஹேஹைஹொஹோஹௌ கேகைகொகோகௌசெசேசைசொசோசௌதெதேதைதொதோதௌபெபேபைபொபோபௌ ஜெஜேஜைஜொஜோஜௌஷெஷேஷைஷொஷோஷௌஸெஸேஸைஸொஸோஸௌஹெஹேஹைஹொஹோஹௌ ஜ், ஷ், ஸ், ஹ், க்ஷ் ்,  ா, ி, ீ, ு, ூ, ெ, ே, ை, ொ, ோ, ௌ, ஂ");
+            state = list.first;
+            // state = TextContent(difficulty: DifficultyEnum.easy, content: "ஹெ ஹே ஹை ஹொ ஹோ ஹௌ க்ஷ க்ஷா க்ஷி க்ஷீ க்ஷு க்ஷூ க்ஷெ க்ஷே க்ஷை க்ஷொ க்ஷோ க்ஷௌ ஸ்ரீ கௌரவமிக்கொழுக்கத்துடன் சௌகரியமற்றசூழலில் தௌரியமாய் செயல்படும் பௌராணிகவாக்கியங்கள் வௌவால்சுழற்சிபோல் மாறிக்கொண்டே இருந்தன கெகேகைகொகோகௌ செசேசைசொசோசௌ தெதேதைதொதோதௌ பெபேபைபொபோபௌ ஜெஜேஜைஜொஜோஜௌ ஷெஷேஷைஷொஷோஷௌ ஸெஸேஸைஸொஸோஸௌ ஹெஹேஹைஹொஹோஹௌ கேகைகொகோகௌசெசேசைசொசோசௌதெதேதைதொதோதௌபெபேபைபொபோபௌ ஜெஜேஜைஜொஜோஜௌஷெஷேஷைஷொஷோஷௌஸெஸேஸைஸொஸோஸௌஹெஹேஹைஹொஹோஹௌ ஜ், ஷ், ஸ், ஹ், க்ஷ் ்,  ா, ி, ீ, ு, ூ, ெ, ே, ை, ொ, ோ, ௌ, ஂ");
         } else {
             state = null;
         }

@@ -1,7 +1,7 @@
 
 
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/content/preload_initial_content_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/preload_initial_content_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/more/presentation/pages/streak_board/streak_board_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/pages/challenge/restore_streak/restore_streak_page.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/challenge/streak_badge.dart';
-import 'package:kothai_app/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
-import 'package:kothai_app/features/typing_session/utils/streak_utils.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/more/presentation/pages/streak_board/streak_board_page.dart';
+import 'package:visai/features/typing_session/presentation/pages/challenge/restore_streak/restore_streak_page.dart';
+import 'package:visai/features/typing_session/presentation/widgets/challenge/streak_badge.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
+import 'package:visai/features/typing_session/utils/streak_utils.dart';
 import 'package:logger/logger.dart';
 
 class WeekilyStreakDisplay extends StatefulWidget {

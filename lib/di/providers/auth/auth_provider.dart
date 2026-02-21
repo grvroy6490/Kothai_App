@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:kothai_app/services/authentication/authentication_service.dart';
-import 'package:kothai_app/features/authentication/presentation/providers/auth_service_provider.dart' as auth;
+import 'package:visai/services/authentication/authentication_service.dart';
+import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart' as auth;
 import 'package:riverpod/riverpod.dart';
 
 // Low-level dependency providers

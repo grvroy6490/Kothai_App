@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/KeyboardLayoutTypeEnum.dart';
+import 'package:visai/enums/KeyboardLayoutTypeEnum.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_controller.dart';
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_keyboard.dart'
+import 'package:visai/core/abstracts/keyboard/keyboard_controller.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_keyboard.dart'
     as tamil_controller;
-import 'package:kothai_app/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_keyboard_renderer.dart';
-import 'package:kothai_app/core/abstracts/keyboard/keyboard_renderer.dart';
+import 'package:visai/presentation/shared/keyboard/layouts/tamil_keyboard/tamil_keyboard_renderer.dart';
+import 'package:visai/core/abstracts/keyboard/keyboard_renderer.dart';
 import 'package:flutter/widgets.dart';
 
 // KEYBOARD NOTIFIER

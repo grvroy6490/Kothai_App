@@ -1,8 +1,8 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
 
 class StatsBadge extends StatelessWidget {
     final Color bgColor;

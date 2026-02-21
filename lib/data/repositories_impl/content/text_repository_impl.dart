@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/constants/constants.dart';
-import 'package:kothai_app/core/shared_prefs/shared_prefs_service.dart';
-import 'package:kothai_app/data/models/content/text_paragraph_dto.dart';
-import 'package:kothai_app/domain/entities/content/text_paragraph.dart';
-import 'package:kothai_app/domain/repositories/content/text_repository.dart';
-import 'package:kothai_app/presentation/providers/content/asset_text_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
+import 'package:visai/core/constants/constants.dart';
+import 'package:visai/core/shared_prefs/shared_prefs_service.dart';
+import 'package:visai/data/models/content/text_paragraph_dto.dart';
+import 'package:visai/domain/entities/content/text_paragraph.dart';
+import 'package:visai/domain/repositories/content/text_repository.dart';
+import 'package:visai/presentation/providers/content/asset_text_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_configuration_provider.dart';
 
 class TextRepositoryImpl implements TextRepository {
     // final TextApiService api;

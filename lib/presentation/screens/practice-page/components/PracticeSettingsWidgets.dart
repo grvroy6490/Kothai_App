@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kothai_app/domain/entities/content/text_paragraph.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/presentation/providers/content/text_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/prcatice_settings_visibility_provider.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
-import 'package:kothai_app/presentation/theme/theme_manager.dart';
+import 'package:visai/domain/entities/content/text_paragraph.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/presentation/providers/content/text_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_configuration_provider.dart';
+import 'package:visai/presentation/providers/practice/prcatice_settings_visibility_provider.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/theme/theme_manager.dart';
 
 class PracticeSettingsWidget extends ConsumerStatefulWidget {
     const PracticeSettingsWidget({super.key});

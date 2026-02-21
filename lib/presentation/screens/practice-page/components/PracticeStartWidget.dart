@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
-import 'package:kothai_app/presentation/providers/content/text_provider.dart';
-import 'package:kothai_app/presentation/providers/facades/practice_facade.dart';
-import 'package:kothai_app/presentation/providers/keyboard/keyboard_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_configuration_provider.dart';
-import 'package:kothai_app/presentation/providers/session/difficulty_provider.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
-import 'package:kothai_app/presentation/providers/session/typing_session_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PracticeSettingsWidgets.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
+import 'package:visai/presentation/providers/content/text_provider.dart';
+import 'package:visai/presentation/providers/facades/practice_facade.dart';
+import 'package:visai/presentation/providers/keyboard/keyboard_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_configuration_provider.dart';
+import 'package:visai/presentation/providers/session/difficulty_provider.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/providers/session/typing_session_provider.dart';
+import 'package:visai/presentation/screens/practice-page/components/PracticeSettingsWidgets.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PracticeStartWidget extends ConsumerStatefulWidget {

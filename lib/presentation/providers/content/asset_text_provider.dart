@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/domain/entities/content/text_paragraph.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/domain/entities/content/text_paragraph.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
 
 
 // NOTE: TEMPORARY SOLUTION OF PROVIDER

@@ -1,10 +1,10 @@
 // lib/features/session/typing_session_provider.dart
-import 'package:kothai_app/data/models/session/difficulty.dart';
+import 'package:visai/data/models/session/difficulty.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:kothai_app/data/models/session/typing_session.dart';
-import 'package:kothai_app/enums/SessionMode.dart';
+import 'package:visai/data/models/session/typing_session.dart';
+import 'package:visai/enums/SessionMode.dart';
 
 import 'metrics_provider.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:visai/core/theme/figma_color.dart';
 
 Future<T?> showAppModalBottomSheet<T>({
     required BuildContext context,

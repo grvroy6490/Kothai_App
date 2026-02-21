@@ -1,7 +1,7 @@
 // lib/features/session/metrics_provider.dart
 import 'dart:math' as math;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kothai_app/data/models/session/metrics.dart';
+import 'package:visai/data/models/session/metrics.dart';
 
 part 'metrics_provider.g.dart';
 

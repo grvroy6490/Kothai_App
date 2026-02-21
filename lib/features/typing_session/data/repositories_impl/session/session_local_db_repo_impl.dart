@@ -1,8 +1,8 @@
 
 
-import 'package:kothai_app/features/typing_session/data/sources/local/session/session_dao.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/session/session_entity.dart';
-import 'package:kothai_app/features/typing_session/domain/repositories/session/session_local_db_repository.dart';
+import 'package:visai/features/typing_session/data/sources/local/session/session_dao.dart';
+import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
+import 'package:visai/features/typing_session/domain/repositories/session/session_local_db_repository.dart';
 
 class SessionLocalRepositoryImpl implements SessionLocalDBRepository {
     final SessionDao dao;

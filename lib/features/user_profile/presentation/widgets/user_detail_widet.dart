@@ -1,13 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/domain/usecases/show_modal.dart';
-import 'package:kothai_app/features/authentication/presentation/pages/login.dart';
-import 'package:kothai_app/features/authentication/presentation/pages/signup.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/level_xp_indicator.dart';
-import 'package:kothai_app/features/user_profile/presentation/widgets/user_score.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/domain/usecases/show_modal.dart';
+import 'package:visai/features/authentication/presentation/pages/login.dart';
+import 'package:visai/features/authentication/presentation/pages/signup.dart';
+import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
+import 'package:visai/features/user_profile/presentation/widgets/user_score.dart';
 
 class UserDetailWidet extends ConsumerStatefulWidget {
     final AsyncValue<User?> auth;

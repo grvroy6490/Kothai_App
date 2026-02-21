@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
+import 'package:visai/core/theme/figma_color.dart';
 
 /// A reusable text form field for authentication flows.
 /// Supports email, username, password, and confirm-password with sensible defaults.

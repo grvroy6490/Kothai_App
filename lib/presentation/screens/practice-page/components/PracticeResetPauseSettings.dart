@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kothai_app/presentation/providers/session/session_state_provider.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/providers/session/session_state_provider.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 
 class PracticeResetPauseSettings extends ConsumerWidget {
     const PracticeResetPauseSettings({super.key});

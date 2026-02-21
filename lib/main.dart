@@ -3,11 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/app/app.dart';
-import 'package:kothai_app/di/providers/db/db_provider.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:kothai_app/services/firebase/firebase_options.dart';
-import 'package:kothai_app/services/shared_preferences/shared_prefs_service.dart';
+import 'package:visai/app/app.dart';
+import 'package:visai/di/providers/db/db_provider.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/services/firebase/firebase_options.dart';
+import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

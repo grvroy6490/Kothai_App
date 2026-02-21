@@ -3,9 +3,9 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:kothai_app/core/constants/endpoints.dart';
-import 'package:kothai_app/domain/contracts/gamification/gamification_data_fetcher.dart';
-import 'package:kothai_app/domain/entities/gamification/gamification_entity.dart';
+import 'package:visai/core/constants/endpoints.dart';
+import 'package:visai/domain/contracts/gamification/gamification_data_fetcher.dart';
+import 'package:visai/domain/entities/gamification/gamification_entity.dart';
 
 class GamificationApiSourceFetcher implements GamificationDataFetcher{
     final Dio dio;

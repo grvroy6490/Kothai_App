@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/presentation/theme/app_typography.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/theme/app_typography.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class SplashPage extends StatelessWidget {

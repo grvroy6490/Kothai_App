@@ -1,9 +1,9 @@
-import 'package:kothai_app/data/models/session/difficulty.dart';
-import 'package:kothai_app/enums/difficulty/AccuracyThresholdEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyEnum.dart';
-import 'package:kothai_app/enums/MulplierEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyTimeLimitEnum.dart';
-import 'package:kothai_app/enums/difficulty/DifficultyWPM.dart';
+import 'package:visai/data/models/session/difficulty.dart';
+import 'package:visai/enums/difficulty/AccuracyThresholdEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyEnum.dart';
+import 'package:visai/enums/MulplierEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyTimeLimitEnum.dart';
+import 'package:visai/enums/difficulty/DifficultyWPM.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'difficulty_provider.g.dart';

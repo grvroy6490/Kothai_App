@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:kothai_app/di/providers/toast/flutter_toast_provider.dart';
-import 'package:kothai_app/features/badges/data/repositories_impl/badge_repository.dart';
-import 'package:kothai_app/features/badges/presentation/pages/badge_popup.dart';
-import 'package:kothai_app/services/shared_preferences/shared_prefs_service.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/di/providers/toast/flutter_toast_provider.dart';
+import 'package:visai/features/badges/data/repositories_impl/badge_repository.dart';
+import 'package:visai/features/badges/presentation/pages/badge_popup.dart';
+import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 class BadgeController extends Notifier<Set<String>> {
     late final SharedPrefsService _prefs = ref.read(sharedPrefsServiceProvider);

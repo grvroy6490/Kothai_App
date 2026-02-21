@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/StreakModeEnum.dart';
+import 'package:visai/enums/StreakModeEnum.dart';
 
 class StreakModeState {
   final StreakModeEnum mode;

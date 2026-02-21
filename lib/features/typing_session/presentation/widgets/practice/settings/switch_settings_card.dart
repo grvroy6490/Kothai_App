@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/core/config/ui/scale.dart';
-import 'package:kothai_app/core/theme/figma_color.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/config_switch_option.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/practice/practice_config.dart';
-import 'package:kothai_app/features/typing_session/presentation/widgets/practice/settings/switch_button.dart';
+import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/config_switch_option.dart';
+import 'package:visai/features/typing_session/domain/entities/practice/practice_config.dart';
+import 'package:visai/features/typing_session/presentation/widgets/practice/settings/switch_button.dart';
 
 class SwitchSettingsCard extends StatelessWidget {
     final String cardTitle;

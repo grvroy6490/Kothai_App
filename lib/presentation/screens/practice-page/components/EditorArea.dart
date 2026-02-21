@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kothai_app/enums/PracticeStatusEnum.dart';
-import 'package:kothai_app/presentation/providers/content/text_provider.dart';
-import 'package:kothai_app/presentation/providers/practice/practice_status_provider.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/AnimatedContentBoard.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PracticeInfoBox.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/PracticeStartWidget.dart';
-import 'package:kothai_app/presentation/theme/figma_color.dart';
-import 'package:kothai_app/presentation/screens/practice-page/components/TypingProgressBar.dart';
+import 'package:visai/enums/PracticeStatusEnum.dart';
+import 'package:visai/presentation/providers/content/text_provider.dart';
+import 'package:visai/presentation/providers/practice/practice_status_provider.dart';
+import 'package:visai/presentation/screens/practice-page/components/AnimatedContentBoard.dart';
+import 'package:visai/presentation/screens/practice-page/components/PracticeInfoBox.dart';
+import 'package:visai/presentation/screens/practice-page/components/PracticeStartWidget.dart';
+import 'package:visai/presentation/theme/figma_color.dart';
+import 'package:visai/presentation/screens/practice-page/components/TypingProgressBar.dart';
 
 class EditorArea extends ConsumerStatefulWidget {
     final TextEditingController controller;

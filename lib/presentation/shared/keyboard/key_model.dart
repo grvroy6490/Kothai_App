@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kothai_app/enums/KeyTypeEnum.dart';
+import 'package:visai/enums/KeyTypeEnum.dart';
 
 class KeyModel {
   final String id;

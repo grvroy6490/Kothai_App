@@ -1,8 +1,8 @@
 
-import 'package:kothai_app/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
-import 'package:kothai_app/features/typing_session/domain/entities/content/text_content.dart';
-import 'package:kothai_app/features/typing_session/domain/enums/content_type_enum.dart';
-import 'package:kothai_app/features/typing_session/data/sources/local/content/content_local_source.dart';
+import 'package:visai/features/typing_session/domain/contracts/content/text_content_fetcher.dart';
+import 'package:visai/features/typing_session/domain/entities/content/text_content.dart';
+import 'package:visai/features/typing_session/domain/enums/content_type_enum.dart';
+import 'package:visai/features/typing_session/data/sources/local/content/content_local_source.dart';
 
 class ContentLocalSourceAdaptor implements TextContentFetcher {
     final ContentTypeEnum type;

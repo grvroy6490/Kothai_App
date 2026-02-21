@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:kothai_app/core/constants/constants.dart';
-import 'package:kothai_app/domain/repositories/session/session_history_repository.dart';
+import 'package:visai/core/constants/constants.dart';
+import 'package:visai/domain/repositories/session/session_history_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:kothai_app/data/models/session/typing_session.dart';
+import 'package:visai/data/models/session/typing_session.dart';
 
 
 
