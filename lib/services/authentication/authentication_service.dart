@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform, TargetPlatform;
 import 'package:google_sign_in/google_sign_in.dart';
+
+/// iOS OAuth client ID (reversed URL scheme in Info.plist is derived from this).
+const String _kGoogleSignInIosClientId =
+    '834995515353-4vv36b5krrkd219ofnj618m9277bmiva.apps.googleusercontent.com';
 
 class AuthService {
   final FirebaseAuth _auth;
@@ -14,6 +18,10 @@ class AuthService {
     // Use the web client ID from google-services.json for server-side authentication
     serverClientId:
         '834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com',
+    // On iOS, set clientId to the iOS OAuth client so the native SDK matches Info.plist URL scheme
+    clientId: defaultTargetPlatform == TargetPlatform.iOS
+        ? _kGoogleSignInIosClientId
+        : null,
   );
 
   AuthService(this._auth, this._db);

@@ -32,7 +32,7 @@ class SplashPage extends StatelessWidget {
                                         width: double.infinity,
                                         child: Center(
                                             child: Image.asset(
-                                                'assets/images/Kothai_logo.png',
+                                                'assets/images/logo.png',
                                                 fit: BoxFit.contain,
                                                 width: 100
                                             )
@@ -50,7 +50,7 @@ class SplashPage extends StatelessWidget {
                                 Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 50),
                                     child: Text(
-                                        "கோதை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
+                                        "விசை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                         ),

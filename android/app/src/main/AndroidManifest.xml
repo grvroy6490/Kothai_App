@@ -5,7 +5,7 @@
     
     
     <application
-        android:label="kothai_app"
+        android:label="Visai App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

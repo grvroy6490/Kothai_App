@@ -1,4 +1,4 @@
-# Kothai Typing App - Complete Relational & Sequence Diagrams
+# Visai Typing App - Complete Relational & Sequence Diagrams
 
 ## 1. RELATIONAL DIAGRAM (Entity Relationship)
 
@@ -661,4 +661,4 @@ graph TB
 3. **Domain Layer** depends on **Data Layer**
 4. **Data Layer** depends on **External Services**
 
-This comprehensive diagram set provides a complete view of your Kothai Typing App's architecture, relationships, and interaction flows.
+This comprehensive diagram set provides a complete view of your Visai Typing App's architecture, relationships, and interaction flows.
