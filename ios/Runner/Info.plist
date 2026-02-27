@@ -47,5 +47,22 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Kothai App needs access to your photo library to share and save content.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Kothai App needs permission to save images to your photo library.</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.834995515353-4vv36b5krrkd219ofnj618m9277bmiva</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>
