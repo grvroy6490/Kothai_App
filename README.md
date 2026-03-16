@@ -1,4 +1,4 @@
-# visai_app
+# Visai App
 
 A new Flutter project.
 

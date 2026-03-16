@@ -74,18 +74,18 @@ flutter_native_splash:
 
   # FOR IOS
   #  color: "#F9F9F9"
-  background_image: "assets/images/splash.jpg"
+  background_image: "assets/images/Splash.png"
   #  image: "assets/images/logo_1024.png"
   #  branding: ""
 
-  background_image_dark: "assets/images/splash.jpg"
+  background_image_dark: "assets/images/Splash.png"
   #  image_dark: ""
   #  branding_dark: ""
 
   android_12:
     #color: "#F9F9F9"
     #    image: "assets/images/logo_1024.png"
-    background_image: "assets/images/splash.jpg"
+    background_image: "assets/images/Splash.png"
   #    background_image_dark: "assets/images/Dark_Mode_BG.png"
   # branding: ""
 

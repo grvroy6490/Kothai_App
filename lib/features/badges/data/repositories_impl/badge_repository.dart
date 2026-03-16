@@ -23,7 +23,7 @@ class BadgeRepository {
             type: BadgeType.general,
             condition: "Complete your first daily challenge",
             toastMessage:
-            '🏁 “Challenge completed! You’ve officially started your Kothai journey.”',
+            '🏁 “Challenge completed! You’ve officially started your Visai journey.”',
             imagePath: "assets/badges/bronze/First_Challenge_Completed.png"
         ),
         BadgeEntity(

@@ -145,20 +145,20 @@ class _SharePageState extends ConsumerState<SharePage> {
                 return;
             }
 
-            // Create Pictures/Kothai directory if it doesn't exist
-            final picturesDir = Directory('${directory.path}/../Pictures/Kothai');
+            // Create Pictures/Visai directory if it doesn't exist
+            final picturesDir = Directory('${directory.path}/../Pictures/Visai');
             if (!await picturesDir.exists()) {
                 await picturesDir.create(recursive: true);
             }
 
             // Save the image
             final fileName =
-                'kothai_share_${DateTime.now().millisecondsSinceEpoch}.png';
+                'visai_share_${DateTime.now().millisecondsSinceEpoch}.png';
             final file = File('${picturesDir.path}/$fileName');
             await file.writeAsBytes(image);
 
             Fluttertoast.showToast(
-                msg: 'Image saved to Pictures/Kothai folder!',
+                msg: 'Image saved to Pictures/Visai folder!',
                 toastLength: Toast.LENGTH_SHORT
             );
         } catch (e) {
@@ -191,15 +191,15 @@ class _SharePageState extends ConsumerState<SharePage> {
             // Save to temporary directory
             final tempDir = await getTemporaryDirectory();
             final file = File(
-                '${tempDir.path}/kothai_share_${DateTime.now().millisecondsSinceEpoch}.png'
+                '${tempDir.path}/visai_share_${DateTime.now().millisecondsSinceEpoch}.png'
             );
             await file.writeAsBytes(image);
 
             // Share the file
             await Share.shareXFiles(
                 [XFile(file.path)],
-                text: 'Check out my Tamil typing progress on Kothai!',
-                subject: 'My Kothai Progress'
+                text: 'Check out my Tamil typing progress on Visai!',
+                subject: 'My Visai Progress'
             );
         } catch (e) {
             Fluttertoast.showToast(
@@ -231,7 +231,7 @@ class _SharePageState extends ConsumerState<SharePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                                 Text(
-                                    'Unlock your Tamil typing mastery with Kothai!',
+                                    'Unlock your Tamil typing mastery with Visai!',
                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                         color: getFigmaColor(context, 'Schemes/On Surface'),
                                         fontWeight: FontWeight.w800
@@ -616,7 +616,7 @@ class _SharePageState extends ConsumerState<SharePage> {
                                             Opacity(
                                                 opacity: 0.8,
                                                 child: Text(
-                                                    'Download Kothai – Tamil Typing Master',
+                                                    'Download Visai – Tamil Typing Master',
                                                     style: Theme.of(
                                                         context
                                                     ).textTheme.bodySmall?.copyWith(color: Colors.black)

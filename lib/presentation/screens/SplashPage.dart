@@ -37,7 +37,7 @@ class SplashPage extends StatelessWidget {
                         child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 50),
                             child: Text(
-                                "கோதை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
+                                "விசை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
                                 style: AppTypography.bodyMedium.copyWith(
                                     color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                 ),
