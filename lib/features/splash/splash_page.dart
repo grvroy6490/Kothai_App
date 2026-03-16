@@ -33,7 +33,6 @@ class SplashPage extends StatelessWidget {
                                         child: Center(
                                             child: Image.asset(
                                                 'assets/images/logo.png',
-                                                'assets/images/logo.png',
                                                 fit: BoxFit.contain,
                                                 width: 100
                                             )
