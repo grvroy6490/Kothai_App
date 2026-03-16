@@ -19,7 +19,7 @@ class SplashPage extends StatelessWidget {
                         child: SizedBox(
                             height: double.infinity,
                             child: Image.asset(
-                                'assets/images/Kothai_logo.png',
+                                'assets/images/logo.png',
                                 fit: BoxFit.contain,
                                 width: 100,
                             ),

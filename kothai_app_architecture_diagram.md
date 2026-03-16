@@ -1,4 +1,4 @@
-# Kothai App - Complete Architecture & Flow Diagram
+# Visai App - Complete Architecture & Flow Diagram
 
 ## Excalidraw Diagram Instructions
 

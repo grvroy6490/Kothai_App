@@ -107,9 +107,11 @@ class TamilKeyboard extends KeyboardController {
 
     // Handle held left diacritic
     if (_heldLeftDiacritic != null) {
-      // Check if value is a mei letter OR a special consonant that can take diacritics
-      if (Letters.meiLetters.contains(value) ||
-          ['ஜ', 'ஷ', 'ஸ', 'ஹ'].contains(value)) {
+      // Check if value is a mei letter, special consonant, or க்ஷ (for க்ஷெ, க்ஷே, க்ஷை)
+      final canTakeLeftDiacritic = Letters.meiLetters.contains(value) ||
+          ['ஜ', 'ஷ', 'ஸ', 'ஹ'].contains(value) ||
+          value == 'க்ஷ';
+      if (canTakeLeftDiacritic) {
         final combinedValue = value + _heldLeftDiacritic!;
         _heldLeftDiacritic = null;
         _ref?.read(holdKeyProvider.notifier).clear();
@@ -169,8 +171,8 @@ class TamilKeyboard extends KeyboardController {
     final suffix = text.text.characters.skip(cursorPosition).string;
 
     if (prefix.isNotEmpty) {
-      final lastChar = prefix.characters.last;
-      final comboKey = lastChar + value;
+      final lastCluster = prefix.characters.last;
+      final comboKey = lastCluster + value;
       if (Letters.diacriticCombos.containsKey(comboKey)) {
         final combined = Letters.diacriticCombos[comboKey]!;
         final newPrefix = prefix.characters.skipLast(1).string + combined;
@@ -181,6 +183,36 @@ class TamilKeyboard extends KeyboardController {
           selection: TextSelection.collapsed(offset: newPrefix.length),
         );
         return;
+      }
+      // Multi-char base: cluster ending with ெ/ே/ை + ா/ௗ → ொ/ோ/ௌ (e.g. க்ஷெ + ா → க்ஷொ)
+      if (Letters.rightDiacriticLetters.contains(value) &&
+          (value == 'ா' || value == 'ௗ') &&
+          lastCluster.runes.isNotEmpty) {
+        const int leftShort = 0x0BC6; // ெ
+        const int leftLong = 0x0BC7;  // ே
+        const int comboShortO = 0x0BCA; // ொ
+        const int comboLongO = 0x0BCB;  // ோ
+        const int comboAu = 0x0BCC;    // ௌ
+        final runes = lastCluster.runes.toList();
+        final lastRune = runes.last;
+        int? replacement;
+        if (value == 'ா') {
+          if (lastRune == leftShort) replacement = comboShortO;
+          if (lastRune == leftLong) replacement = comboLongO;
+        } else if (value == 'ௗ') {
+          if (lastRune == leftShort) replacement = comboAu;
+        }
+        if (replacement != null) {
+          final newRunes = runes.sublist(0, runes.length - 1)..add(replacement);
+          final newLastCluster = String.fromCharCodes(newRunes);
+          final newPrefix = prefix.characters.skipLast(1).string + newLastCluster;
+          final normalized = _normalizeAndInsert(newPrefix + suffix);
+          text.value = TextEditingValue(
+            text: normalized,
+            selection: TextSelection.collapsed(offset: newPrefix.length),
+          );
+          return;
+        }
       }
     }
 

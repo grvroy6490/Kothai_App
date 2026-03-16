@@ -627,7 +627,7 @@ class _SharePageState extends ConsumerState<SharePage> {
                                 ),
 
                                 Image.asset(
-                                    'assets/images/Kothai_logo.png',
+                                    'assets/images/logo.png',
                                     width: Gap(context).gap(50),
                                     height: Gap(context).gap(50)
                                 )

@@ -1,4 +1,4 @@
-# kothai_app
+# visai_app
 
 A new Flutter project.
 

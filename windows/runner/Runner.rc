@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "kothai_app" "\0"
+            VALUE "CompanyName", "org.dckap" "\0"
+            VALUE "FileDescription", "visai_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "kothai_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "kothai_app.exe" "\0"
-            VALUE "ProductName", "kothai_app" "\0"
+            VALUE "InternalName", "visai_app" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 org.dckap. All rights reserved." "\0"
+            VALUE "OriginalFilename", "visai_app.exe" "\0"
+            VALUE "ProductName", "visai_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

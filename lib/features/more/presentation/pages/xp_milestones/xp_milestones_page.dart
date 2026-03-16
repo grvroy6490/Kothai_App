@@ -53,285 +53,289 @@ class _XpMilestonesPageState extends ConsumerState<XpMilestonesPage> {
                         color: getFigmaColor(context, 'Schemes/Surface Container Highest'),
                         borderRadius: BorderRadius.vertical(top: Radius.circular(24))
                     ),
-                    child: Column(
-                        children: [
-                            Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: Gap(context).gap(15),
-                                    vertical: Gap(context).gap(10)
-                                ),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    color: getFigmaColor(
-                                        context,
-                                        'Schemes/Surface Container Lowest'
-                                    )
-                                ),
+                    child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                                Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: Gap(context).gap(15),
+                                        vertical: Gap(context).gap(10)
+                                    ),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(24),
+                                        color: getFigmaColor(
+                                            context,
+                                            'Schemes/Surface Container Lowest'
+                                        )
+                                    ),
 
-                                child: Column(
-                                    children: [
-                                        Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: Gap(context).gap(10),
-                                                vertical: Gap(context).gap(5)
-                                            ),
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(40),
-                                                gradient: LinearGradient(
-                                                    begin: Alignment.centerLeft,
-                                                    end: Alignment.centerRight,
-                                                    colors: [
-                                                        getFigmaColor(context, 'Palettes/Secondary 90'),
-                                                        getFigmaColor(context, 'Palettes/Primary 80')
+                                    child: Column(
+                                        children: [
+                                            Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: Gap(context).gap(10),
+                                                    vertical: Gap(context).gap(5)
+                                                ),
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(40),
+                                                    gradient: LinearGradient(
+                                                        begin: Alignment.centerLeft,
+                                                        end: Alignment.centerRight,
+                                                        colors: [
+                                                            getFigmaColor(context, 'Palettes/Secondary 90'),
+                                                            getFigmaColor(context, 'Palettes/Primary 80')
+                                                        ]
+                                                    )
+                                                ),
+                                                child: Row(
+                                                    children: [
+                                                        SvgPicture.asset(
+                                                            'assets/images/Gold_Icon.svg',
+                                                            width: Gap(context).gap(24)
+                                                        ),
+                                                        SizedBox(width: Gap(context).gap(10)),
+                                                        Text(
+                                                            'Level ${score.level}',
+                                                            style: Theme.of(context).textTheme.titleLarge
+                                                                ?.copyWith(
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/Primary'
+                                                                    )
+                                                                )
+                                                        )
                                                     ]
                                                 )
                                             ),
-                                            child: Row(
-                                                children: [
-                                                    SvgPicture.asset(
-                                                        'assets/images/Gold_Icon.svg',
-                                                        width: Gap(context).gap(24)
-                                                    ),
-                                                    SizedBox(width: Gap(context).gap(10)),
-                                                    Text(
-                                                        'Level ${score.level}',
-                                                        style: Theme.of(context).textTheme.titleLarge
-                                                            ?.copyWith(
-                                                                color: getFigmaColor(
-                                                                    context,
-                                                                    'Schemes/Primary'
-                                                                )
-                                                            )
-                                                    )
-                                                ]
-                                            )
-                                        ),
 
-                                        SizedBox(height: Gap(context).gap(15)),
+                                            SizedBox(height: Gap(context).gap(15)),
 
-                                        Container(
-                                            width: double.infinity,
+                                            Container(
+                                                width: double.infinity,
 
-                                            child: Row(
-                                                children: [
-                                                    Expanded(
-                                                        child: Column(
-                                                            children: [
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                    MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                        Padding(
-                                                                            padding: EdgeInsets.symmetric(
-                                                                                vertical: 2
-                                                                            ),
-                                                                            child: Text(
-                                                                                'Progress to Level $nextLevel',
-                                                                                style: Theme.of(context)
-                                                                                    .textTheme
-                                                                                    .bodySmall
-                                                                                    ?.copyWith(
-                                                                                        color: getFigmaColor(
-                                                                                            context,
-                                                                                            'Schemes/On Surface'
-                                                                                        )
-                                                                                    )
-                                                                            )
-                                                                        ),
-
-                                                                        Padding(
-                                                                            padding: EdgeInsets.symmetric(
-                                                                                vertical: 2
-                                                                            ),
-                                                                            child: Text(
-                                                                                '$levelProgressPercentage%',
-                                                                                style: Theme.of(context)
-                                                                                    .textTheme
-                                                                                    .bodySmall
-                                                                                    ?.copyWith(
-                                                                                        color: getFigmaColor(
-                                                                                            context,
-                                                                                            'Schemes/On Surface'
-                                                                                        )
-                                                                                    )
-                                                                            )
-                                                                        )
-                                                                    ]
-                                                                ),
-
-                                                                SizedBox(height: Gap(context).gap(8)),
-                                                                Stack(
-                                                                    children: [
-                                                                        // Background progress bar
-                                                                        Container(
-                                                                            width: double.infinity,
-                                                                            height: Gap(context).gap(8),
-                                                                            decoration: BoxDecoration(
-                                                                                color: getFigmaColor(
-                                                                                    context,
-                                                                                    'State Layers/On Surface/Opacity-08'
+                                                child: Row(
+                                                    children: [
+                                                        Expanded(
+                                                            child: Column(
+                                                                children: [
+                                                                    Row(
+                                                                        mainAxisAlignment:
+                                                                        MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                            Padding(
+                                                                                padding: EdgeInsets.symmetric(
+                                                                                    vertical: 2
                                                                                 ),
-                                                                                borderRadius: BorderRadius.circular(25)
-                                                                            )
-                                                                        ),
-                                                                        // Progress fill
-                                                                        Align(
-                                                                            alignment: Alignment.centerLeft,
-                                                                            child: FractionallySizedBox(
-                                                                                widthFactor: levelProgress,
-                                                                                child: Container(
-                                                                                    height: Gap(context).gap(8),
-                                                                                    decoration: BoxDecoration(
-                                                                                        gradient: LinearGradient(
-                                                                                            begin: Alignment.topLeft,
-                                                                                            end: Alignment.bottomRight,
-                                                                                            colors: [
-                                                                                                getFigmaColor(
-                                                                                                    context,
-                                                                                                    'Palettes/Secondary 90'
-                                                                                                ),
-                                                                                                getFigmaColor(
-                                                                                                    context,
-                                                                                                    'Palettes/Primary 80'
-                                                                                                )
-                                                                                            ]
-                                                                                        ),
-                                                                                        borderRadius: BorderRadius.circular(
-                                                                                            25
+                                                                                child: Text(
+                                                                                    'Progress to Level $nextLevel',
+                                                                                    style: Theme.of(context)
+                                                                                        .textTheme
+                                                                                        .bodySmall
+                                                                                        ?.copyWith(
+                                                                                            color: getFigmaColor(
+                                                                                                context,
+                                                                                                'Schemes/On Surface'
+                                                                                            )
                                                                                         )
-                                                                                    )
+                                                                                )
+                                                                            ),
+
+                                                                            Padding(
+                                                                                padding: EdgeInsets.symmetric(
+                                                                                    vertical: 2
+                                                                                ),
+                                                                                child: Text(
+                                                                                    '$levelProgressPercentage%',
+                                                                                    style: Theme.of(context)
+                                                                                        .textTheme
+                                                                                        .bodySmall
+                                                                                        ?.copyWith(
+                                                                                            color: getFigmaColor(
+                                                                                                context,
+                                                                                                'Schemes/On Surface'
+                                                                                            )
+                                                                                        )
                                                                                 )
                                                                             )
-                                                                        )
-                                                                    ]
-                                                                ),
-                                                                SizedBox(height: Gap(context).gap(8)),
+                                                                        ]
+                                                                    ),
 
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                    MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                        Padding(
-                                                                            padding: EdgeInsets.symmetric(
-                                                                                vertical: 2
-                                                                            ),
-                                                                            child: Text(
-                                                                                '$xpEarnedInCurrentLevel XP',
-                                                                                style: Theme.of(context)
-                                                                                    .textTheme
-                                                                                    .bodySmall
-                                                                                    ?.copyWith(
-                                                                                        color: getFigmaColor(
-                                                                                            context,
-                                                                                            'Schemes/On Surface'
-                                                                                        )
-                                                                                    )
-                                                                            )
-                                                                        ),
-
-                                                                        Text(
-                                                                            '${score.xpIntoLevel} XP',
-                                                                            style: Theme.of(context)
-                                                                                .textTheme
-                                                                                .bodySmall
-                                                                                ?.copyWith(
+                                                                    SizedBox(height: Gap(context).gap(8)),
+                                                                    Stack(
+                                                                        children: [
+                                                                            // Background progress bar
+                                                                            Container(
+                                                                                width: double.infinity,
+                                                                                height: Gap(context).gap(8),
+                                                                                decoration: BoxDecoration(
                                                                                     color: getFigmaColor(
                                                                                         context,
-                                                                                        'Schemes/On Surface'
+                                                                                        'State Layers/On Surface/Opacity-08'
+                                                                                    ),
+                                                                                    borderRadius: BorderRadius.circular(25)
+                                                                                )
+                                                                            ),
+                                                                            // Progress fill
+                                                                            Align(
+                                                                                alignment: Alignment.centerLeft,
+                                                                                child: FractionallySizedBox(
+                                                                                    widthFactor: levelProgress,
+                                                                                    child: Container(
+                                                                                        height: Gap(context).gap(8),
+                                                                                        decoration: BoxDecoration(
+                                                                                            gradient: LinearGradient(
+                                                                                                begin: Alignment.topLeft,
+                                                                                                end: Alignment.bottomRight,
+                                                                                                colors: [
+                                                                                                    getFigmaColor(
+                                                                                                        context,
+                                                                                                        'Palettes/Secondary 90'
+                                                                                                    ),
+                                                                                                    getFigmaColor(
+                                                                                                        context,
+                                                                                                        'Palettes/Primary 80'
+                                                                                                    )
+                                                                                                ]
+                                                                                            ),
+                                                                                            borderRadius: BorderRadius.circular(
+                                                                                                25
+                                                                                            )
+                                                                                        )
                                                                                     )
                                                                                 )
-                                                                        )
-                                                                    ]
+                                                                            )
+                                                                        ]
+                                                                    ),
+                                                                    SizedBox(height: Gap(context).gap(8)),
+
+                                                                    Row(
+                                                                        mainAxisAlignment:
+                                                                        MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                            Padding(
+                                                                                padding: EdgeInsets.symmetric(
+                                                                                    vertical: 2
+                                                                                ),
+                                                                                child: Text(
+                                                                                    '$xpEarnedInCurrentLevel XP',
+                                                                                    style: Theme.of(context)
+                                                                                        .textTheme
+                                                                                        .bodySmall
+                                                                                        ?.copyWith(
+                                                                                            color: getFigmaColor(
+                                                                                                context,
+                                                                                                'Schemes/On Surface'
+                                                                                            )
+                                                                                        )
+                                                                                )
+                                                                            ),
+
+                                                                            Text(
+                                                                                '${score.xpIntoLevel} XP',
+                                                                                style: Theme.of(context)
+                                                                                    .textTheme
+                                                                                    .bodySmall
+                                                                                    ?.copyWith(
+                                                                                        color: getFigmaColor(
+                                                                                            context,
+                                                                                            'Schemes/On Surface'
+                                                                                        )
+                                                                                    )
+                                                                            )
+                                                                        ]
+                                                                    )
+                                                                ]
+                                                            )
+                                                        ),
+                                                        SizedBox(width: Gap(context).gap(10)),
+                                                        _PentagonBadge(number: nextLevel.toString())
+                                                    ]
+                                                )
+                                            ),
+
+                                            SizedBox(height: Gap(context).gap(15)),
+
+                                            FutureBuilder<List<ScoreEntry>>(
+                                                future: ref
+                                                    .read(scoreLocalRepositoryProvider)
+                                                    .listEntriesFromDB(),
+                                                builder: (context, snapshot) {
+                                                    int todayXp = 0;
+                                                    int weeklyXp = 0;
+
+                                                    if (snapshot.hasData) {
+                                                        final entries = snapshot.data!;
+                                                        final now = DateTime.now();
+                                                        final todayStart = DateTime(
+                                                            now.year,
+                                                            now.month,
+                                                            now.day
+                                                        );
+                                                        final weekStart = todayStart.subtract(
+                                                            const Duration(days: 6)
+                                                        );
+
+                                                        for (final entry in entries) {
+                                                            final entryDate = entry.at;
+                                                            if (entryDate.isAfter(todayStart) ||
+                                                                entryDate.isAtSameMomentAs(todayStart)) {
+                                                                todayXp += entry.amount;
+                                                            }
+                                                            if (entryDate.isAfter(weekStart) ||
+                                                                entryDate.isAtSameMomentAs(weekStart)) {
+                                                                weeklyXp += entry.amount;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    return Container(
+                                                        width: double.infinity,
+                                                        padding: EdgeInsets.all(Gap(context).gap(10)),
+                                                        decoration: BoxDecoration(
+                                                            color: getFigmaColor(
+                                                                context,
+                                                                'Schemes/Surface Container'
+                                                            ),
+                                                            borderRadius: BorderRadius.circular(24)
+                                                        ),
+                                                        child: Row(
+                                                            spacing: 10,
+                                                            children: [
+                                                                Expanded(
+                                                                    child: StatCard(
+                                                                        value: todayXp.toString(),
+                                                                        label: 'Today\'s XP',
+                                                                        icon: Icons.today,
+                                                                        iconSize: 24
+                                                                    )
+                                                                ),
+                                                                Expanded(
+                                                                    child: StatCard(
+                                                                        value: weeklyXp.toString(),
+                                                                        label: 'Weekly XP',
+                                                                        icon: Icons.date_range,
+                                                                        iconSize: 24
+                                                                    )
                                                                 )
                                                             ]
                                                         )
-                                                    ),
-                                                    SizedBox(width: Gap(context).gap(10)),
-                                                    _PentagonBadge(number: nextLevel.toString())
-                                                ]
-                                            )
-                                        ),
-
-                                        SizedBox(height: Gap(context).gap(15)),
-
-                                        FutureBuilder<List<ScoreEntry>>(
-                                            future: ref
-                                                .read(scoreLocalRepositoryProvider)
-                                                .listEntriesFromDB(),
-                                            builder: (context, snapshot) {
-                                                int todayXp = 0;
-                                                int weeklyXp = 0;
-
-                                                if (snapshot.hasData) {
-                                                    final entries = snapshot.data!;
-                                                    final now = DateTime.now();
-                                                    final todayStart = DateTime(
-                                                        now.year,
-                                                        now.month,
-                                                        now.day
                                                     );
-                                                    final weekStart = todayStart.subtract(
-                                                        const Duration(days: 6)
-                                                    );
-
-                                                    for (final entry in entries) {
-                                                        final entryDate = entry.at;
-                                                        if (entryDate.isAfter(todayStart) ||
-                                                            entryDate.isAtSameMomentAs(todayStart)) {
-                                                            todayXp += entry.amount;
-                                                        }
-                                                        if (entryDate.isAfter(weekStart) ||
-                                                            entryDate.isAtSameMomentAs(weekStart)) {
-                                                            weeklyXp += entry.amount;
-                                                        }
-                                                    }
                                                 }
+                                            )
+                                        ]
+                                    )
+                                ),
 
-                                                return Container(
-                                                    width: double.infinity,
-                                                    padding: EdgeInsets.all(Gap(context).gap(10)),
-                                                    decoration: BoxDecoration(
-                                                        color: getFigmaColor(
-                                                            context,
-                                                            'Schemes/Surface Container'
-                                                        ),
-                                                        borderRadius: BorderRadius.circular(24)
-                                                    ),
-                                                    child: Row(
-                                                        spacing: 10,
-                                                        children: [
-                                                            Expanded(
-                                                                child: StatCard(
-                                                                    value: todayXp.toString(),
-                                                                    label: 'Today\'s XP',
-                                                                    icon: Icons.today,
-                                                                    iconSize: 24,
-                                                                )
-                                                            ),
-                                                            Expanded(
-                                                                child: StatCard(
-                                                                    value: weeklyXp.toString(),
-                                                                    label: 'Weekly XP',
-                                                                    icon: Icons.date_range,
-                                                                    iconSize: 24,
-                                                                )
-                                                            )
-                                                        ]
-                                                    )
-                                                );
-                                            }
-                                        )
-                                    ]
-                                )
-                            ),
+                                SizedBox(height: Gap(context).gap(15)),
 
-                            SizedBox(height: Gap(context).gap(15)),
+                                UserBadgeGallery(badges: badges),
 
-                            UserBadgeGallery(badges: badges),
-
-                            SizedBox(height: Gap(context).gap(10))
-                        ]
+                                SizedBox(height: Gap(context).gap(10))
+                            ]
+                        )
                     )
                 )
             )

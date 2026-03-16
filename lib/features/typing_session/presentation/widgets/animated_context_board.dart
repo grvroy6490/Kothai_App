@@ -192,6 +192,52 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     return false;
   }
 
+  /// True when cluster is க்ஷ with a vowel/diacritic (e.g. க்ஷா, க்ஷெ, க்ஷொ)
+  bool _isKshaWithDiacritic(String cluster) {
+    final n = unorm.nfc(cluster);
+    const ksha = 'க்ஷ';
+    return n != ksha && n.startsWith(ksha) && n.length > ksha.length;
+  }
+
+  /// True when expected ends with ொ/ோ/ௌ and typed ends with ெ/ே/ை on same base
+  /// (e.g. typed ஹெ, expected ஹொ — user will type ா next to get ொ).
+  bool _isLeftDiacriticWaitingForCombo(String expected, String typed) {
+    final er = unorm.nfc(expected).runes.toList();
+    final tr = unorm.nfc(typed).runes.toList();
+    if (er.length != tr.length || er.length < 2) return false;
+    const int leftShort = 0x0BC6; // ெ
+    const int leftLong = 0x0BC7;  // ே
+    const int leftAi = 0x0BC8;    // ை
+    const int comboShortO = 0x0BCA; // ொ
+    const int comboLongO = 0x0BCB;  // ோ
+    const int comboAu = 0x0BCC;    // ௌ
+    final expectedLast = er.last;
+    final typedLast = tr.last;
+    final expectedCombo = expectedLast == comboShortO || expectedLast == comboLongO || expectedLast == comboAu;
+    final typedLeft = typedLast == leftShort || typedLast == leftLong || typedLast == leftAi;
+    if (!expectedCombo || !typedLeft) return false;
+    for (var i = 0; i < er.length - 1; i++) {
+      if (er[i] != tr[i]) return false;
+    }
+    return true;
+  }
+
+  /// Generic helper: true when `typed` is a proper prefix of `expected`
+  /// at the rune level (used for multi-step clusters like கள்).
+  bool _isPartialGraphemeCluster(String expected, String typed) {
+    final expectedRunes = unorm.nfc(expected).runes.toList();
+    final typedRunes = unorm.nfc(typed).runes.toList();
+    if (typedRunes.isEmpty || typedRunes.length >= expectedRunes.length) {
+      return false;
+    }
+    for (var i = 0; i < typedRunes.length; i++) {
+      if (typedRunes[i] != expectedRunes[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /// Checks if a character cluster is a 2-character combination (mei + right diacritic)
   /// Examples: "யா", "ளை", "லி"
   bool _isTwoCharDiacriticCombination(String cluster) {
@@ -241,7 +287,21 @@ class _TypingAreaState extends ConsumerState<TypingArea>
           if (newInputIndex < paraClusters.length) {
             final expectedChar = paraClusters[newInputIndex];
             final typedChar = inputClusters[newInputIndex];
-            final isIncorrect = typedChar != expectedChar;
+
+            // Only treat as error when fully wrong — not when waiting for second char
+            final bool isPartialInput = typedChar != expectedChar &&
+                (_isPartialSpecialSequence(expectedChar, typedChar) ||
+                    (_isKshaWithDiacritic(expectedChar) &&
+                        unorm.nfc(typedChar) == unorm.nfc('க்ஷ')) ||
+                    (_isTwoCharDiacriticCombination(expectedChar) &&
+                        typedChar.runes.length == 1 &&
+                        expectedChar.runes.length >= 2 &&
+                        typedChar.runes.first == expectedChar.runes.first &&
+                        Letters.meiLetters.contains(
+                            String.fromCharCode(typedChar.runes.first))) ||
+                    _isLeftDiacriticWaitingForCombo(expectedChar, typedChar) ||
+                    _isPartialGraphemeCluster(expectedChar, typedChar));
+            final isIncorrect = typedChar != expectedChar && !isPartialInput;
 
             if (isIncorrect) {
               // Vibrate when an incorrect character is detected
@@ -326,67 +386,128 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     bool isInWaitingState =
         false; // Track if we're waiting from a previous iteration
 
+    // If the fully-normalized strings are equal, the user input matches the
+    // target exactly. In this case, highlight everything as correct and skip
+    // all per-character "waiting"/error logic to avoid false negatives due
+    // to grapheme cluster differences (e.g. க + ள் vs கள்).
+    final bool isExactMatch = normalizedPara == normalizedInput;
+    if (isExactMatch) {
+      for (final paraChar in paraClusters) {
+        spans.add(
+          TextSpan(
+            text: paraChar,
+            style: TextStyle(
+              color: Colors.green.shade700,
+              backgroundColor: getFigmaColor(
+                context,
+                'State Layers/Success/Opacity-10',
+              ),
+            ),
+          ),
+        );
+      }
+      return spans;
+    }
+
     for (int i = 0; i < paraClusters.length; i++) {
       final paraChar = paraClusters[i];
 
+      // Compare prefixes of the *full* strings up to this visual position.
+      // If the normalized input matches the normalized paragraph up to here,
+      // we should treat this position as correct even if grapheme clustering
+      // split things differently (e.g. க + ள் vs கள்).
+      final expectedPrefix = paraClusters.take(i + 1).join();
+      final typedPrefix = inputClusters
+          .take(currentInputLength < i + 1 ? currentInputLength : i + 1)
+          .join();
+      final bool isPrefixExactlyCorrect =
+          typedPrefix.isNotEmpty && typedPrefix == expectedPrefix;
+
       // First, check if we have typed input at this position
       // If we're already in a waiting state, don't use the same typed character for other paraChars
-      final typed = (!isInWaitingState && inputIndex < inputClusters.length)
+      String? typed = (!isInWaitingState && inputIndex < inputClusters.length)
           ? inputClusters[inputIndex]
           : null;
+
+      // If the prefix up to this position matches, forcibly treat this visual
+      // position as correct and skip "waiting" logic.
+      final bool forceCorrectHere = isPrefixExactlyCorrect;
+      if (forceCorrectHere) {
+        typed = paraChar;
+        isInWaitingState = false;
+      }
 
       // Check if we're waiting for a 2-character diacritic combination to complete
       bool isWaitingForSecondChar = false;
 
-      // First, check if the expected character is a special multi-character sequence
-      // Examples: "க்ஷ", "ஸ்ரீ"
-      if (_isSpecialMultiCharSequence(paraChar) && typed != null) {
-        if (typed == paraChar) {
-          // Special sequence is complete, proceed normally
-          isWaitingForSecondChar = false;
-        } else if (_isPartialSpecialSequence(paraChar, typed)) {
-          // Typed is a partial match of the special sequence
-          // Wait for the complete sequence
+      if (!forceCorrectHere) {
+        // First, check if the expected character is a special multi-character sequence
+        // Examples: "க்ஷ", "ஸ்ரீ"
+        if (_isSpecialMultiCharSequence(paraChar) && typed != null) {
+          if (typed == paraChar) {
+            // Special sequence is complete, proceed normally
+            isWaitingForSecondChar = false;
+          } else if (_isPartialSpecialSequence(paraChar, typed)) {
+            // Typed is a partial match of the special sequence
+            // Wait for the complete sequence
+            final isLastTypedChar = inputIndex == currentInputLength - 1;
+            if (isLastTypedChar) {
+              isWaitingForSecondChar = true;
+              isInWaitingState = true;
+            }
+          }
+        }
+        // Expected is க்ஷ + diacritic (e.g. க்ஷா, க்ஷொ); typed is க்ஷ — wait for diacritic
+        else if (typed != null &&
+            _isKshaWithDiacritic(paraChar) &&
+            unorm.nfc(typed) == unorm.nfc('க்ஷ')) {
           final isLastTypedChar = inputIndex == currentInputLength - 1;
           if (isLastTypedChar) {
             isWaitingForSecondChar = true;
             isInWaitingState = true;
           }
         }
-      }
-      // Check if the expected character is a 2-char combination (mei + right diacritic)
-      // Examples: பி, வீ, வி, etc.
-      else if (_isTwoCharDiacriticCombination(paraChar) && typed != null) {
-        // Check if typed matches the full combination (complete)
-        if (typed == paraChar) {
-          // Combination is complete, proceed normally
-          isWaitingForSecondChar = false;
-        } else {
-          // Check if typed is just the mei part (single rune) and we're at the end of input
-          // This means user is actively typing and might be in the process of completing the combination
-          final paraRunes = paraChar.runes.toList();
-          if (paraRunes.length == 2) {
-            final expectedMei = String.fromCharCode(paraRunes[0]);
-            final typedRunes = typed.runes.toList();
+        // Check if the expected character is a 2-char combination (mei + right diacritic)
+        // Examples: பி, வீ, வி, etc.
+        else if (_isTwoCharDiacriticCombination(paraChar) && typed != null) {
+          // Check if typed matches the full combination (complete)
+          if (typed == paraChar) {
+            // Combination is complete, proceed normally
+            isWaitingForSecondChar = false;
+          } else {
+            // Check if typed is just the mei part (single rune) and we're at the end of input
+            // This means user is actively typing and might be in the process of completing the combination
+            final paraRunes = paraChar.runes.toList();
+            if (paraRunes.length == 2) {
+              final expectedMei = String.fromCharCode(paraRunes[0]);
+              final typedRunes = typed.runes.toList();
 
-            // Only wait if:
-            // 1. Typed is a single rune (just the mei part)
-            // 2. Typed mei matches expected mei
-            // 3. We're at the last typed character (user is actively typing)
-            if (typedRunes.length == 1) {
-              final typedChar = String.fromCharCode(typedRunes[0]);
-              final isLastTypedChar = inputIndex == currentInputLength - 1;
+              // Only wait if:
+              // 1. Typed is a single rune (just the mei part)
+              // 2. Typed mei matches expected mei
+              // 3. We're at the last typed character (user is actively typing)
+              if (typedRunes.length == 1) {
+                final typedChar = String.fromCharCode(typedRunes[0]);
+                final isLastTypedChar = inputIndex == currentInputLength - 1;
 
-              if (typedChar == expectedMei &&
-                  Letters.meiLetters.contains(typedChar) &&
-                  isLastTypedChar) {
-                // User is typing the mei, waiting for the diacritic
-                isWaitingForSecondChar = true;
-                isInWaitingState = true; // Mark that we're in waiting state
+                if (typedChar == expectedMei &&
+                    Letters.meiLetters.contains(typedChar) &&
+                    isLastTypedChar) {
+                  // User is typing the mei, waiting for the diacritic
+                  isWaitingForSecondChar = true;
+                  isInWaitingState = true; // Mark that we're in waiting state
+                }
               }
+              // If typed has multiple runes or doesn't match, it's a complete (but possibly incorrect) character
             }
-            // If typed has multiple runes or doesn't match, it's a complete (but possibly incorrect) character
           }
+        }
+        // Generic partial multi-rune cluster: treat as "waiting" if typed is a rune-prefix
+        else if (typed != null &&
+            _isPartialGraphemeCluster(paraChar, typed) &&
+            inputIndex == currentInputLength - 1) {
+          isWaitingForSecondChar = true;
+          isInWaitingState = true;
         }
       }
 

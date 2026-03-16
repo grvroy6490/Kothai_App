@@ -72,7 +72,7 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
         KeyModel(id: 'diacritic_${leftDiacriticLetters[2]}', type: KeyType.diacritic, label: leftDiacriticLetters[2], onTap: (ctrl) => ctrl.insert(leftDiacriticLetters[2])),
 
         /***********************************************/
-        ...meiLetters.sublist(13, 17).map((letter) {
+        ...meiLetters.sublist(13, 18).map((letter) {
                 return KeyModel(id: 'mei_$letter', type: KeyType.mei, label: letter, onTap: (ctrl) => ctrl.insert(letter));
             }),
 

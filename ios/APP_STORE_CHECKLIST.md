@@ -26,7 +26,7 @@ flutter build ios --release
 - [ ] Submit for review.
 
 ## 4. Already configured in this project
-- **Info.plist**: `ITSAppUsesNonExemptEncryption`, `NSPhotoLibraryUsageDescription`, `NSPhotoLibraryAddUsageDescription`, display name “Kothai App”.
+- **Info.plist**: `ITSAppUsesNonExemptEncryption`, `NSPhotoLibraryUsageDescription`, `NSPhotoLibraryAddUsageDescription`, display name “Visai App”.
 - **Podfile**: iOS platform 13.0; Release optimizations (LTO, stripping, Swift `-O`).
 - **Xcode Release**: `DEVELOPMENT_TEAM`, bitcode off, optimizations on.
 
