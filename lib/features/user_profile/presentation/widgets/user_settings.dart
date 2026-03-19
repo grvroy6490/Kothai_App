@@ -20,6 +20,11 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
         final config = ref.watch(challengeConfigurationProvider);
+        final themeMode = ref.watch(themeProvider);
+        // When following system, reflect device dark/light; otherwise use saved choice
+        final isDarkMode = themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
         // 📃 DECLARATION ----------------------------
         final ChallengeConfig configuration = ChallengeConfig(
@@ -36,10 +41,6 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
 
         void toggleVibration(val){
             ref.read(challengeConfigurationProvider.notifier).toggleHaptics();
-        }
-
-        void toggleDarkMode(val){
-            ref.read(challengeConfigurationProvider.notifier).toggleDarkMode();
         }
 
         void toggleNotifications(val){
@@ -137,14 +138,14 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                         padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: true ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
+                            color: isDarkMode ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
                         ),
                         child: Row(
                             children: [
                                 Icon(
                                     Icons.dark_mode,
                                     size: Gap(context).gap(23),
-                                    color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    color: isDarkMode ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
                                 SizedBox(width: 15),
                                 Expanded(
@@ -153,7 +154,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                         children: [
                                             Text('Dark Mode',
                                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                    color: isDarkMode ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
                                                     fontWeight: FontWeight.w600
                                                 )
                                             ),
@@ -166,12 +167,11 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                     )
                                 ),
                                 SizedBox(width: 10),
-                                _switchButton(context,
-                                    ref.watch(themeProvider) == ThemeMode.dark,
-                                    (val) {
-                                        ref.read(themeProvider.notifier).toggleTheme();
-                                    }
-                                )
+                                _switchButton(context, isDarkMode, (val) {
+                                    ref.read(themeProvider.notifier).setTheme(
+                                        isDarkMode ? ThemeMode.light : ThemeMode.dark,
+                                    );
+                                })
                             ]
                         )
                     ),

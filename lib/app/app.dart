@@ -12,6 +12,7 @@ import 'package:visai/core/theme/app_typography_scaled.dart';
 import 'package:visai/core/theme/theme_manager.dart';
 import 'package:visai/di/providers/app_initialilizer/app_initializer.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/splash/splash_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
@@ -36,6 +37,8 @@ class App extends ConsumerWidget {
         // 👇 APP INITIALIZER
         final init = ref.watch(appInitializerProvider);
 
+        final themeMode = ref.watch(themeProvider);
+
         return ScreenUtilInit(
             designSize: const Size(360, 812),
             minTextAdapt: true,
@@ -43,7 +46,7 @@ class App extends ConsumerWidget {
             child: GetMaterialApp(
                 getPages: routes,
                 debugShowCheckedModeBanner: false,
-                themeMode: ThemeMode.light,
+                themeMode: themeMode,
                 theme: getTheme(false),
                 darkTheme: getTheme(true),
                 builder: (context, child) {

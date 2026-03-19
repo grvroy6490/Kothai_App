@@ -20,7 +20,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
                 state = ThemeMode.system; // fallback to system if invalid value
             }
         } else {
-            state = ThemeMode.system; // follow device if nothing saved
+            state = ThemeMode.system; // follow device dark/light until user toggles
         }
     }
 

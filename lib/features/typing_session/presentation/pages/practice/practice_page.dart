@@ -5,10 +5,8 @@ import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/domain/entities/gamification/gamification_entity.dart';
-import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/keyboard/presentation/keyboard.dart';
 import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
-import 'package:visai/features/typing_session/domain/enums/practice_status_enum.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/pause/practice_pause_page.dart';
@@ -73,7 +71,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
 
         // 🚀 METHODS ---------------------------------
         void showNotifications() async {
-            ref.read(badgeControllerProvider.notifier).onXPChanged(context, 500);
+            // TODO: Show notifications / session history when implemented
             // final records = await ref.read(sessionDaoProvider).list();
             // for (final r in records) {
             //   debugPrint(r.);
