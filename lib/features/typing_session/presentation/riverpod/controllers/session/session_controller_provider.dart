@@ -27,7 +27,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/providers/ch
 import 'package:visai/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
 import 'package:visai/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
 import 'package:visai/features/typing_session/usecases/score/score_calculation.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 // import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -36,7 +36,7 @@ part 'session_controller_provider.g.dart';
 
 @riverpod
 class SessionController extends _$SessionController {
-  final _logger = Logger();
+  // final _logger = Logger();
   bool _isCompleting = false; // Guard to prevent duplicate completion calls
 
   @override

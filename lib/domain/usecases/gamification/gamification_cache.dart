@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:visai/core/constants/gamification.dart';
 import 'package:visai/domain/entities/gamification/gamification_entity.dart';
 import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class GamificationCache {
   final SharedPrefsService prefs;
-  final _logger = Logger();
+  // final _logger = Logger();
 
   GamificationCache(this.prefs);
 

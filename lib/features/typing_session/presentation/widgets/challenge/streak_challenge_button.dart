@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
+// import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+// import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/challenge/bend_line_painter.dart';
 import 'package:visai/features/typing_session/presentation/widgets/challenge/weekly_streak_display.dart';
 
@@ -56,13 +56,13 @@ class _State extends ConsumerState<StreakChallengeButton>
         super.dispose();
     }
 
-    String _formatDuration(Duration duration) {
-        String twoDigits(int n) => n.toString().padLeft(2, "0");
-        String twoDigitHours = twoDigits(duration.inHours);
-        String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-        String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-        return "$twoDigitHours:$twoDigitMinutes:$twoDigitSeconds";
-    }
+    // String _formatDuration(Duration duration) {
+    //     String twoDigits(int n) => n.toString().padLeft(2, "0");
+    //     String twoDigitHours = twoDigits(duration.inHours);
+    //     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    //     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    //     return "$twoDigitHours:$twoDigitMinutes:$twoDigitSeconds";
+    // }
 
     @override
     Widget build(BuildContext context) {

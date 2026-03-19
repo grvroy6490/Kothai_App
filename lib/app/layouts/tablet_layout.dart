@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:visai/features/splash/splash_page.dart';
+// import 'package:visai/features/splash/splash_page.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/practice_page.dart';
 
 class TabletLayout extends StatefulWidget {

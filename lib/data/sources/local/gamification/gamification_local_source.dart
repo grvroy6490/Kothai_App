@@ -1,16 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:visai/core/constants/typing_session_constants.dart';
+// import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/domain/contracts/gamification/gamification_data_fetcher.dart';
 import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 import 'package:visai/domain/entities/gamification/gamification_entity.dart';
 import 'package:visai/domain/entities/levels/level_entity.dart';
-import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
-import 'package:logger/logger.dart';
+// import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+// import 'package:logger/logger.dart';
 
 class GamificationLocalSourceFetcher implements GamificationDataFetcher {
-    final _logger = Logger();
+    // final _logger = Logger();
 
     @override
     Future<GamificationEntity?> fetch() async {

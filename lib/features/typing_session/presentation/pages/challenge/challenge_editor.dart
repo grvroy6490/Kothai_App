@@ -16,7 +16,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/widgets/animated_context_board.dart';
 import 'package:visai/features/typing_session/presentation/widgets/main_metrics_bar.dart';
 import 'package:visai/features/typing_session/presentation/widgets/typing_progress.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class ChallengeEditor extends ConsumerStatefulWidget {
     final TextEditingController controller;
@@ -35,7 +35,7 @@ class ChallengeEditor extends ConsumerStatefulWidget {
 }
 
 class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
-    final _logger = Logger();
+    // final _logger = Logger();
     late String paragraph;
     int _lastLen = 0;
     late VoidCallback _controllerListener;
@@ -92,18 +92,18 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
         final textContent = ref.watch(textContentControllerProvider);
-        final sessionController = ref.read(
-            sessionStatusControllerProvider.notifier
-        ); // Session Controller
-        final sessionState = ref.watch(sessionStatusControllerProvider);
+        // final sessionController = ref.read(
+        //     sessionStatusControllerProvider.notifier
+        // ); // Session Controller
+        // final sessionState = ref.watch(sessionStatusControllerProvider);
         final challengeDifficulty = ref.watch(
             challengeDifficultyControllerProvider
         );
         final typingProgress = ref.watch(typingProgressProvider);
 
-        final challengeStatus = sessionState.mode == SessionMode.challenge
-            ? sessionState.status
-            : false;
+        // final challengeStatus = sessionState.mode == SessionMode.challenge
+        //     ? sessionState.status
+        //     : false;
         paragraph = textContent != null ? textContent.content : placeholderText;
         difficultyCriteria = widget
             .gamificationData

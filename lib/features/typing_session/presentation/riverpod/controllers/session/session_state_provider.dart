@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_state_provider.g.dart';
@@ -37,7 +37,7 @@ class SessionState {
 class SessionStateNotifier extends _$SessionStateNotifier {
   Timer? _timer;
   DateTime? _startTime;
-  final _logger = Logger();
+  // final _logger = Logger();
 
   @override
   SessionState build() {

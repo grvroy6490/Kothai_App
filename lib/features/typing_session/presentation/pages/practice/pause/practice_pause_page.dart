@@ -13,7 +13,7 @@ import 'package:visai/features/typing_session/presentation/pages/session/stop/se
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
+// import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/star_burst_badge.dart';
 import 'package:visai/features/typing_session/presentation/widgets/stats_badge.dart';

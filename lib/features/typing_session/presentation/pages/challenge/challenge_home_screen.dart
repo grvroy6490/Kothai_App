@@ -15,7 +15,7 @@ import 'package:visai/features/typing_session/presentation/widgets/challenge/cha
 import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/challenge_detail_card.dart';
 import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_card_difficulty_xp_badges.dart';
 import 'package:visai/features/typing_session/presentation/widgets/challenge/slide_card_widgets/slide_stats_badges.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class ChallengeHomeScreen extends ConsumerStatefulWidget {
     const ChallengeHomeScreen({super.key});
@@ -26,7 +26,7 @@ class ChallengeHomeScreen extends ConsumerStatefulWidget {
 
 class _State extends ConsumerState<ChallengeHomeScreen> {
     // 📃 DECLARATION ----------------------------
-    final _logger = Logger();
+    // final _logger = Logger();
     late double slideAngle;
     late double slideHeightMultiplier;
     late int slideIndex;

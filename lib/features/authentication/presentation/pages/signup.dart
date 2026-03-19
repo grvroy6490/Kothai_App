@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
-import 'package:visai/core/constants/auth_constants.dart';
+// import 'package:visai/core/constants/auth_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/di/providers/auth/auth_provider.dart';
 import 'package:visai/domain/usecases/show_modal.dart';

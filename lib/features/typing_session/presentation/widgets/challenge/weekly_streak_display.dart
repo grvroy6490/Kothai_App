@@ -8,7 +8,7 @@ import 'package:visai/features/typing_session/presentation/pages/challenge/resto
 import 'package:visai/features/typing_session/presentation/widgets/challenge/streak_badge.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
 import 'package:visai/features/typing_session/utils/streak_utils.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class WeekilyStreakDisplay extends StatefulWidget {
     const WeekilyStreakDisplay({super.key});
@@ -18,7 +18,7 @@ class WeekilyStreakDisplay extends StatefulWidget {
 }
 
 class _WeekilyStreakDisplayState extends State<WeekilyStreakDisplay> {
-    final _logger = Logger();
+    // final _logger = Logger();
     bool _testInitialized = false;
     // 📃 DECLARATION ----------------------------
 

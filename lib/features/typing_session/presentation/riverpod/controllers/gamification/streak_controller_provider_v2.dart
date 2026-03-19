@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 
 
@@ -34,7 +34,7 @@ class StreakState {
 
 class StreakController extends Notifier<StreakState> {
     late final _prefs = ref.read(sharedPrefsServiceProvider);
-    final _logger = Logger();
+    // final _logger = Logger();
 
     @override
     StreakState build() {

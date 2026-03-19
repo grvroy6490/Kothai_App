@@ -6,15 +6,15 @@ import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/core/utils/time_utils.dart';
-import 'package:visai/core/widgets/safe_svg.dart';
+// import 'package:visai/core/widgets/safe_svg.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:visai/features/typing_session/presentation/widgets/lottie_player.dart';
+// import 'package:visai/features/typing_session/presentation/widgets/lottie_player.dart';
 import 'package:visai/features/typing_session/presentation/widgets/star_burst_badge.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class ChallengeFailed extends ConsumerStatefulWidget {
   const ChallengeFailed({super.key});
@@ -24,7 +24,7 @@ class ChallengeFailed extends ConsumerStatefulWidget {
 }
 
 class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
-  final _logger = Logger();
+  // final _logger = Logger();
 
   @override
   Widget build(BuildContext context) {

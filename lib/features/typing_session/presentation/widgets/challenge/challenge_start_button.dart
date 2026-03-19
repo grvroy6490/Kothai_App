@@ -7,7 +7,7 @@ import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
-import 'package:visai/features/typing_session/presentation/widgets/challenge/bend_line_painter.dart';
+// import 'package:visai/features/typing_session/presentation/widgets/challenge/bend_line_painter.dart';
 import 'package:visai/features/typing_session/presentation/widgets/challenge/weekly_streak_display.dart';
 
 class ChallengeStartButton extends ConsumerStatefulWidget {

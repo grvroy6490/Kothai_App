@@ -19,7 +19,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/widgets/lottie_player.dart';
 import 'package:visai/features/typing_session/presentation/widgets/star_burst_badge.dart';
 import 'package:visai/features/typing_session/usecases/score/score_calculation.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class SessionCompletePage extends ConsumerStatefulWidget {
     const SessionCompletePage({super.key});
@@ -30,7 +30,7 @@ class SessionCompletePage extends ConsumerStatefulWidget {
 }
 
 class _SessionCompletePageState extends ConsumerState<SessionCompletePage> {
-    final _logger = Logger();
+    // final _logger = Logger();
 
     @override
     Widget build(BuildContext context) {

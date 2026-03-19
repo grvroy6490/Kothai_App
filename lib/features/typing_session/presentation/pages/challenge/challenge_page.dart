@@ -20,12 +20,12 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/streak_mode_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
+// import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
-import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
+// import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class ChallengePage extends ConsumerStatefulWidget {
     const ChallengePage({super.key});

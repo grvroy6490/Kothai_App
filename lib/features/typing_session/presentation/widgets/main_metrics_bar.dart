@@ -7,8 +7,8 @@ import 'package:visai/core/utils/time_utils.dart';
 import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_wpm_enum.dart';
-import 'package:visai/features/typing_session/domain/enums/practice_status_enum.dart';
-import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+// import 'package:visai/features/typing_session/domain/enums/practice_status_enum.dart';
+// import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
@@ -18,7 +18,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/widgets/metrics_info_badge.dart';
 import 'package:visai/features/typing_session/presentation/widgets/metrics_stat_badge.dart';
 import 'package:visai/features/typing_session/presentation/widgets/toast.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class MainMetricsBar extends ConsumerStatefulWidget {
     final String paragraph;

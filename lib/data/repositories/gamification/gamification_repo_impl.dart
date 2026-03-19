@@ -25,7 +25,7 @@ class GamificationRepoImpl extends GamificationRepository {
         }
 
         try {
-            await cache.write(existingData!);
+            await cache.write(existingData);
         } catch (e, s) {
             _logger.e(
                 'Failed to fetch and cache gamification data',

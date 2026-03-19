@@ -5,17 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:visai/app/layout_builder.dart';
-import 'package:visai/core/constants/gamification.dart';
+// import 'package:visai/core/constants/gamification.dart';
 import 'package:visai/core/errors/default_404.dart';
 import 'package:visai/core/routing/routes.dart';
 import 'package:visai/core/theme/app_typography_scaled.dart';
 import 'package:visai/core/theme/theme_manager.dart';
 import 'package:visai/di/providers/app_initialilizer/app_initializer.dart';
-import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
+// import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/splash/splash_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 
 class App extends ConsumerWidget {

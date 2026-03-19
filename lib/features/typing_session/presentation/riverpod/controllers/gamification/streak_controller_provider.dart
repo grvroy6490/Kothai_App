@@ -138,27 +138,24 @@ class StreakController extends Notifier<StreakState> {
     }
 
     // Check if we need to reset the window (7 days have passed since window start)
-    String? windowStartDate = state.windowStartDate;
+    // After this block, `windowStartDate` is guaranteed to be non-null.
+    String windowStartDate = state.windowStartDate ?? todayDateDash;
     bool shouldResetWindow = false;
 
-    if (windowStartDate != null) {
-      final windowStart = DateTime.tryParse(windowStartDate);
-      if (windowStart != null) {
-        final windowStartOnly = DateTime(
-          windowStart.year,
-          windowStart.month,
-          windowStart.day,
-        );
-        final daysSinceStart = todayDateOnly.difference(windowStartOnly).inDays;
-        if (daysSinceStart >= 7) {
-          // Window expired, reset
-          shouldResetWindow = true;
-          windowStartDate = todayDateDash; // Start new window from today
-        }
+    final windowStart = DateTime.tryParse(windowStartDate);
+    if (windowStart != null) {
+      final windowStartOnly = DateTime(
+        windowStart.year,
+        windowStart.month,
+        windowStart.day,
+      );
+      final daysSinceStart =
+          todayDateOnly.difference(windowStartOnly).inDays;
+      if (daysSinceStart >= 7) {
+        // Window expired, reset
+        shouldResetWindow = true;
+        windowStartDate = todayDateDash; // Start new window from today
       }
-    } else {
-      // No window started yet, start it from today
-      windowStartDate = todayDateDash;
     }
 
     // If window is reset, clear old entries
@@ -171,27 +168,25 @@ class StreakController extends Notifier<StreakState> {
 
     // Calculate current streak within the window
     int currentStreak = 0;
-    if (windowStartDate != null) {
-      final windowStart = DateTime.tryParse(windowStartDate);
-      if (windowStart != null) {
-        final windowStartOnly = DateTime(
-          windowStart.year,
-          windowStart.month,
-          windowStart.day,
-        );
-        final completedDates = newStreakCompleted.map((e) => e.date).toSet();
+    final windowStartForStreak = DateTime.tryParse(windowStartDate);
+    if (windowStartForStreak != null) {
+      final windowStartOnly = DateTime(
+        windowStartForStreak.year,
+        windowStartForStreak.month,
+        windowStartForStreak.day,
+      );
+      final completedDates = newStreakCompleted.map((e) => e.date).toSet();
 
-        // Count consecutive days from window start
-        for (int i = 0; i < 7; i++) {
-          final checkDate = windowStartOnly.add(Duration(days: i));
-          final checkDateDash = _ymdDash(checkDate);
+      // Count consecutive days from window start
+      for (int i = 0; i < 7; i++) {
+        final checkDate = windowStartOnly.add(Duration(days: i));
+        final checkDateDash = _ymdDash(checkDate);
 
-          if (completedDates.contains(checkDateDash) ||
-              (checkDateDash == todayDateDash)) {
-            currentStreak++;
-          } else {
-            break; // Streak broken
-          }
+        if (completedDates.contains(checkDateDash) ||
+            (checkDateDash == todayDateDash)) {
+          currentStreak++;
+        } else {
+          break; // Streak broken
         }
       }
     }
@@ -202,29 +197,26 @@ class StreakController extends Notifier<StreakState> {
     );
 
     // Keep only entries within the current 7-day window
-    if (windowStartDate != null) {
-      final windowStart = DateTime.tryParse(windowStartDate);
-      if (windowStart != null) {
-        final windowStartOnly = DateTime(
-          windowStart.year,
-          windowStart.month,
-          windowStart.day,
-        );
-        final windowDays = <String>[];
-        for (int i = 0; i < 7; i++) {
-          final day = windowStartOnly.add(Duration(days: i));
-          windowDays.add(_ymdDash(day));
-        }
-
-        // Keep only entries within the window and sort by date (oldest first)
-        final cleanedStreakCompleted =
-            newStreakCompleted
-                .where((item) => windowDays.contains(item.date))
-                .toList()
-              ..sort((a, b) => a.date.compareTo(b.date));
-
-        newStreakCompleted = cleanedStreakCompleted;
+    final windowStartForFilter = DateTime.tryParse(windowStartDate);
+    if (windowStartForFilter != null) {
+      final windowStartOnly = DateTime(
+        windowStartForFilter.year,
+        windowStartForFilter.month,
+        windowStartForFilter.day,
+      );
+      final windowDays = <String>[];
+      for (int i = 0; i < 7; i++) {
+        final day = windowStartOnly.add(Duration(days: i));
+        windowDays.add(_ymdDash(day));
       }
+
+      // Keep only entries within the window and sort by date (oldest first)
+      final cleanedStreakCompleted = newStreakCompleted
+          .where((item) => windowDays.contains(item.date))
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
+
+      newStreakCompleted = cleanedStreakCompleted;
     }
 
     // Update best streak if current is better

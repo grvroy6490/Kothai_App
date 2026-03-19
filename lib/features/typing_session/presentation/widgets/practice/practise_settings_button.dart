@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/di/providers/theme/theme_provider.dart';
+// import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/settings/practice_settings_page.dart';
 
@@ -15,7 +15,7 @@ class PracticeSettingButtons extends ConsumerWidget {
     @override
     Widget build(BuildContext context, ref) {
         // 🌐 PROVIDERS ------------------------------
-        final themeMode = ref.watch(themeProvider);
+        // final themeMode = ref.watch(themeProvider);
 
         // ⭐ Widget ---------------------------------
         return Row(

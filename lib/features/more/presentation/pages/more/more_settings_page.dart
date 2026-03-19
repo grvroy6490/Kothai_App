@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
+// import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
 import 'package:visai/features/more/presentation/pages/achievement/achievement_gallery_page.dart';
 import 'package:visai/features/more/presentation/pages/streak_board/streak_board_page.dart';
 import 'package:visai/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
@@ -68,7 +68,7 @@ class _MoreSettingsPageState extends ConsumerState<MoreSettingsPage> {
                                             Icon(
                                                 FontAwesomeIcons.trophy,
                                                 size: Gap(context).gap(20),
-                                                color: true ? getFigmaColor(context, 'Schemes/On Surface') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                color: getFigmaColor(context, 'Schemes/On Surface')
                                             ),
                                             SizedBox(width: 15),
                                             Expanded(
@@ -113,7 +113,7 @@ class _MoreSettingsPageState extends ConsumerState<MoreSettingsPage> {
                                             Icon(
                                                 Icons.local_fire_department,
                                                 size: Gap(context).gap(25),
-                                                color: true ? getFigmaColor(context, 'Schemes/On Surface') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                color: getFigmaColor(context, 'Schemes/On Surface')
                                             ),
                                             SizedBox(width: 15),
                                             Expanded(
@@ -158,7 +158,7 @@ class _MoreSettingsPageState extends ConsumerState<MoreSettingsPage> {
                                             Icon(
                                                 Icons.stars,
                                                 size: Gap(context).gap(23),
-                                                color: true ? getFigmaColor(context, 'Schemes/On Surface') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                color: getFigmaColor(context, 'Schemes/On Surface')
                                             ),
                                             SizedBox(width: 15),
                                             Expanded(

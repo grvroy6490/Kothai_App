@@ -4,11 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/domain/entities/gamification/gamification_entity.dart';
+// import 'package:visai/domain/entities/gamification/gamification_entity.dart';
 import 'package:visai/features/more/presentation/pages/xp_milestones/xp_milestones_page.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
+// import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class LevelXPIndicatior extends ConsumerWidget {
     final double? width;
@@ -35,9 +35,9 @@ class LevelXPIndicatior extends ConsumerWidget {
     @override
     Widget build(BuildContext context, WidgetRef ref) {
         // 🌐 PROVIDERS ------------------------------
-        final GamificationEntity? gamificationData = ref.watch(
-            gamificationDataControllerProvider
-        );
+        // final GamificationEntity? gamificationData = ref.watch(
+        //     gamificationDataControllerProvider
+        // );
         final score = ref.watch(scoreControllerProvider);
 
         // 📃 DECLARATION ----------------------------

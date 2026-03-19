@@ -147,6 +147,6 @@ class StreakBadge extends StatelessWidget {
             );
         }
 
-        return badgeContent;
+        // return badgeContent;
     }
 }

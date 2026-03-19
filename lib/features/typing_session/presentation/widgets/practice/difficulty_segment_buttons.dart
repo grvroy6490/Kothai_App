@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/di/providers/theme/theme_provider.dart';
+// import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/content/text_content_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
@@ -19,7 +19,7 @@ class DifficultySegmentButtons extends ConsumerWidget {
         // 📃 DECLARATION ----------------------------
         // 🌐 PROVIDERS ------------------------------
         final selectedDifficulty = ref.watch(practiceConfigurationProvider).difficulty;
-        final themeMode = ref.watch(themeProvider);
+        // final themeMode = ref.watch(themeProvider);
 
         // 🚀 METHODS --------------------------------
         // 👇 UPDATE DIFFICULTY
