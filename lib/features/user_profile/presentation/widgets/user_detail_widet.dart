@@ -6,6 +6,7 @@ import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/domain/usecases/show_modal.dart';
 import 'package:visai/features/authentication/presentation/pages/login.dart';
 import 'package:visai/features/authentication/presentation/pages/signup.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
 import 'package:visai/features/user_profile/presentation/widgets/user_score.dart';
 
@@ -236,6 +237,31 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 );
                                                 break;
 
+                                            case 'SaveProgress':
+                                                try {
+                                                    await ref
+                                                        .read(scoreControllerProvider.notifier)
+                                                        .syncAll();
+                                                    if (!mounted) return;
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text('Progress synced successfully.'),
+                                                            backgroundColor: Colors.green,
+                                                            behavior: SnackBarBehavior.floating
+                                                        )
+                                                    );
+                                                } catch (e) {
+                                                    if (!mounted) return;
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                            content: Text('Sync failed: ${e.toString()}'),
+                                                            backgroundColor: Colors.red,
+                                                            behavior: SnackBarBehavior.floating
+                                                        )
+                                                    );
+                                                }
+                                                break;
+
                                             case 'Logout':
                                                 // Sign out current user
                                                 await FirebaseAuth.instance.signOut();
@@ -263,6 +289,10 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 child: Text('Signup')
                                             )
                                         ] else ...const [
+                                            PopupMenuItem<String>(
+                                                value: 'SaveProgress',
+                                                child: Text('Save progress')
+                                            ),
                                             PopupMenuItem<String>(
                                                 value: 'Logout',
                                                 child: Text('Logout')

@@ -1,7 +1,10 @@
 
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:visai/app/layout_builder.dart';
@@ -15,11 +18,24 @@ import 'package:visai/di/providers/app_initialilizer/app_initializer.dart';
 import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/splash/splash_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 // import 'package:logger/logger.dart';
 
 
-class App extends ConsumerWidget {
-    const App({super.key}); 
+class App extends ConsumerStatefulWidget {
+    const App({super.key});
+
+    @override
+    ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+    // Prevent multiple restore/sync calls for the same uid.
+    static String? _lastSyncedUid;
+
+    final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+        GlobalKey<ScaffoldMessengerState>();
 
     void clear() async {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -28,7 +44,8 @@ class App extends ConsumerWidget {
     }
 
     @override
-    Widget build(BuildContext context, ref) {
+    Widget build(BuildContext context) {
+        final ref = this.ref;
         // final _logger = Logger();
         
         // clear();
@@ -36,10 +53,47 @@ class App extends ConsumerWidget {
 
         // 👇 APP INITIALIZER
         final init = ref.watch(appInitializerProvider);
-
         final themeMode = ref.watch(themeProvider);
 
-        return ScreenUtilInit(
+        // Auto-sync scores after login (and after reinstall).
+        // Riverpod requires ref.listen to be called from build.
+        ref.listen<AsyncValue<User?>>(
+            authUserProvider,
+            (previous, next) {
+                next.whenData((user) {
+                    final uid = user?.uid;
+                    if (uid == null) {
+                        _lastSyncedUid = null;
+                        return;
+                    }
+                    if (_lastSyncedUid == uid) return;
+
+                    _lastSyncedUid = uid;
+
+                    // Show a snackbar for sync success/failure.
+                    unawaited(() async {
+                        try {
+                            await ref.read(scoreControllerProvider.notifier).syncAll();
+                            _scaffoldMessengerKey.currentState?.showSnackBar(
+                                const SnackBar(content: Text('Progress synced successfully.'),
+                                    backgroundColor: Colors.green),
+                            );
+                        } catch (e) {
+                            _scaffoldMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                    content: Text('Sync failed: ${e.toString()}'),
+                                    backgroundColor: Colors.red,
+                                ),
+                            );
+                        }
+                    }());
+                });
+            },
+        );
+
+        return ScaffoldMessenger(
+            key: _scaffoldMessengerKey,
+            child: ScreenUtilInit(
             designSize: const Size(360, 812),
             minTextAdapt: true,
             splitScreenMode: false,
@@ -77,6 +131,6 @@ class App extends ConsumerWidget {
                     loading: () => const SplashPage()
                 )
             )
-        );
+        ));
     }
 }

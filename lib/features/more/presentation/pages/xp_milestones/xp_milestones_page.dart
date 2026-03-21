@@ -363,8 +363,8 @@ class _PentagonBadge extends StatelessWidget {
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                     colors: [
-                                        Color(0xFFFFE5D4), // Light peach
-                                        Color(0xFFE8D5F0) // Light lavender purple
+                                        getFigmaColor(context, 'Palettes/Secondary 90'), // Light peach
+                                        getFigmaColor(context, 'Palettes/Primary 80') // Light lavender purple
                                     ]
                                 )
                             ),
@@ -374,7 +374,7 @@ class _PentagonBadge extends StatelessWidget {
                                     style: TextStyle(
                                         fontSize: 48,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF6B46C1) // Dark purple
+                                        color: getFigmaColor(context, 'Schemes/Primary') // Dark purple
                                     )
                                 )
                             )

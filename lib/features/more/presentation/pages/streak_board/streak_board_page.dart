@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
@@ -23,6 +24,7 @@ class _StreakBoardPageState extends ConsumerState<StreakBoardPage> {
     Widget build(BuildContext context) {
         final badges = ref.read(badgeControllerProvider);
         final streak = ref.watch(streakControllerProvider);
+        ref.watch(themeProvider);
 
         // Create a set of completed dates for quick lookup
         final completedDates = streak.streakCompleted
@@ -304,6 +306,7 @@ class _StreakBoardPageState extends ConsumerState<StreakBoardPage> {
         final daysInMonth = lastDay.day;
         final today = DateTime.now();
         final todayDateOnly = DateTime(today.year, today.month, today.day);
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
         // Weekday headers (starting with Sunday to match design)
         const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -361,7 +364,7 @@ class _StreakBoardPageState extends ConsumerState<StreakBoardPage> {
 
                                         if (isToday) {
                                             backgroundColor = Colors.white;
-                                            textColor = getFigmaColor(context, 'Schemes/Secondary');
+                                            textColor = isDarkMode ? getFigmaColor(context, 'Schemes/Secondary') : Colors.white;
                                         } else if (isCompleted) {
                                             backgroundColor = getFigmaColor(
                                                 context,

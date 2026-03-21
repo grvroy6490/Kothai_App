@@ -351,7 +351,7 @@ class _BadgeDisplayState extends ConsumerState<BadgeDisplay> {
                             },
                             style: ButtonStyle(
                                 backgroundColor: WidgetStatePropertyAll(
-                                    Color.fromARGB(255, 255, 247, 240)
+                                    getFigmaColor(context, 'Schemes/On Secondary Container')
                                 ),
                                 padding: WidgetStatePropertyAll(
                                     EdgeInsets.symmetric(
@@ -368,14 +368,14 @@ class _BadgeDisplayState extends ConsumerState<BadgeDisplay> {
                                             Text(
                                                 'Best: ',
                                                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                                    color: Color.fromARGB(255, 120, 82, 9)
+                                                    color: getFigmaColor(context, 'Schemes/Secondary')
                                                 )
                                             ),
 
                                             Text(
                                                 '${streak.best} Days',
                                                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                                    color: Color.fromARGB(255, 120, 82, 9),
+                                                    color: getFigmaColor(context, 'Schemes/Secondary'),
                                                     fontWeight: FontWeight.bold
                                                 )
                                             )
@@ -388,7 +388,7 @@ class _BadgeDisplayState extends ConsumerState<BadgeDisplay> {
                                             child: Icon(
                                                 Icons.keyboard_double_arrow_right,
                                                 size: 24,
-                                                color: Color.fromARGB(255, 120, 82, 9)
+                                                color: getFigmaColor(context, 'Schemes/Secondary')
                                             )
                                         )
                                     )

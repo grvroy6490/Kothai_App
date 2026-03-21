@@ -1,9 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 // import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 // import 'package:visai/features/typing_session/presentation/pages/practice/practice_page.dart';
 // import 'package:visai/di/providers/navigation/navigation_provider.dart';
@@ -23,6 +25,11 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
     Widget build(BuildContext context) {
         final typingProgress = ref.watch(typingProgressProvider);
         final sessionMode = ref.watch(sessionStatusControllerProvider).mode;
+        final themeMode = ref.watch(themeProvider);
+
+        final isDarkMode = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
         final args = Get.arguments;
         // 🚀 METHODS --------------------------------
@@ -54,18 +61,22 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
 
         // ⭐ Widget ---------------------------------
         return Scaffold(
-            backgroundColor: getFigmaColor(context, 'Schemes/Background'),
+            backgroundColor: isDarkMode
+                ? getFigmaColor(context, 'State Layers/Background/Opacity-60')
+                : getFigmaColor(context, 'Schemes/Background'),
             body: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                     children: [
-                        Opacity(opacity: 0.5,
-                            child: Image.asset('assets/images/Pattern.png',
-                                width: double.infinity,
-                                height: double.infinity
-                            )
-                        ),
+                        Opacity(opacity: isDarkMode ? 0.3 : 0.5,
+                        child: Image.asset('assets/images/Pattern.png',
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: isDarkMode ? Colors.white : null,
+                            colorBlendMode: isDarkMode ? BlendMode.srcIn : BlendMode.srcATop
+                        )
+                    ),
 
                         SizedBox(
                             height: double.infinity,
@@ -85,15 +96,25 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
                                                         bottom: 0,
                                                         child: Align(
                                                             alignment: Alignment.center,
-                                                            child: Container(
-                                                                constraints: BoxConstraints(
-                                                                    minWidth: MediaQuery.of(context).size.width - 32
-                                                                ),
-                                                                height: Gap(context).gap(315),
-                                                                padding: EdgeInsets.all(Gap(context).gap(16)),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(16),
-                                                                    color: getFigmaColor(context, 'State Layers/Error/Opacity-08')
+                                                            child: ClipRRect(
+                                                                borderRadius: BorderRadius.circular(16),
+                                                                child: BackdropFilter(
+                                                                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                                    child: Container(
+                                                                        constraints: BoxConstraints(
+                                                                            minWidth:
+                                                                            MediaQuery.of(context).size.width - 32
+                                                                        ),
+                                                                        height: Gap(context).gap(315),
+                                                                        padding: EdgeInsets.all(Gap(context).gap(16)),
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(16),
+                                                                            color: getFigmaColor(
+                                                                                context,
+                                                                                'State Layers/Error/Opacity-08'
+                                                                            )
+                                                                        )
+                                                                    )
                                                                 )
                                                             )
                                                         )
@@ -186,7 +207,7 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
                                                                                     padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 0, vertical: Gap(context).gap(16)))
                                                                                 ),
                                                                                 onPressed: () => handleSessionStopDenied(),
-                                                                                child: Text('No', style: Theme.of(context).textTheme.bodyLarge)
+                                                                                child: Text('No', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: getFigmaColor(context, 'Schemes/Surface Variant')))
                                                                             )
                                                                         )
                                                                     ]

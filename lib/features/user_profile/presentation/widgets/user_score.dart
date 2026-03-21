@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/streak_controller_provider.dart';
 import 'package:visai/features/user_profile/presentation/widgets/stats_card.dart';
 import 'package:visai/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
@@ -46,7 +47,7 @@ class _UserScoreState extends ConsumerState<UserScore> {
             width: double.infinity,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Color.fromARGB(255, 238, 238, 238)
+                color: getFigmaColor(context, 'Schemes/Surface Container')
             ),
             padding: EdgeInsets.symmetric(
                 horizontal: Gap(context).gap(12),

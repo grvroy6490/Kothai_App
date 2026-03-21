@@ -185,13 +185,13 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
                                         colors: [
-                                            Colors.black45,
+                                            Color.fromARGB(255, 230, 224, 236),
                                             getFigmaColor(
                                                 context,
                                                 'State Layers/On Background/Opacity-00'
                                             )
                                         ],
-                                        stops: const [0.5, 1]
+                                        stops: const [0.0, 1.0]
                                     ).createShader(bounds),
                                     child: Text(
                                         _getChallengeText(slideIndex, hiddenChallenges),

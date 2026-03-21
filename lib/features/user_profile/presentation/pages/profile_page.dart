@@ -4,17 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-import 'package:visai/di/providers/auth/auth_provider.dart';
-import 'package:visai/di/providers/navigation/navigation_provider.dart';
 import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
+import 'package:visai/domain/usecases/show_modal.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/share/presentation/pages/share_page.dart';
 import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:visai/features/user_profile/presentation/widgets/badge_display.dart';
 import 'package:visai/features/user_profile/presentation/widgets/user_badge_gallery.dart';
 import 'package:visai/features/user_profile/presentation/widgets/user_detail_widet.dart';
-import 'package:visai/features/user_profile/presentation/widgets/user_settings.dart';
-import 'package:logger/logger.dart';
+import 'package:visai/features/authentication/presentation/pages/login.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
     const ProfilePage({super.key});
@@ -24,22 +23,15 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-    final _logger = Logger();
-
     @override
     Widget build(BuildContext context) {
         // 🌐 PROVIDERS ------------------------------
         final _auth = ref.watch(authUserProvider);
-        final isLoggedIn = ref.watch(isLoggedInProvider);
         final badges = ref.read(badgeControllerProvider);
 
         // _logger.d(_auth.value?.email != null);
 
         // 📃 DECLARATION ----------------------------
-        final idx = ref.watch(selectNavProvider);
-        final nav = ref.read(selectNavProvider.notifier);
-        final currentIndex = (idx >= 0 && idx < 4) ? idx : 0;
-
         // ⭐ Widget ---------------------------------
         return Scaffold(
             backgroundColor: getFigmaColor(context, 'Schemes/Surface Container'),
@@ -67,9 +59,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ]
                             );
                         },
-                        child:  _auth.value?.email != null // TODO: update auth
+                        child:  _auth.value?.email == null // TODO: update auth
                             ?  FilledButton.icon(
-                                onPressed: (){
+                                onPressed: () async {
+                                    final user = FirebaseAuth.instance.currentUser;
+                                    if (user == null) {
+                                        await showAppModalWithChild(
+                                            context: context,
+                                            child: const LoginPage(),
+                                            heightFactor: 0.67,
+                                        );
+                                        if (!mounted) return;
+                                    }
+
+                                    final u = FirebaseAuth.instance.currentUser;
+                                    if (u == null) return;
+                                    try {
+                                        await ref
+                                            .read(scoreControllerProvider.notifier)
+                                            .syncAll();
+                                        if (!mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text('Progress synced successfully.'),
+                                                backgroundColor: Colors.green),
+                                        );
+                                    } catch (e, _) {
+                                        // Keep UI responsive; prevent crash on sync failure.
+                                        // ignore: avoid_print
+                                        print('syncAll failed: $e');
+                                        if (!mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                                content: Text('Sync failed: ${e.toString()}'),
+                                                backgroundColor: Colors.red),
+                                        );
+                                    }
                                 },
                                 label: Text('Save your progress',
                                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -97,7 +122,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                         margin: EdgeInsets.symmetric(horizontal: 10),
                                                         padding: EdgeInsets.all(5),
                                                         decoration: BoxDecoration(
-                                                            color: Colors.white,
+                                                            color: getFigmaColor(context, 'Schemes/Surface Container Lowest'),
                                                             borderRadius: BorderRadius.circular(20)
                                                         ),
                                                         child: SharePage()

@@ -8,6 +8,7 @@ import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/core/utils/time_utils.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/presentation/pages/session/reset/session_reset_page.dart';
 import 'package:visai/features/typing_session/presentation/pages/session/stop/session_stop_page.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
@@ -36,7 +37,12 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
         final practiceConfig = ref.watch(practiceConfigurationProvider);
         final metricsStateController = ref.watch(metricsStateControllerProvider);
         final typingProgress = ref.watch(typingProgressProvider);
+        final themeMode = ref.watch(themeProvider);
 
+        final isDarkMode = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        
         // 🚀 METHODS --------------------------------
         void handlePracticeStopConfirmation() async {
             final result = await Get.to(
@@ -65,13 +71,17 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
 
         // ⭐ Widget ---------------------------------
         return Scaffold(
-            backgroundColor: getFigmaColor(context, 'Schemes/Background'),
+            backgroundColor: isDarkMode
+                ? getFigmaColor(context, 'State Layers/Background/Opacity-60')
+                : getFigmaColor(context, 'Schemes/Background'),
             body: Stack(
                 children: [
-                    Opacity(opacity: 0.5,
+                    Opacity(opacity: isDarkMode ? 0.3 : 0.5,
                         child: Image.asset('assets/images/Pattern.png',
                             width: double.infinity,
-                            height: double.infinity
+                            height: double.infinity,
+                            color: isDarkMode ? Colors.white : null,
+                            colorBlendMode: isDarkMode ? BlendMode.srcIn : BlendMode.srcATop
                         )
                     ),
 

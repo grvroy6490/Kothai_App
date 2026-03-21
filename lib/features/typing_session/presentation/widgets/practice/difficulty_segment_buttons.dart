@@ -97,7 +97,7 @@ class DifficultySegmentButtons extends ConsumerWidget {
                                                 ),
                                                 child: Text('${difficulty.name[0].toUpperCase()}${difficulty.name.substring(1).toLowerCase()}',
                                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                        color: isActive ?  Colors.white70 : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                                        color: isActive ?  getFigmaColor(context, 'Schemes/Background') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                                     )
                                                 )
                                             )

@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 
@@ -21,6 +24,11 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
         // 📃 DECLARATION ----------------------------
         // 🌐 PROVIDERS ------------------------------
         final typingProgress = ref.watch(typingProgressProvider);
+        final themeMode = ref.watch(themeProvider);
+
+        final isDarkMode = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
         // 🚀 METHODS --------------------------------
         void handlePracticeReset() {
@@ -48,14 +56,14 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                     children: [
-                        Opacity(
-                            opacity: 0.5,
-                            child: Image.asset(
-                                'assets/images/Pattern.png',
-                                width: double.infinity,
-                                height: double.infinity
-                            )
-                        ),
+                        Opacity(opacity: isDarkMode ? 0.3 : 0.5,
+                        child: Image.asset('assets/images/Pattern.png',
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: isDarkMode ? Colors.white : null,
+                            colorBlendMode: isDarkMode ? BlendMode.srcIn : BlendMode.srcATop
+                        )
+                    ),
 
                         SizedBox(
                             height: double.infinity,
@@ -75,18 +83,24 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
                                                         bottom: 0,
                                                         child: Align(
                                                             alignment: Alignment.center,
-                                                            child: Container(
-                                                                constraints: BoxConstraints(
-                                                                    minWidth:
-                                                                    MediaQuery.of(context).size.width - 32
-                                                                ),
-                                                                height: Gap(context).gap(315),
-                                                                padding: EdgeInsets.all(Gap(context).gap(16)),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(16),
-                                                                    color: getFigmaColor(
-                                                                        context,
-                                                                        'State Layers/Secondary/Opacity-08'
+                                                            child: ClipRRect(
+                                                                borderRadius: BorderRadius.circular(16),
+                                                                child: BackdropFilter(
+                                                                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                                                    child: Container(
+                                                                        constraints: BoxConstraints(
+                                                                            minWidth:
+                                                                            MediaQuery.of(context).size.width - 32
+                                                                        ),
+                                                                        height: Gap(context).gap(315),
+                                                                        padding: EdgeInsets.all(Gap(context).gap(16)),
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(16),
+                                                                            color: getFigmaColor(
+                                                                                context,
+                                                                                'State Layers/Secondary/Opacity-08'
+                                                                            )
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -270,12 +284,7 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
                                                                                 ),
                                                                                 onPressed: () =>
                                                                                 handlePracticeResetDenied(),
-                                                                                child: Text(
-                                                                                    'No',
-                                                                                    style: Theme.of(
-                                                                                        context
-                                                                                    ).textTheme.bodyLarge
-                                                                                )
+                                                                                child: Text('No', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: getFigmaColor(context, 'Schemes/Surface Variant')))
                                                                             )
                                                                         )
                                                                     ]
