@@ -256,11 +256,14 @@ class _State extends ConsumerState<ChallengeStartButton>
                                                                     )
                                                                 );
                                                             },
-                                                            child: Image.asset(
-                                                                isCurrentChallengeBlocked
-                                                                    ? 'assets/images/remaining_watch_light.png'
-                                                                    : images[widget.currentIndex],
-                                                                width: 60
+                                                            child: Transform.translate(
+                                                                offset: isCurrentChallengeBlocked ? Offset(0, 0) : Offset(0, 3), // translate Y by 8 pixels (edit as needed)
+                                                                child: Image.asset(
+                                                                    isCurrentChallengeBlocked
+                                                                        ? 'assets/images/remaining_watch_light.png'
+                                                                        : images[widget.currentIndex],
+                                                                    width: 60,
+                                                                )
                                                             )
                                                         ),
                                                         SizedBox(height: isCurrentChallengeBlocked ? Gap(context).gap(3) : Gap(context).gap(23)),

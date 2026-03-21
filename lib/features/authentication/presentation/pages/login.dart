@@ -9,6 +9,7 @@ import 'package:visai/di/providers/auth/auth_provider.dart';
 import 'package:visai/domain/usecases/show_modal.dart';
 import 'package:visai/features/authentication/presentation/pages/signup.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
     const LoginPage({super.key});
@@ -729,9 +730,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                         decoration: TextDecoration.underline
                                                     ),
                                                     recognizer: TapGestureRecognizer()
-                                                        ..onTap = () {
-                                                        // TODO: Go To Terms Page
-                                                        // launchUrl(Uri.parse('https://kothai.app/terms-of-use'));
+                                                        ..onTap = () async {
+                                                        final uri = Uri.parse(
+                                                            'https://kothai.org/policies/terms-of-service',
+                                                        );
+                                                        await launchUrl(
+                                                            uri,
+                                                            mode: LaunchMode.externalApplication,
+                                                        );
                                                     }
                                                 ),
                                                 const TextSpan(text: ' and '),
@@ -742,8 +748,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                         decoration: TextDecoration.underline
                                                     ),
                                                     recognizer: TapGestureRecognizer()
-                                                        ..onTap = () => {
-                                                        // TODO: Go To Policy Page
+                                                        ..onTap = () async {
+                                                        final uri = Uri.parse(
+                                                            'https://kothai.org/policies/privacy-policy',
+                                                        );
+                                                        await launchUrl(
+                                                            uri,
+                                                            mode: LaunchMode.externalApplication,
+                                                        );
                                                     }
                                                 ),
                                                 const TextSpan(

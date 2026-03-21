@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/core/utils/time_utils.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 // import 'package:visai/core/widgets/safe_svg.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/features/typing_session/domain/enums/session_status_enum.dart';
@@ -23,8 +24,25 @@ class ChallengeFailed extends ConsumerStatefulWidget {
   ConsumerState<ChallengeFailed> createState() => _ChallengeFailedState();
 }
 
-class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
+class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
+    with SingleTickerProviderStateMixin {
   // final _logger = Logger();
+  AnimationController? _starburstRotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _starburstRotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _starburstRotationController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +53,14 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
       sessionStatusControllerProvider.notifier,
     );
     final metricsStateController = ref.read(metricsStateControllerProvider);
+
+    final themeMode = ref.watch(themeProvider);
+
+    final isDarkMode = themeMode == ThemeMode.dark ||
+    (themeMode == ThemeMode.system &&
+    MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+    final failedBg = isDarkMode ? 'assets/images/failed_bg_dark.png' : 'assets/images/failed_bg.jpg';
 
     void handleClose() async {
       // Session is already completed before navigating to this page
@@ -58,7 +84,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/failed_bg.jpg',
+              failedBg,
               fit: BoxFit.cover, // 👈 second image covers too
               filterQuality: FilterQuality.high,
             ),
@@ -68,6 +94,8 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
               opacity: 0.5,
               child: Image.asset(
                 'assets/images/Pattern.png',
+                color: isDarkMode ? Colors.white : null,
+                colorBlendMode: isDarkMode ? BlendMode.srcIn : BlendMode.srcATop,
                 fit: BoxFit.cover, // 👈 scales to cover screen
                 filterQuality: FilterQuality.high,
               ),
@@ -118,10 +146,19 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
                   clipBehavior: Clip.hardEdge,
                   alignment: Alignment.center,
                   children: [
-                    StarburstBadge(
-                      spikes: 16,
-                      starColor: Colors.white.withAlpha(170),
-                      child: const SizedBox.shrink(), // or any inner content
+                    RotationTransition(
+                      turns:
+                          _starburstRotationController ??
+                          const AlwaysStoppedAnimation<double>(0),
+                      child: StarburstBadge(
+                        spikes: 16,
+                        innerRatio: 0.89,
+                        starColor: getFigmaColor(
+                          context,
+                          'State Layers/Background/Opacity-60',
+                        ),
+                        child: const SizedBox.shrink(), // or any inner content
+                      ),
                     ),
 
                     Positioned(
@@ -246,7 +283,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
                             children: [
                               AbsorbPointer(
                                 child: CloseButton(
-                                  color: Color.fromARGB(255, 29, 26, 34),
+                                  color: getFigmaColor(context, 'Schemes/On Background'),
                                   style: ButtonStyle(
                                     iconSize: WidgetStateProperty.all(
                                       KxScale(context).sp(25),
@@ -259,7 +296,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
                                 'Close',
                                 style: Theme.of(context).textTheme.labelLarge
                                     ?.copyWith(
-                                      color: Color.fromARGB(255, 29, 26, 34),
+                                      color: getFigmaColor(context, 'Schemes/On Background'),
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -290,31 +327,37 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
   }) {
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsetsGeometry.symmetric(
-            horizontal: Gap(context).gap(16),
-            vertical: Gap(context).gap(10),
-          ),
-          decoration: BoxDecoration(
-            color: failed
-                ? getFigmaColor(context, 'State Layers/Error/Opacity-10')
-                : getFigmaColor(context, 'State Layers/Success/Opacity-10'),
-            borderRadius: BorderRadius.circular(50),
-            border: Border.all(
-              color: failed
-                  ? getFigmaColor(context, 'Schemes/Error')
-                  : getFigmaColor(context, 'State Layers/Success/Opacity-16'),
-              width: 1.15,
-              style: BorderStyle.solid,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: Gap(context).gap(16),
+                vertical: Gap(context).gap(10),
+              ),
+              decoration: BoxDecoration(
+                color: failed
+                    ? getFigmaColor(context, 'State Layers/Error/Opacity-10')
+                    : getFigmaColor(context, 'State Layers/Success/Opacity-10'),
+                borderRadius: BorderRadius.circular(50),
+                border: Border.all(
+                  color: failed
+                      ? getFigmaColor(context, 'Schemes/Error')
+                      : getFigmaColor(context, 'State Layers/Success/Opacity-16'),
+                  width: 1.15,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: failed
+                    ? getFigmaColor(context, 'Schemes/Error')
+                    : getFigmaColor(context, 'Schemes/Green'),
+                size: KxScale(context).sp(30),
+              ),
             ),
-          ),
-          child: Icon(
-            icon,
-            color: failed
-                ? getFigmaColor(context, 'Schemes/Error')
-                : Color.fromARGB(255, 0, 110, 28),
-            size: KxScale(context).sp(30),
           ),
         ),
         SizedBox(height: 10),
@@ -323,14 +366,14 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed> {
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: failed
                 ? getFigmaColor(context, 'Schemes/Error')
-                : Color.fromARGB(255, 0, 55, 10),
+                : getFigmaColor(context, 'Schemes/On Green Container'),
             fontWeight: FontWeight.w600,
           ),
         ),
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: Color.fromARGB(255, 74, 69, 77),
+            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
           ),
         ),
       ],

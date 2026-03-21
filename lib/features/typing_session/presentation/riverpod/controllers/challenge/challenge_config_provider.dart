@@ -5,9 +5,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visai/core/constants/notifications_constants.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/challenge/challenge_config.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
 
 class ChallengeConfigController extends Notifier<ChallengeConfig>{
     @override
@@ -63,8 +65,20 @@ class ChallengeConfigController extends Notifier<ChallengeConfig>{
     Future<void> toggleDarkMode() =>
     _update((s) => s.copyWith(darkMode: !s.darkMode));
 
-    Future<void> toggleNotifications() =>
-    _update((s) => s.copyWith(notificationsEnabled: !s.notificationsEnabled));
+    Future<void> toggleNotifications() async {
+        await _update((s) => s.copyWith(notificationsEnabled: !s.notificationsEnabled));
+        await LocalNotificationService.instance.syncFromPrefs(
+            ref.read(sharedPrefsServiceProvider),
+        );
+    }
+
+    /// Persists daily reminder time (local notification) and reschedules.
+    Future<void> setDailyReminderTime(int hour, int minute) async {
+        final prefs = ref.read(sharedPrefsServiceProvider);
+        await prefs.setInt(kDailyReminderHourKey, hour);
+        await prefs.setInt(kDailyReminderMinuteKey, minute);
+        await LocalNotificationService.instance.syncFromPrefs(prefs);
+    }
 
     Future<void> replace(ChallengeConfig next) => _save(next);
     Future<void> reset() => _save(const ChallengeConfig());

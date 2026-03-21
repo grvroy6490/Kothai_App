@@ -5,6 +5,7 @@ import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 import 'package:visai/enums/StreakModeEnum.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:visai/features/notifications/presentation/riverpod/in_app_notifications_controller.dart';
 import 'package:visai/features/typing_session/domain/entities/challenge/challenge_tracking_entity.dart';
 import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
 import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
@@ -224,14 +225,6 @@ class SessionController extends _$SessionController {
           // _logger.f(challenge);
         }
 
-        // Badge check for session completion (regardless of pass/fail)
-        ref
-            .read(badgeControllerProvider.notifier)
-            .onSessionComplete(
-              Get.context!,
-              accuracy: ref.read(metricsStateControllerProvider).accuracy,
-              wpm: ref.read(metricsStateControllerProvider).wpm,
-            );
       }
 
       final xp = _mode == SessionMode.practice
@@ -249,6 +242,17 @@ class SessionController extends _$SessionController {
       ref
           .read(badgeControllerProvider.notifier)
           .onXPChanged(Get.context!, xp.toInt());
+
+      // Badge check for session completion (for both practice and challenge).
+      final liveMetrics = ref.read(metricsStateControllerProvider);
+      ref
+          .read(badgeControllerProvider.notifier)
+          .onSessionComplete(
+            Get.context!,
+            accuracy: liveMetrics.accuracy,
+            wpm: liveMetrics.wpm,
+            mode: _mode,
+          );
 
       // snapshot metrics
       final m = ref.read(metricsStateControllerProvider);
@@ -278,6 +282,14 @@ class SessionController extends _$SessionController {
             amount: xp.toInt(),
             mode: _mode.toString(),
             sessionId: session.id,
+          );
+
+      await ref
+          .read(inAppNotificationsControllerProvider.notifier)
+          .tryAddSessionSummary(
+            sessionId: session.id,
+            wpm: m.wpm,
+            accuracy: m.accuracy,
           );
     } finally {
       _isCompleting = false;

@@ -141,7 +141,7 @@ class BadgeRepository {
             imagePath: "assets/badges/gold/Fortnight_Fighter.png"
         ),
         BadgeEntity(
-            id: "weekend_warrior",
+            id: "month_marathoner",
             name: "Month Marathoner",
             tier: "Gold",
             type: BadgeType.streak,

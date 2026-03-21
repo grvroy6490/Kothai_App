@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
-// import 'package:visai/di/providers/theme/theme_provider.dart';
+import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/randomize/practice_randomize_page.dart';
 import 'package:visai/features/typing_session/presentation/pages/practice/settings/practice_settings_page.dart';
 
@@ -16,7 +16,10 @@ class PracticeSettingButtons extends ConsumerWidget {
     Widget build(BuildContext context, ref) {
         // 🌐 PROVIDERS ------------------------------
         // final themeMode = ref.watch(themeProvider);
-
+        final themeMode = ref.watch(themeProvider);
+        final isDarkMode = themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
         // ⭐ Widget ---------------------------------
         return Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -29,7 +32,7 @@ class PracticeSettingButtons extends ConsumerWidget {
                             child: SvgPicture.asset(
                                 'assets/images/dice.svg',
                                 width: Gap(context).gap(18),
-                                colorFilter: ColorFilter.mode(Colors.black45, BlendMode.srcIn)
+                                colorFilter: isDarkMode ? ColorFilter.mode(Colors.white, BlendMode.srcIn) : ColorFilter.mode(Colors.black45, BlendMode.srcIn)
                             )
 
                         ),

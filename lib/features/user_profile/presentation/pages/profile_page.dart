@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
@@ -14,6 +13,7 @@ import 'package:visai/features/user_profile/presentation/widgets/user_badge_gall
 import 'package:visai/features/user_profile/presentation/widgets/user_detail_widet.dart';
 import 'package:visai/features/authentication/presentation/pages/login.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
+import 'package:visai/features/notifications/presentation/widgets/notification_bell_button.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
     const ProfilePage({super.key});
@@ -146,24 +146,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
 
                     SizedBox(width: 5),
-                    IconButton(
-                        padding: const EdgeInsets.all(11),
-                        style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all<Color>(
-                                getFigmaColor(context, 'State Layers/On Surface/Opacity-08')
-                            ),
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                            )
-                        ),
-                        onPressed: (){
-                        },
-                        icon: Icon(
-                            FontAwesomeIcons.bell,
-                            size: KxScale(context).sp(18),
-                            color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                        )
-                    ),
+                    const NotificationBellIconButton(),
                     SizedBox(width: 15)
                 ]
             ),

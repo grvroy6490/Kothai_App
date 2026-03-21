@@ -1,15 +1,13 @@
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/features/notifications/presentation/widgets/notification_bell_button.dart';
 import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/practice_stop_filled_button.dart';
 
 List<Widget> appBarActions(
     ctx,
     bool practiceStatus,
-    void Function() showNotifications,
     TextEditingController controller,
 ) {
     return [
@@ -34,23 +32,7 @@ List<Widget> appBarActions(
                 : PracticeStopFilledButton(controller: controller)
         ),
         const SizedBox(width: 5),
-        IconButton(
-            padding: const EdgeInsets.all(11),
-            style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    getFigmaColor(ctx, 'State Layers/On Surface/Opacity-08')
-                ),
-                shape: WidgetStateProperty.all(
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                )
-            ),
-            onPressed: showNotifications,
-            icon: Icon(
-                FontAwesomeIcons.bell,
-                size: KxScale(ctx).sp(18),
-                color: getFigmaColor(ctx, 'Schemes/On Surface Variant')
-            )
-        ),
+        const NotificationBellIconButton(),
         const SizedBox(width: 16)
     ];
 }

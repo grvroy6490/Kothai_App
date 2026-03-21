@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:visai/core/constants/auth_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/di/providers/auth/auth_provider.dart';
@@ -76,12 +77,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     await user.updateDisplayName(username);
                     await user.reload();
                 }
-                // TODO: Implement this
-                // final prefs = ref.read(sharedPrefsServiceProvider);
-                // await prefs.setString(kcurrent_user_uid, user.uid);
-                // if (user.email != null) {
-                //     await prefs.setString(kcurrent_user_uid, user.email!);
-                // }
             }
 
             if (!loaderDismissed) {
@@ -403,10 +398,15 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                                             decoration: TextDecoration.underline
                                                         ),
                                                         recognizer: TapGestureRecognizer()
-                                                            ..onTap = () {
-                                                            // TODO: Go To Terms Page
-                                                            // launchUrl(Uri.parse('https://kothai.app/terms-of-use'));
-                                                        }
+                                                              ..onTap = () async {
+                                                              final uri = Uri.parse(
+                                                                  'https://kothai.org/policies/terms-of-service',
+                                                              );
+                                                              await launchUrl(
+                                                                  uri,
+                                                                  mode: LaunchMode.externalApplication,
+                                                              );
+                                                          }
                                                     ),
                                                     const TextSpan(text: ' and '),
                                                     TextSpan(
@@ -415,8 +415,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                                             // color: getFigmaColor(context, 'Schemes/Primary'),
                                                             decoration: TextDecoration.underline
                                                         ),
-                                                        recognizer: TapGestureRecognizer()..onTap = () => {
-                                                            // TODO: Go To Policy Page
+                                                        recognizer: TapGestureRecognizer()..onTap = () async {
+                                                            final uri = Uri.parse(
+                                                                'https://kothai.org/policies/privacy-policy',
+                                                            );
+                                                            await launchUrl(
+                                                                uri,
+                                                                mode: LaunchMode.externalApplication,
+                                                            );
                                                         }
                                                     ),
                                                     const TextSpan(text: '. கோதை is designed for educational Tamil typing practice only.')

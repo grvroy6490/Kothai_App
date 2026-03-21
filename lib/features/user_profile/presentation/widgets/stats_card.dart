@@ -43,7 +43,7 @@ class StatCard extends StatelessWidget {
                 child: Text(
                   value,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: getFigmaColor(context, 'Schemes/On Surface'),
                   ),
                 ),

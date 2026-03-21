@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:visai/app/app.dart';
 import 'package:visai/di/providers/db/db_provider.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/services/firebase/firebase_options.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
 import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 void main() async {
@@ -17,6 +19,12 @@ void main() async {
 
   final service = SharedPrefsServiceImpl();
   await service.init();
+
+  if (!kIsWeb) {
+    await LocalNotificationService.instance.init();
+    await LocalNotificationService.instance.configureTimeZone();
+    await LocalNotificationService.instance.syncFromPrefs(service);
+  }
 
   final container = ProviderContainer(
     overrides: [sharedPrefsServiceProvider.overrideWithValue(service)],

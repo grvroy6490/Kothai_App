@@ -311,17 +311,44 @@ class _BadgeDisplayState extends ConsumerState<BadgeDisplay> {
                                                                                 )
                                                                             ),
 
-                                                                            Text(
-                                                                                '$targetDays Days',
-                                                                                style: Theme.of(context)
-                                                                                    .textTheme
-                                                                                    .bodySmall
-                                                                                    ?.copyWith(
-                                                                                        color: getFigmaColor(
-                                                                                            context,
-                                                                                            'State Layers/Secondary Fixed/Opacity-16'
+                                                                            ShaderMask(
+                                                                                shaderCallback: (bounds) =>
+                                                                                LinearGradient(
+                                                                                    colors: [
+                                                                                        Color.fromARGB(
+                                                                                            255,
+                                                                                            215,
+                                                                                            190,
+                                                                                            116
+                                                                                        ),
+                                                                                        Color.fromARGB(
+                                                                                            255,
+                                                                                            164,
+                                                                                            138,
+                                                                                            88
                                                                                         )
+                                                                                    ]
+                                                                                ).createShader(
+                                                                                        Rect.fromLTWH(
+                                                                                            -2,
+                                                                                            -2,
+                                                                                            bounds.width + 4,
+                                                                                            bounds.height + 4
+                                                                                        )
+                                                                                    ),
+                                                                                blendMode: BlendMode.srcIn,
+                                                                                child: Padding(
+                                                                                    padding: EdgeInsets.symmetric(
+                                                                                        vertical: 2
+                                                                                    ),
+                                                                                    child: Text(
+                                                                                        '$targetDays Days',
+                                                                                        style: Theme.of(context)
+                                                                                            .textTheme
+                                                                                            .bodySmall
+                                                                                            ?.copyWith(color: Colors.white)
                                                                                     )
+                                                                                )
                                                                             )
                                                                         ]
                                                                     )

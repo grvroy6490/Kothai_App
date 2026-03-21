@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,7 @@ class StarburstBadge extends StatelessWidget {
     final double size;
     final int spikes;              // number of scallops (e.g. 16–24)
     final double innerRatio;       // inner radius / outer radius (0.5–0.9)
+    final double blurSigma;
     final Widget child;
     final VoidCallback? onTap;
     final Color? starColor;
@@ -16,6 +18,7 @@ class StarburstBadge extends StatelessWidget {
         this.size = 200,
         this.spikes = 20,
         this.innerRatio = 0.78,
+        this.blurSigma = 10,
         this.onTap,
         this.starColor
     });
@@ -24,42 +27,45 @@ class StarburstBadge extends StatelessWidget {
     Widget build(BuildContext context) {
         final badge = ClipPath(
             clipper: _StarburstClipper(spikes: spikes, innerRatio: innerRatio),
-            child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                    // soft lilac gradient like your mock
-                    color: starColor ?? Color(0x1A000000),
-                    boxShadow: const [
-                        BoxShadow(
-                            color: Color(0x1A000000),
-                            blurRadius: 16,
-                            spreadRadius: 2,
-                            offset: Offset(0, 6)
-                        )
-                    ]
-                ),
-                child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                        // subtle inner vignette to sell the embossed look
-                        // IgnorePointer(
-                        //     child: Container(
-                        //         decoration: const BoxDecoration(
-                        //             gradient: RadialGradient(
-                        //                 center: Alignment(0, -0.1),
-                        //                 radius: 0.9,
-                        //                 colors: [
-                        //                     Colors.white70,
-                        //                     Colors.transparent,
-                        //                 ],
-                        //                 stops: [0.3, 1],
-                        //             ),
-                        //         ),
-                        //     ),
-                        // ),
-                        child // 👈 your center content
-                    ]
+            child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+                child: Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                        // soft lilac gradient like your mock
+                        color: starColor ?? Color(0x1A000000),
+                        boxShadow: const [
+                            BoxShadow(
+                                color: Color(0x1A000000),
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                                offset: Offset(0, 6)
+                            )
+                        ]
+                    ),
+                    child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                            // subtle inner vignette to sell the embossed look
+                            // IgnorePointer(
+                            //     child: Container(
+                            //         decoration: const BoxDecoration(
+                            //             gradient: RadialGradient(
+                            //                 center: Alignment(0, -0.1),
+                            //                 radius: 0.9,
+                            //                 colors: [
+                            //                     Colors.white70,
+                            //                     Colors.transparent,
+                            //                 ],
+                            //                 stops: [0.3, 1],
+                            //             ),
+                            //         ),
+                            //     ),
+                            // ),
+                            child // 👈 your center content
+                        ]
+                    )
                 )
             )
         );

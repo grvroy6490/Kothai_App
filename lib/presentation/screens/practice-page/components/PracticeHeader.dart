@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:visai/features/notifications/presentation/widgets/notification_bell_button.dart';
 import 'package:visai/enums/PracticeStatusEnum.dart';
 import 'package:visai/presentation/screens/practice-page/components/Level_XP_Indicator.dart';
 import 'package:visai/presentation/screens/practice-page/components/PractiseStopButton.dart';
@@ -72,24 +72,7 @@ class _PracticeHeaderState extends ConsumerState<PracticeHeader> {
                                     : const LevelXP_Indicatior(key: ValueKey('xp')),
                             ),
 
-                            // Notification Button
-                            IconButton(
-                                padding: const EdgeInsets.all(11),
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all<Color>(
-                                        getFigmaColor(context, 'State Layers/On Surface/Opacity-08'),
-                                    ),
-                                    shape: WidgetStateProperty.all(
-                                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                                    ),
-                                ),
-                                onPressed: () {},
-                                icon: Icon(
-                                    FontAwesomeIcons.bell,
-                                    size: 20,
-                                    color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                ),
-                            ),
+                            const NotificationBellIconButton(),
                         ],
                     )
 

@@ -4,9 +4,17 @@ import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart
 import 'package:visai/di/providers/toast/flutter_toast_provider.dart';
 import 'package:visai/features/badges/data/repositories_impl/badge_repository.dart';
 import 'package:visai/features/badges/presentation/pages/badge_popup.dart';
+import 'package:visai/features/notifications/presentation/riverpod/in_app_notifications_controller.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 class BadgeController extends Notifier<Set<String>> {
+    static const _kLastActiveYmdKey = 'badges.last_active_ymd';
+    static const _kAcc98SessionStreakKey = 'badges.acc98_session_streak';
+    static const _kAcc95SessionStreakKey = 'badges.acc95_session_streak';
+    static const _kPracticeSessionDateKey = 'badges.practice_session_date';
+    static const _kPracticeSessionCountKey = 'badges.practice_session_count';
+
     late final SharedPrefsService _prefs = ref.read(sharedPrefsServiceProvider);
     late final toast = ref.read(toastServiceProvider);
 
@@ -19,29 +27,33 @@ class BadgeController extends Notifier<Set<String>> {
     void _unlock(BuildContext context, String badgeId) {
         if (state.contains(badgeId)) return;
 
-        final badge = BadgeRepository.allBadges.firstWhere(
-            (b) => b.id == badgeId,
-            orElse: () => throw ""
-        );
+        final matches = BadgeRepository.allBadges.where((b) => b.id == badgeId);
+        if (matches.isEmpty) return;
+        final badge = matches.first;
 
         state = {...state, badgeId};
         _prefs.setSet("badges", state);
 
         // toast.show(badge.toastMessage);
         showBadgePopup(context, badge);
+
+        ref
+            .read(inAppNotificationsControllerProvider.notifier)
+            .tryAddBadgeUnlocked(badge);
     }
 
     // ---------- EVENT LISTENERS ----------
-    void onFirstKeystroke(BuildContext context) =>
-    _unlock(context, "first_keystroke");
+    void onFirstKeystroke(BuildContext context) {
+        _unlock(context, "first_keystroke");
+        _checkComebackAfterInactivity(context);
+        _touchLastActiveDate();
+    }
 
     void onChallengeCompleted(BuildContext context) =>
     _unlock(context, "first_challenge_completed");
 
-    void onReturnAfterInactivity(BuildContext context) => _unlock(
-        context,
-        "comeback_kid"
-    ); // TODO: Logic to check 3+ days of inactivity
+    void onReturnAfterInactivity(BuildContext context) =>
+    _checkComebackAfterInactivity(context);
 
     void onXPChanged(BuildContext context, int xp) {
         if (xp >= 100) _unlock(context, "new_learner");
@@ -64,13 +76,110 @@ class BadgeController extends Notifier<Set<String>> {
     void onSessionComplete(
         BuildContext context, {
             required double accuracy,
-            required double wpm
+            required double wpm,
+            required SessionMode mode
         }) {
         if (accuracy == 100) _unlock(context, "accuracy_hunter");
         if (wpm >= 50) _unlock(context, "speed_sprinter");
-        // if (accuracy >= 98) _unlock(context, "perfectionist"); //TODO: Need to add 5 seesions check
-        // if (accuracy >= 95) _unlock(context, "perfection_pro"); //TODO: Need to add 10 seesions check
-        // TODO: Complete 10 practice sessions within a single day
+        _checkAccuracySessionStreakBadges(context, accuracy: accuracy);
+        _checkMarathonTypist(context, mode: mode);
+        _touchLastActiveDate();
+    }
+
+    void _checkComebackAfterInactivity(BuildContext context) {
+        final lastYmd = _prefs.getString(_kLastActiveYmdKey);
+        if (lastYmd == null || lastYmd.isEmpty) return;
+
+        final lastDate = DateTime.tryParse(lastYmd);
+        if (lastDate == null) return;
+
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final last = DateTime(lastDate.year, lastDate.month, lastDate.day);
+
+        if (today.difference(last).inDays >= 3) {
+            _unlock(context, "comeback_kid");
+        }
+    }
+
+    void _checkAccuracySessionStreakBadges(
+        BuildContext context, {
+            required double accuracy
+        }
+    ) {
+        int acc98 = _prefs.getInt(_kAcc98SessionStreakKey) ?? 0;
+        int acc95 = _prefs.getInt(_kAcc95SessionStreakKey) ?? 0;
+
+        if (accuracy >= 98) {
+            acc98 += 1;
+            acc95 += 1;
+        } else if (accuracy >= 95) {
+            acc98 = 0;
+            acc95 += 1;
+        } else {
+            acc98 = 0;
+            acc95 = 0;
+        }
+
+        _prefs.setInt(_kAcc98SessionStreakKey, acc98);
+        _prefs.setInt(_kAcc95SessionStreakKey, acc95);
+
+        if (acc98 >= 5) _unlock(context, "perfectionist");
+        if (acc95 >= 10) _unlock(context, "perfection_pro");
+    }
+
+    void _checkMarathonTypist(
+        BuildContext context, {
+            required SessionMode mode
+        }
+    ) {
+        if (mode != SessionMode.practice) return;
+
+        final now = DateTime.now();
+        final todayYmd = _ymd(now);
+        final storedYmd = _prefs.getString(_kPracticeSessionDateKey);
+
+        int count;
+        if (storedYmd == todayYmd) {
+            count = (_prefs.getInt(_kPracticeSessionCountKey) ?? 0) + 1;
+        } else {
+            count = 1;
+            _prefs.setString(_kPracticeSessionDateKey, todayYmd);
+        }
+
+        _prefs.setInt(_kPracticeSessionCountKey, count);
+        if (count >= 10) {
+            _unlock(context, "marathon_typist");
+        }
+    }
+
+    void _touchLastActiveDate() {
+        _prefs.setString(_kLastActiveYmdKey, _ymd(DateTime.now()));
+    }
+
+    String _ymd(DateTime date) {
+        final d = date.toLocal();
+        final y = d.year.toString().padLeft(4, '0');
+        final m = d.month.toString().padLeft(2, '0');
+        final day = d.day.toString().padLeft(2, '0');
+        return '$y-$m-$day';
+    }
+
+    /// Debug helper: resets only progress counters used for advanced badges.
+    /// Keeps already unlocked badges intact.
+    Future<void> resetProgressCounters() async {
+        await _prefs.remove(_kLastActiveYmdKey);
+        await _prefs.remove(_kAcc98SessionStreakKey);
+        await _prefs.remove(_kAcc95SessionStreakKey);
+        await _prefs.remove(_kPracticeSessionDateKey);
+        await _prefs.remove(_kPracticeSessionCountKey);
+    }
+
+    /// Debug/admin helper: clears all unlocked badges and counters.
+    Future<void> resetAllBadgesAndProgress() async {
+        state = <String>{};
+        await _prefs.remove("badges");
+        await resetProgressCounters();
     }
 }
 

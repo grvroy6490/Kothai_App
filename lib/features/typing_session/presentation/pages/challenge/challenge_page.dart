@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
@@ -90,10 +89,6 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
             : null;
 
         // 🚀 METHODS --------------------------------
-        void showNotifications() async {
-            // final prefs = await SharedPreferences.getInstance();
-            // prefs.remove(kStreakLastYmdKey);
-        }
 
         void handleChallengePause(TextEditingController controller) {
         }
@@ -128,7 +123,6 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
                 actions: appBarActions(
                     context,
                     sessionStatus != SessionStatusEnum.start,
-                    showNotifications,
                     _controller
                 )
             ), // 👈 PRACTICE APP BAR ACTIONS

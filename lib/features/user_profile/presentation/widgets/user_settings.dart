@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/constants/notifications_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/di/providers/theme/theme_provider.dart';
+import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/challenge/challenge_config.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_config_provider.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
 
 class UserSettings extends ConsumerStatefulWidget {
     const UserSettings({super.key});
@@ -43,8 +46,8 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
             ref.read(challengeConfigurationProvider.notifier).toggleHaptics();
         }
 
-        void toggleNotifications(val){
-            ref.read(challengeConfigurationProvider.notifier).toggleNotifications();
+        Future<void> toggleNotifications(bool val) async {
+            await ref.read(challengeConfigurationProvider.notifier).toggleNotifications();
         }
 
         return Container(
@@ -182,14 +185,14 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                         padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(13), vertical: Gap(context).gap(10)),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: true ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
+                            color: configuration.notificationsEnabled ? getFigmaColor(context, 'Schemes/Surface Container Lowest') : getFigmaColor(context, 'Schemes/Surface Container High')
                         ),
                         child: Row(
                             children: [
                                 Icon(
                                     Icons.notifications,
                                     size: Gap(context).gap(23),
-                                    color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    color: configuration.notificationsEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant')
                                 ),
                                 SizedBox(width: 15),
                                 Expanded(
@@ -198,7 +201,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                         children: [
                                             Text('Notifications',
                                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    color: true ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                                    color: configuration.notificationsEnabled ? getFigmaColor(context, 'Schemes/Primary') : getFigmaColor(context, 'Schemes/On Surface Variant'),
                                                     fontWeight: FontWeight.w600
                                                 )
                                             ),
@@ -211,10 +214,103 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                     )
                                 ),
                                 SizedBox(width: 10),
-                                _switchButton(context, configuration.notificationsEnabled, toggleNotifications )
+                                _switchButton(context, configuration.notificationsEnabled, (v) {
+                                    toggleNotifications(v);
+                                })
                             ]
                         )
                     ),
+
+                    if (configuration.notificationsEnabled) ...[
+                        SizedBox(height: Gap(context).gap(10)),
+                        Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                                borderRadius: BorderRadius.circular(24),
+                                onTap: () async {
+                                    final prefs = ref.read(sharedPrefsServiceProvider);
+                                    final h = prefs.getInt(kDailyReminderHourKey) ?? 9;
+                                    final m = prefs.getInt(kDailyReminderMinuteKey) ?? 0;
+                                    final picked = await showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay(hour: h, minute: m),
+                                    );
+                                    if (picked != null && context.mounted) {
+                                        await ref
+                                            .read(challengeConfigurationProvider.notifier)
+                                            .setDailyReminderTime(picked.hour, picked.minute);
+                                        setState(() {});
+                                    }
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: Gap(context).gap(13),
+                                        vertical: Gap(context).gap(10),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(24),
+                                        color: getFigmaColor(
+                                            context,
+                                            'Schemes/Surface Container Lowest',
+                                        ),
+                                    ),
+                                    child: Row(
+                                        children: [
+                                            Icon(
+                                                Icons.schedule,
+                                                size: Gap(context).gap(23),
+                                                color: getFigmaColor(
+                                                    context,
+                                                    'Schemes/On Surface',
+                                                ),
+                                            ),
+                                            SizedBox(width: 15),
+                                            Expanded(
+                                                child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                        Text(
+                                                            'Daily reminder time',
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .titleMedium
+                                                                ?.copyWith(
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/On Surface',
+                                                                    ),
+                                                                    fontWeight: FontWeight.w600,
+                                                                ),
+                                                        ),
+                                                        Text(
+                                                            _reminderTimeLabel(context),
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodyMedium
+                                                                ?.copyWith(
+                                                                    color: getFigmaColor(
+                                                                        context,
+                                                                        'Schemes/On Surface Variant',
+                                                                    ),
+                                                                ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                            Icon(
+                                                Icons.chevron_right,
+                                                size: KxScale(context).sp(30),
+                                                color: getFigmaColor(
+                                                    context,
+                                                    'Schemes/On Surface',
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
 
                     SizedBox(height: Gap(context).gap(10)),
 
@@ -229,7 +325,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                 Icon(
                                     Icons.help,
                                     size: Gap(context).gap(23),
-                                    color: true ? getFigmaColor(context, 'Schemes/On Surface') : getFigmaColor(context, 'Schemes/On Surface Variant')
+                                    color: getFigmaColor(context, 'Schemes/On Surface')
                                 ),
                                 SizedBox(width: 15),
                                 Expanded(
@@ -260,11 +356,83 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                         )
                     ),
 
+                    if (kDebugMode) ...[
+                        SizedBox(height: Gap(context).gap(10)),
+                        Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: Gap(context).gap(13),
+                                vertical: Gap(context).gap(10),
+                            ),
+                            decoration: BoxDecoration(
+                                color: getFigmaColor(context, 'Schemes/Surface Container Lowest'),
+                                borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                    Text(
+                                        'Debug - Badge Testing',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface'),
+                                            fontWeight: FontWeight.w700,
+                                        ),
+                                    ),
+                                    SizedBox(height: Gap(context).gap(8)),
+                                    Row(
+                                        children: [
+                                            Expanded(
+                                                child: OutlinedButton(
+                                                    onPressed: () async {
+                                                        await ref
+                                                            .read(badgeControllerProvider.notifier)
+                                                            .resetProgressCounters();
+                                                        if (!context.mounted) return;
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text('Badge progress counters reset.'),
+                                                            ),
+                                                        );
+                                                    },
+                                                    child: const Text('Reset progress'),
+                                                ),
+                                            ),
+                                            SizedBox(width: Gap(context).gap(8)),
+                                            Expanded(
+                                                child: FilledButton(
+                                                    onPressed: () async {
+                                                        await ref
+                                                            .read(badgeControllerProvider.notifier)
+                                                            .resetAllBadgesAndProgress();
+                                                        if (!context.mounted) return;
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text('All badges and progress reset.'),
+                                                            ),
+                                                        );
+                                                    },
+                                                    child: const Text('Reset all badges'),
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
+                        ),
+                    ],
+
                     SizedBox(height: Gap(context).gap(20))
 
                 ]
             )
         );
+    }
+
+    String _reminderTimeLabel(BuildContext context) {
+        final prefs = ref.read(sharedPrefsServiceProvider);
+        final h = prefs.getInt(kDailyReminderHourKey) ?? 9;
+        final m = prefs.getInt(kDailyReminderMinuteKey) ?? 0;
+        return TimeOfDay(hour: h, minute: m).format(context);
     }
 
     Widget _switchButton(

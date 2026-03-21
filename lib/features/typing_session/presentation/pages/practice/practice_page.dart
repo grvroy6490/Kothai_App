@@ -70,13 +70,6 @@ class _PracticePageState extends ConsumerState<PracticePage> {
 
 
         // 🚀 METHODS ---------------------------------
-        void showNotifications() async {
-            // TODO: Show notifications / session history when implemented
-            // final records = await ref.read(sessionDaoProvider).list();
-            // for (final r in records) {
-            //   debugPrint(r.);
-            // }
-        }
 
         void handlePracticePause(TextEditingController controller) {
             sessionEngineController.pause();
@@ -112,7 +105,6 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 actions: appBarActions(
                     context,
                     practiceStatus != SessionStatusEnum.start,
-                    showNotifications,
                     controller
                 ) // 👈 PRACTICE APP BAR ACTIONS
             ),
