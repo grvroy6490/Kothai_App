@@ -24,6 +24,8 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
   Widget build(BuildContext context) {
     final typingProgress = ref.watch(typingProgressProvider);
     final sessionMode = ref.watch(sessionStatusControllerProvider).mode;
+    final sessionLabel =
+        sessionMode == SessionMode.challenge ? 'challenge' : 'practice';
     final themeMode = ref.watch(themeProvider);
 
     final isDarkMode =
@@ -172,7 +174,7 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
                                       MediaQuery.of(context).size.width * 0.8,
                                   child: Center(
                                     child: Text(
-                                      'Are you sure you want to end this practice?',
+                                      'Are you sure you want to end this $sessionLabel?',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyLarge

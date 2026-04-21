@@ -20,12 +20,13 @@ abstract class MetricsEntity with _$MetricsEntity {
     /// 0..1
     double get accuracy => typed == 0 ? 1.0 : correct / typed;
 
-    /// words per minute (5 chars = 1 word)
+    /// Gross words per minute — counts every keystroke (correct + incorrect).
+    /// Accuracy is tracked separately so errors never cause WPM to decline.
     double get wpm {
+        if (typed == 0) return 0;
         final minutes = elapsedMs / 60000.0;
         if (minutes <= 0) return 0;
-        final words = correct / 5.0;
-        return words / minutes;
+        return (typed / 5.0) / minutes;
     }
 
     /// 0..1 (how much of target finished)

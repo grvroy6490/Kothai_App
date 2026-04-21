@@ -238,11 +238,6 @@ class SessionController extends _$SessionController {
                   .accuracy,
             );
 
-      // BADGE CHECK
-      ref
-          .read(badgeControllerProvider.notifier)
-          .onXPChanged(Get.context!, xp.toInt());
-
       // Badge check for session completion (for both practice and challenge).
       final liveMetrics = ref.read(metricsStateControllerProvider);
       ref
@@ -283,6 +278,13 @@ class SessionController extends _$SessionController {
             mode: _mode.toString(),
             sessionId: session.id,
           );
+
+      // XP tier badges (new_learner, focused_student, …) use *cumulative* total XP
+      // per BadgeRepository conditions — must run after award().
+      final totalXp = ref.read(scoreControllerProvider).totalXp;
+      ref
+          .read(badgeControllerProvider.notifier)
+          .onXPChanged(Get.context!, totalXp);
 
       await ref
           .read(inAppNotificationsControllerProvider.notifier)

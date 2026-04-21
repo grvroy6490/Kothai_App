@@ -40,6 +40,8 @@ class _UserBadgeGalleryState extends ConsumerState<UserBadgeGallery> {
             .toList();
         final unlockedCount = unlockedBadges.length;
         final totalCount = allBadges.length;
+        final previewBadges = unlockedBadges.take(4).toList();
+        final remainingBadgeCount = unlockedCount - previewBadges.length;
 
         return Container(
             padding: EdgeInsets.only(
@@ -102,20 +104,37 @@ class _UserBadgeGalleryState extends ConsumerState<UserBadgeGallery> {
                                 textAlign: TextAlign.center
                             )
                         )
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: unlockedBadges.length,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: Gap(context).gap(10),
-                                mainAxisSpacing: Gap(context).gap(10),
-                                childAspectRatio: 1
-                            ),
-                            itemBuilder: (context, index) {
-                                final badge = unlockedBadges[index];
-                                return _galleryBadge(badge: badge, isUnlocked: true);
-                            }
+                        : Column(
+                            children: [
+                                GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: previewBadges.length,
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: Gap(context).gap(10),
+                                        mainAxisSpacing: Gap(context).gap(10),
+                                        mainAxisExtent: Gap(context).gap(160)
+                                    ),
+                                    itemBuilder: (context, index) {
+                                        final badge = previewBadges[index];
+                                        return _galleryBadge(badge: badge, isUnlocked: true);
+                                    }
+                                ),
+                                if (remainingBadgeCount > 0) ...[
+                                    SizedBox(height: Gap(context).gap(10)),
+                                    Text(
+                                        '+$remainingBadgeCount more badges. Tap the arrow to view all.',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: getFigmaColor(
+                                                context,
+                                                'Schemes/On Surface Variant'
+                                            )
+                                        ),
+                                        textAlign: TextAlign.center
+                                    )
+                                ]
+                            ]
                         )
                 ]
             )

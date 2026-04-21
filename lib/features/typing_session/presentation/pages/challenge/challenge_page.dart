@@ -23,6 +23,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/widgets/bottom_navigation_bar.dart';
 // import 'package:visai/features/typing_session/presentation/widgets/level_xp_indicator.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/appbar_actions.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/practice_reset_pause.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,17 +38,6 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
     final TextEditingController _controller = TextEditingController();
     final FocusNode _focusNode = FocusNode();
     late GamificationEntity? gamificationData;
-
-    @override
-    void didChangeDependencies() {
-        super.didChangeDependencies();
-        // Reset to normal mode when challenge page becomes visible
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                    ref.read(streakModeProvider.notifier).setNormalMode();
-                }
-            });
-    }
 
     @override
     void dispose() {
@@ -87,6 +77,19 @@ class _ChallengePageState extends ConsumerState<ChallengePage> {
         final sessionStatus = sessionState.mode == SessionMode.challenge
             ? sessionState.status
             : null;
+
+        // When the session is reset (Try Again / Reset), clear the physical
+        // TextEditingController so the editor's _lastLen stays in sync.
+        // Without this, the old text is still in the controller and the first
+        // keystroke of the new session sets userInputProvider to the full old
+        // text, making typingProgress jump to ≥1.0 immediately.
+        ref.listen<String>(userInputProvider, (prev, next) {
+          if ((prev?.isNotEmpty ?? false) && next.isEmpty) {
+            if (_controller.text.isNotEmpty) {
+              _controller.clear();
+            }
+          }
+        });
 
         // 🚀 METHODS --------------------------------
 

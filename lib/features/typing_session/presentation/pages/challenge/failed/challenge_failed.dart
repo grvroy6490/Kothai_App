@@ -29,9 +29,21 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
   // final _logger = Logger();
   AnimationController? _starburstRotationController;
 
+  // Snapshots captured the moment this page is created.
+  // Nothing that happens after navigation (resets, new sessions, timer ticks)
+  // can mutate these — they are the definitive end-of-session values.
+  late final Duration _finalElapsed;
+  late final double _finalWpm;
+  late final double _finalAccuracy;
+
   @override
   void initState() {
     super.initState();
+    final metrics = ref.read(metricsStateControllerProvider);
+    _finalElapsed  = ref.read(sessionControllerProvider).elapsed;
+    _finalWpm      = metrics.wpm;
+    _finalAccuracy = metrics.accuracy;
+
     _starburstRotationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -52,7 +64,6 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
     final sesstionStatusController = ref.read(
       sessionStatusControllerProvider.notifier,
     );
-    final metricsStateController = ref.read(metricsStateControllerProvider);
 
     final themeMode = ref.watch(themeProvider);
 
@@ -192,7 +203,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               context,
                               Icons.text_fields,
                               'WPM',
-                              metricsStateController.wpm.toStringAsFixed(0),
+                              _finalWpm.toStringAsFixed(0),
                             ),
                           ),
                         ),
@@ -203,7 +214,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               context,
                               Icons.my_location,
                               'Accuracy',
-                              '${(metricsStateController.accuracy * 100).toStringAsFixed(0)}%',
+                              '${(_finalAccuracy * 100).toStringAsFixed(0)}%',
                             ),
                           ),
                         ),
@@ -214,12 +225,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               context,
                               Icons.schedule,
                               'Time Taken',
-                              formatDuration(
-                                Duration(
-                                  milliseconds:
-                                      metricsStateController.elapsedMs,
-                                ),
-                              ),
+                              formatDuration(_finalElapsed),
                               failed: true,
                             ),
                           ),

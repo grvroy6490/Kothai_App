@@ -37,6 +37,7 @@ class SessionState {
 class SessionStateNotifier extends _$SessionStateNotifier {
   Timer? _timer;
   DateTime? _startTime;
+  Duration _accumulatedElapsed = Duration.zero;
   // final _logger = Logger();
 
   @override
@@ -52,16 +53,17 @@ class SessionStateNotifier extends _$SessionStateNotifier {
   /// This is useful for immediate WPM calculations on keystroke
   Duration getCurrentElapsed() {
     if (_startTime == null || !state.running) {
-      return state.elapsed;
+      return _accumulatedElapsed;
     }
     final now = DateTime.now();
-    return now.difference(_startTime!);
+    return _accumulatedElapsed + now.difference(_startTime!);
   }
 
   // 👇 Session Start Function
   void start({required String target}) {
     _timer?.cancel();
     _startTime = DateTime.now();
+    _accumulatedElapsed = Duration.zero;
     state = SessionState(
       running: true,
       target: target,
@@ -75,17 +77,10 @@ class SessionStateNotifier extends _$SessionStateNotifier {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (!state.running || _startTime == null) return;
 
-      // Calculate precise elapsed time
-      final now = DateTime.now();
-      final preciseElapsed = now.difference(_startTime!);
-
-      // Update state every second (for display purposes)
-      final secondsElapsed = preciseElapsed.inSeconds;
-      final lastSecondsElapsed = state.elapsed.inSeconds;
-
-      if (secondsElapsed != lastSecondsElapsed) {
-        state = state.copyWith(elapsed: Duration(seconds: secondsElapsed));
-      }
+      // Keep the exact elapsed time in session state so all screens
+      // read the same source before and after completion.
+      final preciseElapsed = getCurrentElapsed();
+      state = state.copyWith(elapsed: preciseElapsed);
 
       // 🔁 keep Metrics in sync with precise elapsed time for real-time WPM updates
       ref
@@ -95,13 +90,12 @@ class SessionStateNotifier extends _$SessionStateNotifier {
   }
 
   void pause() {
-    if (!state.running || _startTime == null) return;
-    // Calculate elapsed up to pause point
-    final now = DateTime.now();
-    final elapsedSinceStart = now.difference(_startTime!);
+    if (!state.running) return;
+    final elapsedSinceStart = getCurrentElapsed();
+    _accumulatedElapsed = elapsedSinceStart;
     state = state.copyWith(
       running: false,
-      elapsed: state.elapsed + elapsedSinceStart,
+      elapsed: elapsedSinceStart,
     );
     _startTime = null;
     // Update metrics with final elapsed time
@@ -117,6 +111,7 @@ class SessionStateNotifier extends _$SessionStateNotifier {
   void reset() {
     _timer?.cancel();
     _startTime = null;
+    _accumulatedElapsed = Duration.zero;
     state = const SessionState();
     // TODO: If needed to reset the metrics typed to reset WPM
     // zero metrics elapsed as well
@@ -128,6 +123,7 @@ class SessionStateNotifier extends _$SessionStateNotifier {
     final currentTarget = state.target;
     _timer?.cancel();
     _startTime = null;
+    _accumulatedElapsed = Duration.zero;
     state = const SessionState();
     // zero metrics elapsed
     ref.read(metricsStateControllerProvider.notifier).setElapsed(Duration.zero);
@@ -138,23 +134,11 @@ class SessionStateNotifier extends _$SessionStateNotifier {
   }
 
   void stop() {
-    // Calculate final elapsed time
-    if (_startTime != null && state.running) {
-      final now = DateTime.now();
-      final elapsedSinceStart = now.difference(_startTime!);
-      final finalElapsed = state.elapsed + elapsedSinceStart;
-      state = state.copyWith(running: false, elapsed: finalElapsed);
-      // push the final elapsed into Metrics
-      ref
-          .read(metricsStateControllerProvider.notifier)
-          .setElapsed(finalElapsed);
-    } else {
-      state = state.copyWith(running: false);
-      // push the final elapsed into Metrics once more (defensive)
-      ref
-          .read(metricsStateControllerProvider.notifier)
-          .setElapsed(state.elapsed);
-    }
+    final finalElapsed = getCurrentElapsed();
+    _accumulatedElapsed = finalElapsed;
+    state = state.copyWith(running: false, elapsed: finalElapsed);
+    // push the final elapsed into Metrics
+    ref.read(metricsStateControllerProvider.notifier).setElapsed(finalElapsed);
     _startTime = null;
     _timer?.cancel();
   }

@@ -1,7 +1,7 @@
 name: visai
 description: "Tamil Typing Game"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 3.0.1+2
+version: 3.0.2+4
 
 environment:
   sdk: ^3.9.2
@@ -82,7 +82,7 @@ flutter_native_splash:
   #  image: "assets/images/logo_1024.png"
   #  branding: ""
 
-  background_image_dark: "assets/images/Splash.png"
+  background_image_dark: "assets/images/Splash_Dark.png"
   #  image_dark: ""
   #  branding_dark: ""
 
@@ -90,7 +90,7 @@ flutter_native_splash:
     #color: "#F9F9F9"
     #    image: "assets/images/logo_1024.png"
     background_image: "assets/images/Splash.png"
-  #    background_image_dark: "assets/images/Dark_Mode_BG.png"
+    background_image_dark: "assets/images/Splash_Dark.png"
   # branding: ""
 
 flutter_launcher_icons:

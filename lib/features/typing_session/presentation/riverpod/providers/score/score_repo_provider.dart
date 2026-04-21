@@ -7,6 +7,8 @@ import 'package:visai/di/providers/db/db_provider.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/features/typing_session/data/repositories_impl/score/score_cloud_firestore_repo_impl.dart';
 import 'package:visai/features/typing_session/data/repositories_impl/score/score_local_db_repo_impl.dart';
+import 'package:visai/features/user_profile/data/repositories_impl/user_progress_cloud_firestore_repo_impl.dart';
+import 'package:visai/features/user_profile/domain/repositories/user_progress_cloud_repository.dart';
 import 'package:visai/features/typing_session/data/sources/local/score/score_dao.dart';
 import 'package:visai/features/typing_session/domain/repositories/score/score_local_db_repository.dart';
 import 'package:visai/features/typing_session/domain/repositories/score/score_cloud_db_repository.dart';
@@ -31,6 +33,12 @@ ScoreLocalDBRepository scoreLocalRepository(Ref ref) {
 final scoreCloudRepositoryProvider = Provider<XpCloudRepository>((ref) {
   final firestore = ref.watch(firebaseFirestoreProvider);
   return ScoreCloudFirestoreRepositoryImpl(firestore);
+});
+
+final userProgressCloudRepositoryProvider =
+    Provider<UserProgressCloudRepository>((ref) {
+  final firestore = ref.watch(firebaseFirestoreProvider);
+  return UserProgressCloudFirestoreRepositoryImpl(firestore);
 });
 
 // final xpCloudRepoProvider = Provider((ref) => _NoopXpCloudRepo());

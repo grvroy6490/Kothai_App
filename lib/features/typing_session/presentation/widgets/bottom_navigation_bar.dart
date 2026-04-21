@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/di/providers/navigation/navigation_provider.dart';
+import 'package:visai/enums/StreakModeEnum.dart';
 // import 'package:visai/domain/usecases/show_modal.dart';
 // import 'package:visai/features/authentication/presentation/pages/signup.dart';
 // import 'package:visai/features/more/presentation/pages/more/more_settings_page.dart';
@@ -37,9 +38,13 @@ class BottomNavigationBarWidget extends ConsumerWidget {
             onTap: (index) async {
                 final intendedRoute = navNotifier.routeFor(index);
 
-                // Reset to normal mode when challenge tab (index 1) is tapped
+                // Clear stale challenge-only state when opening Challenge tab — but
+                // do not wipe restore mode; user may be completing a streak restore.
                 if (index == 1) {
-                    streakProvider.setNormalMode();
+                    final streakMode = ref.read(streakModeProvider);
+                    if (streakMode.mode != StreakModeEnum.restore) {
+                        streakProvider.setNormalMode();
+                    }
                 }
 
                 // If a session is running and user is changing tabs (any index),

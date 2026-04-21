@@ -23,10 +23,10 @@ class AppInitializer extends _$AppInitializer {
             // 1️⃣ Initialize SharedPreferences (and any global singletons)
             await SharedPreferences.getInstance();
 
-            // 2️⃣ Preload content & gamification controllers
-            await ref.read(preloadPracticeInitialContentControllerProvider);
-            await ref.read(preloadChallengeInitialContentControllerProvider);
-            await ref.read(preloadGamificationControllerProvider);
+            // Wait for the preload futures themselves, not their AsyncValue wrappers.
+            await ref.read(preloadPracticeInitialContentControllerProvider.future);
+            await ref.read(preloadChallengeInitialContentControllerProvider.future);
+            await ref.read(preloadGamificationControllerProvider.future);
 
             _initialized = true;
         } catch (e, st) {

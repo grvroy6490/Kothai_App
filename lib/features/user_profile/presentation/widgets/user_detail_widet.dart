@@ -262,6 +262,35 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                                 }
                                                 break;
 
+                                            case 'RestoreProgress':
+                                                try {
+                                                    await ref
+                                                        .read(scoreControllerProvider.notifier)
+                                                        .restoreFirebaseToLocal();
+                                                    if (!mounted) return;
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                'Progress restored from your saved cloud data.',
+                                                            ),
+                                                            backgroundColor: Colors.green,
+                                                            behavior: SnackBarBehavior.floating,
+                                                        ),
+                                                    );
+                                                } catch (e) {
+                                                    if (!mounted) return;
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                            content: Text(
+                                                                'Could not restore progress: ${e.toString()}',
+                                                            ),
+                                                            backgroundColor: Colors.red,
+                                                            behavior: SnackBarBehavior.floating,
+                                                        ),
+                                                    );
+                                                }
+                                                break;
+
                                             case 'Logout':
                                                 // Sign out current user
                                                 await FirebaseAuth.instance.signOut();
@@ -292,6 +321,10 @@ class _UserDetailWidetState extends ConsumerState<UserDetailWidet> {
                                             PopupMenuItem<String>(
                                                 value: 'SaveProgress',
                                                 child: Text('Save progress')
+                                            ),
+                                            PopupMenuItem<String>(
+                                                value: 'RestoreProgress',
+                                                child: Text('Restore progress')
                                             ),
                                             PopupMenuItem<String>(
                                                 value: 'Logout',

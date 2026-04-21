@@ -267,8 +267,8 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     // 🌐 PROVIDERS ------------------------------
     final practiceConfig = ref.watch(practiceConfigurationProvider);
     final sessionStatus = ref.watch(sessionStatusControllerProvider);
-    final normalizedPara = unorm.nfc(widget.paragraph);
-    final normalizedInput = unorm.nfc(widget.userInput);
+    final normalizedPara = _normalizeTamil(widget.paragraph);
+    final normalizedInput = _normalizeTamil(widget.userInput);
 
     // 🚀 METHODS --------------------------------
     // Handle haptic / vibration based on practice config
@@ -365,6 +365,16 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     );
   }
 
+  /// Applies Tamil vowel-sign compositions before NFC.
+  /// unorm.nfc alone may not compose ே+ா→ோ / ெ+ா→ொ / ெ+ௗ→ௌ at runtime.
+  String _normalizeTamil(String text) {
+    String result = text;
+    for (final entry in Letters.diacriticCombos.entries) {
+      result = result.replaceAll(entry.key, entry.value);
+    }
+    return unorm.nfc(result);
+  }
+
   List<InlineSpan> _buildTextSpans(
     BuildContext context,
     String paragraph,
@@ -373,9 +383,10 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     SessionHandler sessionStatus,
     double cursorOpacity,
   ) {
-    // Normalize both to NFC form
-    final normalizedPara = unorm.nfc(paragraph);
-    final normalizedInput = unorm.nfc(input);
+    // Normalize both through Tamil composition + NFC so that keyboard-sent
+    // decomposed pairs (ே+ா) match paragraph-stored precomposed forms (ோ).
+    final normalizedPara = _normalizeTamil(paragraph);
+    final normalizedInput = _normalizeTamil(input);
 
     final paraClusters = normalizedPara.characters.toList();
     final inputClusters = normalizedInput.characters.toList();
@@ -505,6 +516,14 @@ class _TypingAreaState extends ConsumerState<TypingArea>
         // Generic partial multi-rune cluster: treat as "waiting" if typed is a rune-prefix
         else if (typed != null &&
             _isPartialGraphemeCluster(paraChar, typed) &&
+            inputIndex == currentInputLength - 1) {
+          isWaitingForSecondChar = true;
+          isInWaitingState = true;
+        }
+        // Left-diacritic typed as first component of a 3-key combined vowel
+        // (e.g. typed "தெ" while expected "தொ" — still waiting for ா).
+        else if (typed != null &&
+            _isLeftDiacriticWaitingForCombo(paraChar, typed) &&
             inputIndex == currentInputLength - 1) {
           isWaitingForSecondChar = true;
           isInWaitingState = true;

@@ -1,9 +1,11 @@
-
-
 import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
+import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/providers/score/score_repo_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
+import 'package:visai/features/user_profile/presentation/riverpod/providers/user_stats_provider.dart';
 // import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -114,35 +116,58 @@ class ScoreController extends _$ScoreController {
         final pendingSum = pendingLocal.fold<int>(0, (sum, e) => sum + e.amount);
 
         final firebaseTotals = await cloudRepo.fetchTotals(uid);
-        if (firebaseTotals == null) {
-            // Nothing on cloud yet; local will be uploaded by syncLocalToFirebase().
-            return;
+        if (firebaseTotals != null) {
+            final mergedTotalXp = firebaseTotals.totalXp + pendingSum;
+
+            final gamification = ref.read(gamificationDataControllerProvider);
+            final levels = gamification?.levels;
+            if (levels == null || levels.isEmpty) {
+                await localRepo.saveScore(
+                    firebaseTotals.copyWith(totalXp: mergedTotalXp),
+                );
+            } else {
+                final mergedTotals = _computeTotalsFromTotalXp(mergedTotalXp, levels);
+                await localRepo.saveScore(mergedTotals);
+            }
+
+            final firebaseEntries = await cloudRepo.fetchEntries(uid);
+            final restoredIds = <String>[];
+
+            for (final entry in firebaseEntries) {
+                restoredIds.add(entry.id);
+                await localRepo.addEntryToDB(entry.copyWith(synced: true));
+            }
+            await localRepo.markSynced(restoredIds);
         }
 
-        final mergedTotalXp = firebaseTotals.totalXp + pendingSum;
-
-        final gamification = ref.read(gamificationDataControllerProvider);
-        final levels = gamification?.levels;
-        if (levels == null || levels.isEmpty) {
-            // Fallback: only update totalXp; xpIntoLevel/xpNextLevel may be recomputed later.
-            await localRepo.saveScore(firebaseTotals.copyWith(totalXp: mergedTotalXp));
-        } else {
-            final mergedTotals = _computeTotalsFromTotalXp(mergedTotalXp, levels);
-            await localRepo.saveScore(mergedTotals);
-        }
-
-        // Restore all cloud entries as synced=true.
-        final firebaseEntries = await cloudRepo.fetchEntries(uid);
-        final restoredIds = <String>[];
-
-        for (final entry in firebaseEntries) {
-            restoredIds.add(entry.id);
-            await localRepo.addEntryToDB(entry.copyWith(synced: true));
-        }
-        await localRepo.markSynced(restoredIds);
-
-        // Recompute state from local totals.
+        await _restoreProfileFromCloud(uid);
+        ref.invalidate(userStatsProvider);
         await _load();
+    }
+
+    Future<void> _restoreProfileFromCloud(String uid) async {
+        final progress = ref.read(userProgressCloudRepositoryProvider);
+        final cloudBadges = await progress.fetchBadges(uid);
+        if (cloudBadges != null && cloudBadges.isNotEmpty) {
+            ref.read(badgeControllerProvider.notifier).mergeFromCloud(cloudBadges);
+        }
+
+        final cloudSessions = await progress.fetchSessions(uid);
+        final sessionRepo = ref.read(sessionLocalRepositoryProvider);
+        final localSessions = await sessionRepo.list();
+
+        if (cloudSessions.isEmpty) return;
+
+        final byId = <String, SessionEntity>{};
+        for (final s in cloudSessions) {
+            byId[s.id] = s;
+        }
+        for (final s in localSessions) {
+            byId[s.id] = s;
+        }
+        final merged = byId.values.toList()
+          ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
+        await sessionRepo.replaceAllSessions(merged);
     }
 
     /// Upload local pending entries + totals to Firebase.
@@ -158,10 +183,21 @@ class ScoreController extends _$ScoreController {
         await cloudRepo.uploadTotals(uid, state);
 
         final pending = await localRepo.listEntriesFromDB(onlyPending: true);
-        if (pending.isEmpty) return;
+        if (pending.isNotEmpty) {
+            await cloudRepo.uploadEntries(uid, pending);
+            await localRepo.markSynced(pending.map((e) => e.id).toList());
+        }
 
-        await cloudRepo.uploadEntries(uid, pending);
-        await localRepo.markSynced(pending.map((e) => e.id).toList());
+        await _syncProfileArtifactsToCloud(uid);
+        ref.invalidate(userStatsProvider);
+    }
+
+    Future<void> _syncProfileArtifactsToCloud(String uid) async {
+        final progress = ref.read(userProgressCloudRepositoryProvider);
+        final badges = ref.read(badgeControllerProvider);
+        await progress.uploadBadges(uid, badges);
+        final sessions = await ref.read(sessionLocalRepositoryProvider).list();
+        await progress.uploadSessions(uid, sessions);
     }
 
     /// Full sync: restore cloud -> local (merge pending local), then upload local -> cloud.

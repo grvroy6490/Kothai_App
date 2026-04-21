@@ -236,10 +236,11 @@ class _PracticeSettingsPageState extends ConsumerState<PracticeSettingsPage> {
                                                 ),
                                                 SizedBox(width: Gap(context).gap(20)),
                                                 Expanded(
-                                                    child: SegmentedButtons(
+                                                    child: SegmentedButtons<DifficultyEnum>(
                                                         selected: configuration.difficulty,
                                                         iterable: DifficultyEnum.values,
-                                                        onSelected: (option) => updateDifficulty(option)
+                                                        onSelected: (option) => updateDifficulty(option),
+                                                        labelFor: (d) => d.segmentLabel
                                                     )
                                                 )
                                             ]

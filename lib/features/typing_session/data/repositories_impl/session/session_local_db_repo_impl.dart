@@ -22,6 +22,14 @@ class SessionLocalRepositoryImpl implements SessionLocalDBRepository {
     @override
     Future<List<SessionEntity>> list({int? limit}) => dao.list(limit: limit);
 
+    @override
+    Future<void> replaceAllSessions(List<SessionEntity> sessions) async {
+        await dao.deleteAll();
+        for (final s in sessions) {
+            await dao.insert(s);
+        }
+    }
+
     // @override
     // Future<void> purgeOldestIfOverCap(int cap) async {
     //     final c = await dao.count();

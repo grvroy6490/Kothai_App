@@ -1,7 +1,13 @@
-
-
-enum DifficultyEnum{
+enum DifficultyEnum {
   easy,
   medium,
-  hard
+  hard,
+}
+
+extension DifficultyEnumSegmentLabel on DifficultyEnum {
+  String get segmentLabel => switch (this) {
+        DifficultyEnum.easy => 'Word',
+        DifficultyEnum.medium => 'Sentence',
+        DifficultyEnum.hard => 'Para',
+      };
 }

@@ -14,9 +14,17 @@
 
 # Gson (used by Firebase)
 -keepattributes Signature
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
 -keepattributes *Annotation*
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.** { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+
+# flutter_local_notifications uses Gson TypeToken internally for scheduled
+# notifications, so keep its model/plugin classes intact in release builds.
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+-dontwarn com.dexterous.flutterlocalnotifications.**
 
 # Keep native methods
 -keepclasseswithmembernames class * {

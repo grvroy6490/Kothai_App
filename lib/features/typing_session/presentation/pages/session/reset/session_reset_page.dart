@@ -7,7 +7,9 @@ import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/di/providers/theme/theme_provider.dart';
+import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 
 class SessionResetPage extends ConsumerStatefulWidget {
@@ -25,6 +27,9 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
     // 🌐 PROVIDERS ------------------------------
     final typingProgress = ref.watch(typingProgressProvider);
     final themeMode = ref.watch(themeProvider);
+    final sessionMode = ref.watch(sessionStatusControllerProvider).mode;
+    final sessionLabel =
+        sessionMode == SessionMode.challenge ? 'challenge' : 'practice';
 
     final isDarkMode =
         themeMode == ThemeMode.dark ||
@@ -32,10 +37,18 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
     // 🚀 METHODS --------------------------------
-    void handlePracticeReset() {
-      ref.read(sessionControllerProvider.notifier).restart();
+    Future<void> handlePracticeReset() async {
+      final sessionController = ref.read(sessionControllerProvider.notifier);
       var arguments = Get.arguments;
+
       widget.controller.clear();
+
+      if (sessionMode == SessionMode.challenge) {
+        sessionController.reset();
+        await sessionController.start();
+      } else {
+        sessionController.restart();
+      }
 
       if (arguments == kReset) {
         Get.back();
@@ -158,7 +171,7 @@ class _SessionResetPageState extends ConsumerState<SessionResetPage> {
                                       MediaQuery.of(context).size.width * 0.8,
                                   child: Center(
                                     child: Text(
-                                      'Are you sure you want to reset your progress in this practice?',
+                                      'Are you sure you want to reset your progress in this $sessionLabel?',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyLarge

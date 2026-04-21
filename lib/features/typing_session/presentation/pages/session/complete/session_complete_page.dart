@@ -39,9 +39,21 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
   AnimationController? _xpPulseController;
   Animation<double>? _xpPulseAnimation;
 
+  // Snapshots captured the moment this page is created.
+  // Nothing that happens after navigation (resets, new sessions, timer ticks)
+  // can mutate these — they are the definitive end-of-session values.
+  late final Duration _finalElapsed;
+  late final double _finalWpm;
+  late final double _finalAccuracy;
+
   @override
   void initState() {
     super.initState();
+    final metrics = ref.read(metricsStateControllerProvider);
+    _finalElapsed  = ref.read(sessionControllerProvider).elapsed;
+    _finalWpm      = metrics.wpm;
+    _finalAccuracy = metrics.accuracy;
+
     _starburstRotationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -84,7 +96,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
       sessionStatusControllerProvider.notifier,
     );
     final sesstionStatusWatcher = ref.watch(sessionStatusControllerProvider);
-    final metricsStateController = ref.watch(metricsStateControllerProvider);
+    final metricsStateController = ref.read(metricsStateControllerProvider);
     final isLoggedIn = ref.watch(isLoggedInProvider);
     final gamificationDataController = ref.watch(
       gamificationDataControllerProvider,
@@ -377,7 +389,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
                               context,
                               Icons.text_fields,
                               'WPM',
-                              metricsStateController.wpm.toStringAsFixed(0),
+                              _finalWpm.toStringAsFixed(0),
                             ),
                           ),
                         ),
@@ -388,7 +400,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
                               context,
                               Icons.my_location,
                               'Accuracy',
-                              '${(metricsStateController.accuracy * 100).toStringAsFixed(0)}%',
+                              '${(_finalAccuracy * 100).toStringAsFixed(0)}%',
                             ),
                           ),
                         ),
@@ -399,12 +411,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
                               context,
                               Icons.schedule,
                               'Time Taken',
-                              formatDuration(
-                                Duration(
-                                  milliseconds:
-                                      metricsStateController.elapsedMs,
-                                ),
-                              ),
+                              formatDuration(_finalElapsed),
                             ),
                           ),
                         ),

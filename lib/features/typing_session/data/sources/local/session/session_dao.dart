@@ -63,4 +63,8 @@ class SessionDao {
         await db.rawDelete('DELETE FROM sessions WHERE id IN ('
             'SELECT id FROM sessions ORDER BY endedAt ASC LIMIT ?)', [n]);
     }
+
+    Future<void> deleteAll() async {
+        await db.delete('sessions');
+    }
 }

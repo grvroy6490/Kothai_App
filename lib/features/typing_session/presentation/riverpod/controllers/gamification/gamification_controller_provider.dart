@@ -23,7 +23,7 @@ class GamificationDataController extends _$GamificationDataController {
 
 @riverpod
 Future<void> preloadGamificationController(Ref ref) async {
-    ref.watch(gamificationRepositoryProvider).preloadGamificationData();
+    await ref.read(gamificationRepositoryProvider).preloadGamificationData();
 }
 
 

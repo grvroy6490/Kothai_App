@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -271,13 +272,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             );
 
             return;
-        } catch (e) {
+        } catch (e, stackTrace) {
+            if (kDebugMode) {
+                debugPrint('Google sign-in error: $e (${e.runtimeType})');
+                debugPrint('$stackTrace');
+            }
             if (mounted) {
                 if (!loaderDismissed) {
                     Navigator.of(context, rootNavigator: true).pop();
                     loaderDismissed = true;
                 }
-                String? snack;
+                String snack = 'Unexpected error. Please try again.';
                 if (e is FirebaseAuthException) {
                     switch (e.code) {
                         case 'account-exists-with-different-credential':
@@ -293,6 +298,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         case 'auth-state-sync':
                             snack = 'Authentication error. Please try again.';
                             break;
+                        case 'google-android-config':
+                            snack =
+                            'Google Sign-In: add this app build\'s SHA-1 in Firebase Console (release keystore for release APKs), then rebuild.';
+                            break;
                         default:
                         // Check if the error message contains network-related keywords
                         final errorMsg = e.message?.toLowerCase() ?? '';
@@ -306,6 +315,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             snack = e.message ?? 'Google sign in failed. Please try again.';
                         }
                     }
+                } else if (e is FirebaseException) {
+                    // e.g. Firestore write after successful Google auth
+                    snack = e.code == 'permission-denied'
+                        ? 'Signed in, but saving your profile was blocked. Check Firestore security rules.'
+                        : 'Could not finish sign-in (${e.code}). Please try again.';
+                } else if (e is PlatformException) {
+                    final m = '${e.message ?? ''} ${e.code}'.toLowerCase();
+                    if ((m.contains('10') && m.contains('apiexception')) ||
+                        m.contains('developer_error')) {
+                        snack =
+                            'Google Sign-In: register this build in Firebase (SHA-1 for the keystore you used).';
+                    } else {
+                        snack = e.message ?? 'Google sign in failed. Please try again.';
+                    }
                 } else {
                     // Handle non-Firebase exceptions
                     final errorStr = e.toString().toLowerCase();
@@ -314,9 +337,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         errorStr.contains('timeout') ||
                         errorStr.contains('connection')) {
                         snack =
-                        'Network error. Please check your internet connection and try again.';
+                            'Network error. Please check your internet connection and try again.';
                     } else {
-                        snack = 'Unexpected error. Please try again.';
+                        snack = kDebugMode
+                            ? 'Unexpected: $e'
+                            : 'Unexpected error. Please try again.';
                     }
                 }
 
@@ -760,7 +785,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                 ),
                                                 const TextSpan(
                                                     text:
-                                                    '. கோதை is designed for educational Tamil typing practice only.'
+                                                    '. விசை is designed for educational Tamil typing practice only.'
                                                 )
                                             ]
                                         )

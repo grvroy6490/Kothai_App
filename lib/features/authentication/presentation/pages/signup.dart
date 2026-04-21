@@ -425,7 +425,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                                             );
                                                         }
                                                     ),
-                                                    const TextSpan(text: '. கோதை is designed for educational Tamil typing practice only.')
+                                                    const TextSpan(text: '. விசை is designed for educational Tamil typing practice only.')
                                                 ]
                                             )
                                         ),

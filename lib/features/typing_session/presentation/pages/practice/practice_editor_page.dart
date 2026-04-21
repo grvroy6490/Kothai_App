@@ -14,6 +14,7 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 // import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/practice/practice_config_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_controller_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_state_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
@@ -21,7 +22,11 @@ import 'package:visai/features/typing_session/presentation/widgets/animated_cont
 import 'package:visai/features/typing_session/presentation/widgets/main_metrics_bar.dart';
 import 'package:visai/features/typing_session/presentation/widgets/practice/practice_start_button.dart';
 import 'package:visai/features/typing_session/presentation/widgets/typing_progress.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:logger/logger.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 
 class PracticeEditorPage extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -43,6 +48,11 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
   final _logger = Logger();
   late String paragraph;
   int _lastLen = 0;
+  // Mutex: only one async listener invocation runs at a time.
+  bool _processingKeys = false;
+  // Pending left-diacritic awaiting its right-diacritic to form a composed vowel.
+  // e.g. ெ (U+0BC6) waiting for ா (U+0BBE) to compose into ொ (U+0BCA).
+  String? _compositionPending;
   late VoidCallback _controllerListener;
   late DifficultyCriteriaEntity? difficultyCriteria;
   AudioPlayer? _fallbackAudioPlayer;
@@ -59,39 +69,198 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
     _initializeFallbackAudio();
 
     _controllerListener = () async {
-      if (!mounted) return;
+      // Only one async processing chain runs at a time.
+      // If another invocation fires while we are inside an await, it exits
+      // here. The outer while-loop below will drain any characters that
+      // arrived during that await, so nothing is lost.
+      if (!mounted || _processingKeys) return;
+      _processingKeys = true;
 
-      final textNow = widget.controller.text;
+      if (kDebugMode) {
+        final preview = paragraph.length > 20 ? paragraph.substring(0, 20) : paragraph;
+        _logger.d('[LISTEN] _lastLen=$_lastLen ctrl.text.len=${widget.controller.text.length} para="${preview.replaceAll('\n', '↵')}"');
+      }
 
-      // 1) keep your provider in sync
-      ref.read(userInputProvider.notifier).set(textNow);
+      try {
+        final ctrl = ref.read(sessionControllerProvider.notifier);
 
-      // 2) compute deltas and call onKey for new chars
-      final ctrl = ref.read(sessionControllerProvider.notifier);
-      final progress = ref.read(typingProgressProvider);
+        while (mounted) {
+          final textNow = widget.controller.text;
+          final from = _lastLen;
+          final to = textNow.length;
 
-      // If user pasted multiple chars, process each new char
-      if (textNow.length > _lastLen) {
-        for (int i = _lastLen; i < textNow.length; i++) {
-          final received = textNow[i];
-          // Guard against paragraph shorter than input
-          final expected = (i < paragraph.length) ? paragraph[i] : null;
-          final correct = expected != null && received == expected;
-          await ctrl.onKey(correct: correct);
+          if (to < from) {
+            // Text was deleted. Two cases:
+            // (a) Normal backspace: roll back cursor/metrics for each deleted char.
+            // (b) External reset: the controller was cleared programmatically
+            //     (e.g. Try Again / Reset). Just sync _lastLen — the session
+            //     state was already reset via Riverpod providers.
+            final sessionRunning =
+                ref.read(sessionStateNotifierProvider).running;
+            final deletedCount = from - to;
+            _lastLen = to;
+            _compositionPending = null;
+            ref.read(userInputProvider.notifier).set(textNow);
+            if (sessionRunning) {
+              for (int d = 0; d < deletedCount; d++) {
+                ctrl.onBackspace();
+              }
+            }
+            break;
+          }
+          if (to == from) {
+            // The keyboard may have done an in-place substitution with the same
+            // text length — e.g. replacing "தெ" (U+0BA4+U+0BC6) with "தொ"
+            // (U+0BA4+U+0BCA) when ா is pressed after a held left-diacritic.
+            // Length didn't change, so the normal append path never runs, but
+            // our pending composition must still be resolved.
+            if (_compositionPending != null && to > 0) {
+              const composedVowelForms = {'\u0BCA', '\u0BCB', '\u0BCC'};
+              final substituted = textNow[to - 1];
+              if (composedVowelForms.contains(substituted)) {
+                final nfcPara =
+                    unorm.nfc(_applyTamilCompositions(paragraph));
+                final expectedCursor =
+                    ref.read(sessionStateNotifierProvider).cursor;
+                final expected = (expectedCursor < nfcPara.length)
+                    ? nfcPara[expectedCursor]
+                    : null;
+                final correct = expected != null && substituted == expected;
+                _compositionPending = null;
+                ref.read(userInputProvider.notifier).set(textNow);
+                await ctrl.onKey(correct: correct);
+              }
+            }
+            break;
+          }
 
-          // Play keypress sound if enabled
-          _playKeypressSoundIfEnabled();
+          _lastLen = to;
+          ref.read(userInputProvider.notifier).set(textNow);
+
+          // Normalize the paragraph: first apply Tamil-specific vowel compositions
+          // (ே+ா→ோ, ெ+ா→ொ, ெ+ௗ→ௌ) then general NFC.  unorm.nfc alone does
+          // not reliably compose these Tamil pairs in the Dart runtime.
+          final nfcPara = unorm.nfc(_applyTamilCompositions(paragraph));
+
+          // Read cursor AFTER any previous onKey has had a chance to
+          // call advanceCursor — safe because we are the only async invocation.
+          var expectedCursor = ref.read(sessionStateNotifierProvider).cursor;
+
+          int i = from;
+          while (i < to) {
+            if (!mounted) break;
+            final received = textNow[i];
+
+            // ── Tamil vowel composition ────────────────────────────────────────
+            // The keyboard sends ொ/ோ/ௌ as two decomposed code units
+            // (e.g. ெ U+0BC6 + ா U+0BBE), but the paragraph stores them as a
+            // single precomposed code point (ொ U+0BCA). We compose them here
+            // before comparing so the match works correctly.
+            String charToCompare;
+            int codUnitsConsumed = 1;
+
+            // Composed vowel signs that are formed from two decomposed code units.
+            // The keyboard sends these as two separate code units (e.g. ெ+ா for ொ),
+            // but the paragraph stores them as the single precomposed NFC code point.
+            const composedVowelForms = {'\u0BCA', '\u0BCB', '\u0BCC'}; // ொ, ோ, ௌ
+            const leftDiacritics = {'\u0BC6', '\u0BC7'}; // ெ, ே
+
+            if (_compositionPending != null) {
+              // Previous invocation left a pending left-diacritic; try to
+              // complete the composition with the current code unit.
+              final pair = _compositionPending! + received;
+              _compositionPending = null;
+              // Use Letters.diacriticCombos as the authoritative Tamil composition
+              // table — more reliable than unorm.nfc for these specific pairs.
+              final composed = Letters.diacriticCombos[pair] ?? unorm.nfc(pair);
+              if (composed.length == 1) {
+                charToCompare = composed;
+              } else {
+                // No composition — emit an error for the pending diacritic
+                // then fall through to process `received` normally below.
+                await ctrl.onKey(correct: false);
+                charToCompare = received;
+              }
+            } else {
+              // Only defer as a composition-start when the EXPECTED character is
+              // a composed vowel form (ொ/ோ/ௌ). When ெ/ே is itself the expected
+              // character (e.g. in "செ"), compare it directly — don't defer.
+              final expectedAtCursor = (expectedCursor < nfcPara.length)
+                  ? nfcPara[expectedCursor]
+                  : null;
+              final needsComposition = leftDiacritics.contains(received) &&
+                  expectedAtCursor != null &&
+                  composedVowelForms.contains(expectedAtCursor);
+
+              if (needsComposition) {
+                if (i + 1 < to) {
+                  // Look ahead in the same batch.
+                  final next = textNow[i + 1];
+                  final pair = received + next;
+                  final composed =
+                      Letters.diacriticCombos[pair] ?? unorm.nfc(pair);
+                  if (composed.length == 1) {
+                    charToCompare = composed;
+                    codUnitsConsumed = 2; // consume both code units
+                  } else {
+                    charToCompare = received;
+                  }
+                } else {
+                  // Next code unit arrives in the next invocation — defer.
+                  _compositionPending = received;
+                  i++;
+                  continue;
+                }
+              } else {
+                charToCompare = received;
+              }
+            }
+
+            final expected = (expectedCursor < nfcPara.length)
+                ? nfcPara[expectedCursor]
+                : null;
+            final correct = expected != null && charToCompare == expected;
+            await ctrl.onKey(correct: correct);
+            if (correct) expectedCursor++;
+
+            if (kDebugMode) {
+              final m = ref.read(metricsStateControllerProvider);
+              _logger.d(
+                '[KEY i=$i] '
+                'received="${charToCompare}"(U+${charToCompare.codeUnitAt(0).toRadixString(16).toUpperCase()}) '
+                'expected="${expected ?? "∅"}"'
+                '${expected != null ? "(U+${expected.codeUnitAt(0).toRadixString(16).toUpperCase()})" : ""} '
+                'correct=$correct | '
+                'typed=${m.typed} correct=${m.correct} errors=${m.errors} '
+                'accuracy=${(m.accuracy * 100).toStringAsFixed(1)}% '
+                'wpm=${m.wpm.toStringAsFixed(1)} '
+                'cursor=$expectedCursor',
+              );
+            }
+
+            _playKeypressSoundIfEnabled();
+            i += codUnitsConsumed;
+          }
+
+          // If more characters arrived during the awaits above, the while
+          // loop will process them in the next iteration.
+          if (widget.controller.text.length <= _lastLen) break;
         }
-      }
-      // If user deleted (backspace), we won't alter metrics here.
-      // (If you want to support take-backs: add a ctrl.onBackspace() that adjusts metrics.)
 
-      if (progress >= 1.0) {
-        widget.controller.clear();
+        if (mounted && ref.read(typingProgressProvider) >= 1.0) {
+          // Reset _lastLen BEFORE clear() so that the clear-triggered listener
+          // invocation (rejected by the mutex) leaves _lastLen at 0.  Without
+          // this, the next session's first character is skipped because
+          // _lastLen still holds the old session's length.
+          _lastLen = 0;
+          _compositionPending = null;
+          widget.controller.clear();
+        }
+      } finally {
+        _processingKeys = false;
       }
 
-      _lastLen = textNow.length;
-      setState(() {}); // if you still need a local rebuild
+      if (mounted) setState(() {});
     };
 
     widget.controller.addListener(_controllerListener);
@@ -138,6 +307,17 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
   }
 
   // Method to play keypress sound if enabled (using fallback sound primarily)
+  /// Applies Tamil vowel-sign compositions that unorm.nfc may miss at runtime.
+  /// Replaces decomposed keyboard pairs (ே+ா, ெ+ா, ெ+ௗ) with their
+  /// precomposed equivalents (ோ, ொ, ௌ) before any further NFC pass.
+  String _applyTamilCompositions(String text) {
+    String result = text;
+    for (final entry in Letters.diacriticCombos.entries) {
+      result = result.replaceAll(entry.key, entry.value);
+    }
+    return result;
+  }
+
   void _playKeypressSoundIfEnabled() {
     final config = ref.read(practiceConfigurationProvider);
     if (!config.soundEnabled) return;
@@ -302,8 +482,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                   Positioned.fill(
                     top: MediaQuery.of(context).size.height * 1.1,
                     child: IgnorePointer(
-                      ignoring:
-                          true, // <- key change: don't intercept taps/scrolls
+                      ignoring: false, // <- key change: don't intercept taps/scrolls
                       child: Opacity(
                         opacity: 0,
                         child: TextFormField(

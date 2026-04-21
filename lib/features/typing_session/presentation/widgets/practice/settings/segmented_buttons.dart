@@ -8,12 +8,14 @@ class SegmentedButtons<T extends Enum> extends StatelessWidget {
     final T selected;
     final List<T> iterable;
     final void Function(T) onSelected;
+    final String Function(T)? labelFor;
 
     const SegmentedButtons({
-        super.key, 
-        required this.selected, 
-        required this.iterable, 
-        required this.onSelected
+        super.key,
+        required this.selected,
+        required this.iterable,
+        required this.onSelected,
+        this.labelFor,
     });
 
     @override
@@ -29,6 +31,9 @@ class SegmentedButtons<T extends Enum> extends StatelessWidget {
             child: Row(
                 children: iterable.map((property)  {
                         final isActive = selected == property;
+                        final label = labelFor != null
+                            ? labelFor!(property)
+                            : '${property.name[0].toUpperCase()}${property.name.substring(1).toLowerCase()}';
 
                         return Expanded(
                             child: ElevatedButton(
@@ -61,7 +66,7 @@ class SegmentedButtons<T extends Enum> extends StatelessWidget {
                                     )
 
                                 ),
-                                child: Text('${property.name[0].toUpperCase()}${property.name.substring(1).toLowerCase()}',
+                                child: Text(label,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: isActive ? getFigmaColor(context, 'Schemes/On Surface Variant') : getFigmaColor(context, 'Schemes/On Surface Variant').withAlpha(127)
                                     )

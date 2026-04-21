@@ -9,12 +9,12 @@ part 'preload_initial_content_controller_provider.g.dart';
 
 @riverpod
 Future<void> preloadPracticeInitialContentController(Ref ref) async {
-    await ref.watch(practiceContentRepositoryProvider).preloadInitialTexts();
+    await ref.read(practiceContentRepositoryProvider).preloadInitialTexts();
 }
 
 
 
 @riverpod
 Future<void> preloadChallengeInitialContentController(Ref ref) async {
-  await ref.watch(challengeContentRepositoryProvider).preloadInitialTexts();
+  await ref.read(challengeContentRepositoryProvider).preloadInitialTexts();
 }

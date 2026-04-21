@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 /// iOS OAuth client ID (reversed URL scheme in Info.plist is derived from this).
@@ -365,6 +366,20 @@ class AuthService {
         }
         // User cancelled - return null instead of throwing
         return null;
+      }
+
+      // Android: ApiException 10 / DEVELOPER_ERROR — app SHA not registered in Firebase
+      if (e is PlatformException) {
+        final combined =
+            '${e.message ?? ''} ${e.details ?? ''} ${e.code}'.toLowerCase();
+        if ((combined.contains('10') && combined.contains('apiexception')) ||
+            combined.contains('developer_error')) {
+          throw FirebaseAuthException(
+            code: 'google-android-config',
+            message:
+                'Google Sign-In is not set up for this build. In Firebase Console, add the SHA-1 (and SHA-256) for the keystore used to build this APK—use the release keystore fingerprint for release installs—then download the updated google-services.json and rebuild.',
+          );
+        }
       }
 
       // For other errors, throw a FirebaseAuthException

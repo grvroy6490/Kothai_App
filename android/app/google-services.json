@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "834995515353-0thho9jth8avfaqpom5klom9bgv7opnh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.dckap.visai",
+            "certificate_hash": "b739719d26ed9c7f5c8d8a0aa3d610b321928c6d"
+          }
+        },
+        {
           "client_id": "834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "834995515353-4vv36b5krrkd219ofnj618m9277bmiva.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.dckap.visai"
+              }
             }
           ]
         }

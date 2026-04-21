@@ -31,10 +31,13 @@ class SplashPage extends StatelessWidget {
                                     child: SizedBox(
                                         width: double.infinity,
                                         child: Center(
-                                            child: Image.asset(
-                                                'assets/images/logo.png',
-                                                fit: BoxFit.contain,
-                                                width: 100
+                                            child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(12),
+                                                child: Image.asset(
+                                                    'assets/images/logo.png',
+                                                    fit: BoxFit.contain,
+                                                    width: 100
+                                                )
                                             )
                                         )
                                     )
@@ -50,7 +53,7 @@ class SplashPage extends StatelessWidget {
                                 Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 50),
                                     child: Text(
-                                        "விசாய் பயன்பாட்டிற்கு வருக. நீங்கள் எழுதும்போது தட்டச்சு செய்யலாம்.",
+                                        "விசை செயலியில் உங்களை வரவேற்கிறோம். விரல்களுக்குப் பயிற்சி. தமிழுக்குத் தேர்ச்சி.",
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                         ),
@@ -66,7 +69,7 @@ class SplashPage extends StatelessWidget {
                                 ),
                                 Padding(padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(20)),
                                     child: Text(
-                                        "உங்கள் தட்டச்சு பயணத்தை தயாரிக்கிறோம்...",
+                                        "தட்டச்சு களம் தயாராகிறது...",
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                         ),

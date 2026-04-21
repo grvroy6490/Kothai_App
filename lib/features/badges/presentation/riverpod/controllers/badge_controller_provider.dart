@@ -153,16 +153,26 @@ class BadgeController extends Notifier<Set<String>> {
   void onChallengeCompleted(BuildContext context) =>
       _unlock(context, "first_challenge_completed");
 
+  /// Merges cloud badge ids with local (union). Does not show popups.
+  void mergeFromCloud(Set<String> cloudBadgeIds) {
+    if (cloudBadgeIds.isEmpty) return;
+    final merged = {...state, ...cloudBadgeIds};
+    if (merged.length == state.length) return;
+    state = merged;
+    _prefs.setSet('badges', state);
+  }
+
   void onReturnAfterInactivity(BuildContext context) =>
       _checkComebackAfterInactivity(context);
 
-  void onXPChanged(BuildContext context, int xp) {
-    if (xp >= 100) _unlock(context, "new_learner");
-    if (xp >= 500) _unlock(context, "focused_student");
-    if (xp >= 1000) _unlock(context, "typing_enthusiast");
-    if (xp >= 2500) _unlock(context, "speed_scholar");
-    if (xp >= 5000) _unlock(context, "master_of_keys");
-    if (xp >= 10000) _unlock(context, "tamil_titan");
+  /// [totalXp] is lifetime XP after the current session is saved (not session-only XP).
+  void onXPChanged(BuildContext context, int totalXp) {
+    if (totalXp >= 100) _unlock(context, "new_learner");
+    if (totalXp >= 500) _unlock(context, "focused_student");
+    if (totalXp >= 1000) _unlock(context, "typing_enthusiast");
+    if (totalXp >= 2500) _unlock(context, "speed_scholar");
+    if (totalXp >= 5000) _unlock(context, "master_of_keys");
+    if (totalXp >= 10000) _unlock(context, "tamil_titan");
   }
 
   void onStreakChanged(BuildContext context, int days) {
