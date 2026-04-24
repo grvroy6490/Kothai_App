@@ -212,7 +212,7 @@ return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.noti
 @JsonSerializable()
 
 class _ChallengeConfig implements ChallengeConfig {
-  const _ChallengeConfig({this.soundEnabled = false, this.hapticEnabled = false, this.darkMode = true, this.notificationsEnabled = false});
+  const _ChallengeConfig({this.soundEnabled = false, this.hapticEnabled = false, this.darkMode = true, this.notificationsEnabled = true});
   factory _ChallengeConfig.fromJson(Map<String, dynamic> json) => _$ChallengeConfigFromJson(json);
 
 @override@JsonKey() final  bool soundEnabled;

@@ -276,7 +276,10 @@ class _AchievementGalleryPageState
                             context,
                             'Schemes/Primary',
                           ),
-                          selectedForegroundColor: Colors.white,
+                          selectedForegroundColor: getFigmaColor(
+                            context,
+                            'Schemes/On Primary',
+                          ),
                           foregroundColor: getFigmaColor(
                             context,
                             'Schemes/Primary',

@@ -1,6 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:visai/di/providers/auth/auth_provider.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
 import 'package:visai/enums/StreakModeEnum.dart';
@@ -22,7 +23,6 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_state_provider.dart';
-import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/user_input/user_input_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/providers/challenge/challenge_tracking_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/providers/session/session_repo_provider.dart';
@@ -30,7 +30,9 @@ import 'package:visai/features/user_profile/presentation/riverpod/providers/user
 import 'package:visai/features/typing_session/usecases/score/score_calculation.dart';
 // import 'package:logger/logger.dart';
 // import 'package:logger/logger.dart';
+import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 import 'package:uuid/uuid.dart';
 
 part 'session_controller_provider.g.dart';
@@ -56,14 +58,15 @@ class SessionController extends _$SessionController {
       : ref.read(challengeDifficultyControllerProvider);
 
   Future<void> start() async {
-    final paragraph = await ref.read(textContentControllerProvider);
+    final paragraph = ref.read(textContentControllerProvider);
+    if (paragraph == null) return;
     // reset metrics
     ref.read(metricsStateControllerProvider.notifier).reset();
     ref
         .read(metricsStateControllerProvider.notifier)
-        .setTotalChars(paragraph!.content.length);
+        .setTotalChars(paragraph.content.length);
 
-    // start engine
+    // start engine (same [paragraph.content] the editor uses for nfcPara)
     ref
         .read(sessionStateNotifierProvider.notifier)
         .start(target: paragraph.content);
@@ -96,9 +99,11 @@ class SessionController extends _$SessionController {
     final engine = ref.read(sessionStateNotifierProvider.notifier);
     engine.stop();
 
-    // clear user input
-    final userInput = ref.read(userInputProvider.notifier);
-    userInput.clear();
+    // Do not clear [userInputProvider] here. The practice/challenge editor must
+    // run `if (typingProgress >= 1.0) { ... }` after the last onKey; clearing
+    // here would make progress 0 and skip clearing the TextEditingController.
+    // User input is cleared in those editors (or via session status reset when
+    // the user stops manually).
   }
 
   /// Parse time limit string (e.g., "5m", "4m", "3m" or "5:00") to Duration in milliseconds
@@ -293,6 +298,15 @@ class SessionController extends _$SessionController {
             wpm: m.wpm,
             accuracy: m.accuracy,
           );
+
+      // Push progress to Firebase when signed in (practice + challenge).
+      if (ref.read(firebaseAuthProvider).currentUser != null) {
+        try {
+          await ref.read(scoreControllerProvider.notifier).syncLocalToFirebase();
+        } catch (_) {
+          // Network / rules errors must not break completion flow; user can sync manually.
+        }
+      }
     } finally {
       _isCompleting = false;
     }
@@ -308,12 +322,15 @@ class SessionController extends _$SessionController {
 
   // Keystroke bridge:
   Future<void> onKey({required bool correct}) async {
-    // Start session automatically on first keypress if not already running
     final sessionState = ref.read(sessionStateNotifierProvider);
-    final wasNotRunning = !sessionState.running;
-    if (wasNotRunning) {
+    // Only auto-start when the session has NEVER been started (target is empty —
+    // i.e. first keystroke or after reset). Do NOT restart when the session was
+    // stopped by completion: target is set, running is false.
+    if (!sessionState.running && sessionState.target.isEmpty) {
       await start();
     }
+    // If still not running (content not ready, or already completed), bail.
+    if (!ref.read(sessionStateNotifierProvider).running) return;
 
     // update metrics
     ref.read(badgeControllerProvider.notifier).onFirstKeystroke(Get.context!);
@@ -341,100 +358,163 @@ class SessionController extends _$SessionController {
     }
 
     // check completion
-    final progress = ref.read(typingProgressProvider);
-    if (progress >= 1.0) {
-      stop();
-      final currentMode = _mode;
-      // _logger.f('Session completed in mode: $currentMode');
+    await _completeSessionIfProgressDone();
+  }
 
-      // For challenge mode, validate before completing
-      if (currentMode == SessionMode.challenge) {
-        final gamificationData = ref.read(gamificationDataControllerProvider);
+  /// Idempotent. Call after [onKey] *or* after the practice/challenge text field
+  /// has been processed. Finishes when [SessionState.cursor] has reached the end
+  /// of the typing line (same NFC+diacritic length as the editor), not when raw
+  /// [userInput] string-equals the target.
+  Future<void> maybeFinishSessionByProgress() => _completeSessionIfProgressDone();
 
-        if (gamificationData == null) {
-          // _logger.e('Gamification data is null - cannot validate challenge');
-          await complete();
-          // Don't reset metrics here - let the complete page read them first
-          // Reset will happen when user leaves the complete page
-          _navigateToResult(false);
-          return;
-        }
+  /// True when the engine is [SessionState.running] and [userInput] has reached
+  /// the end of [SessionState.target] (see [_isTargetTextFullyTyped]).
+  bool isNormalizedSessionTextComplete() {
+    if (!ref.read(sessionStateNotifierProvider).running) {
+      return false;
+    }
+    return _isTargetTextFullyTyped();
+  }
 
-        // _logger.f('Looking for difficulty criteria: ${_difficulty.name}');
-        // _logger.f(
-        //   'Available criteria types: ${gamificationData.difficultyCriteria.map((c) => c.type).toList()}',
-        // );
+  /// Whether the line is “done” for the hidden field: cursor at end, or
+  /// [text] (when non-null) / [userInput] is the full line plus optional
+  /// trailing input (NFC+diacritic, same as editors).
+  bool isNormalizedTextEqualToSessionTarget(String? text) {
+    return _isLineCompleteByCursorOrBuffer(override: text);
+  }
 
-        final difficultyCriteria = gamificationData.difficultyCriteria
-            .where(
-              (criteria) =>
-                  criteria.type.toLowerCase() == _difficulty.name.toLowerCase(),
-            )
-            .firstOrNull;
+  String _normTypingForProgress(String s) {
+    return unorm.nfc(Letters.applyDiacriticCompositions(s));
+  }
 
-        if (difficultyCriteria != null) {
-          // _logger.f(
-          //   'Found criteria for ${_difficulty.name}: accuracy=${difficultyCriteria.accuracy}%, wpm=${difficultyCriteria.wpm}, time=${difficultyCriteria.timelimit}',
-          // );
-          final metrics = ref.read(metricsStateControllerProvider);
-          final st = ref.read(sessionStateNotifierProvider);
-          final challengePassed = _validateChallenge(
-            difficultyCriteria,
-            metrics.accuracy,
-            metrics.wpm,
-            st.elapsed.inMilliseconds,
-          );
+  /// Same as `nfcPara.length` in the editors; **not** raw [String.length] on
+  /// [SessionState.target].
+  int _nfcKeySpaceLength(String target) {
+    if (target.isEmpty) return 0;
+    return _normTypingForProgress(target).length;
+  }
 
-          // Complete session (saves data, awards XP, marks streak only if passed)
-          await complete(challengePassed: challengePassed);
+  bool _isLineCompleteByCursorOrBuffer({String? override}) {
+    final st = ref.read(sessionStateNotifierProvider);
+    if (st.target.isEmpty) return false;
+    final nfcLen = _nfcKeySpaceLength(st.target);
+    if (nfcLen == 0) return false;
 
-          // If in restore mode and challenge passed, add the missing day
-          final streakModeState = ref.read(streakModeProvider);
-          if (challengePassed &&
-              streakModeState.mode == StreakModeEnum.restore) {
-            final missingDayDate = streakModeState.missingDayDate;
-            if (missingDayDate != null) {
-              await ref
-                  .read(streakControllerProvider.notifier)
-                  .addMissingDay(missingDayDate);
-              // _logger.f('✅ Missing streak day restored: ${missingDayDate}');
+    // Condition 1: cursor (correct-only) reached end of NFC key-space.
+    if (st.cursor >= nfcLen) return true;
 
-              // BADGE CHECK - Check streak badges after restoring missing day
-              final updatedStreak = ref.read(streakControllerProvider);
-              ref
-                  .read(badgeControllerProvider.notifier)
-                  .onStreakChanged(Get.context!, updatedStreak.current);
+    final String buffer = override ?? ref.read(userInputProvider);
+    if (buffer.isEmpty) return false;
 
-              // Reset to normal mode after restoring
-              ref.read(streakModeProvider.notifier).setNormalMode();
-            }
-          }
+    // Condition 2: grapheme-cluster count matches the target - same rule used
+    // by AnimatedContentBoard and typingProgressProvider. Ends the session the
+    // instant the visual overlay shows all characters covered, even when wrong
+    // characters have fewer UTF-16 code units than the expected ones.
+    final targetClusterLen = st.target.characters.length;
+    if (targetClusterLen > 0 && buffer.characters.length >= targetClusterLen) {
+      return true;
+    }
 
-          // Don't reset metrics here - let the complete page read them first
-          // Reset will happen when user leaves the complete page
+    // Condition 3: NFC code-unit fallback (correct line + optional trailing).
+    final nIn = _normTypingForProgress(buffer);
+    if (nIn.length >= nfcLen) return true;
+    final nT = _normTypingForProgress(st.target);
+    return nT.isNotEmpty && nIn.startsWith(nT);
+  }
 
-          // Navigate based on validation result
-          _navigateToResult(challengePassed);
-          return;
-        } else {
-          // _logger.e('Difficulty criteria not found for ${_difficulty.name}');
-          // _logger.e(
-          //   'Available criteria: ${gamificationData.difficultyCriteria.map((c) => '${c.type}').join(", ")}',
-          // );
-          // Complete without validation if criteria not found
-          await complete();
-          // Don't reset metrics here - let the complete page read them first
-          // Reset will happen when user leaves the complete page
-          _navigateToResult(false);
-          return;
-        }
+  bool _isTargetTextFullyTyped() {
+    return _isLineCompleteByCursorOrBuffer();
+  }
+
+  Future<void> _completeSessionIfProgressDone() async {
+    if (!ref.read(sessionStateNotifierProvider).running) {
+      return;
+    }
+    // Never use [typingProgressProvider] here: it is only input.length/para.length.
+    // Completion is driven by [SessionState.cursor] (see [_isTargetTextFullyTyped]).
+    if (!_isTargetTextFullyTyped()) {
+      return;
+    }
+
+    stop();
+    final currentMode = _mode;
+    // _logger.f('Session completed in mode: $currentMode');
+
+    // For challenge mode, validate before completing
+    if (currentMode == SessionMode.challenge) {
+      final gamificationData = ref.read(gamificationDataControllerProvider);
+
+      if (gamificationData == null) {
+        // _logger.e('Gamification data is null - cannot validate challenge');
+        await complete();
+        // Don't reset metrics here - let the complete page read them first
+        // Reset will happen when user leaves the complete page
+        _navigateToResult(false);
+        return;
       }
 
-      // For practice mode or if criteria not found, complete normally
-      await complete();
-      // Don't reset metrics here - let the complete page read them first
-      // Reset will happen when user leaves the complete page
-      _navigateToResult(true);
+      final difficultyCriteria = gamificationData.difficultyCriteria
+          .where(
+            (criteria) =>
+                criteria.type.toLowerCase() == _difficulty.name.toLowerCase(),
+          )
+          .firstOrNull;
+
+      if (difficultyCriteria != null) {
+        final metrics = ref.read(metricsStateControllerProvider);
+        final st = ref.read(sessionStateNotifierProvider);
+        final challengePassed = _validateChallenge(
+          difficultyCriteria,
+          metrics.accuracy,
+          metrics.wpm,
+          st.elapsed.inMilliseconds,
+        );
+
+        // Complete session (saves data, awards XP, marks streak only if passed)
+        await complete(challengePassed: challengePassed);
+
+        // If in restore mode and challenge passed, add the missing day
+        final streakModeState = ref.read(streakModeProvider);
+        if (challengePassed && streakModeState.mode == StreakModeEnum.restore) {
+          final missingDayDate = streakModeState.missingDayDate;
+          if (missingDayDate != null) {
+            await ref
+                .read(streakControllerProvider.notifier)
+                .addMissingDay(missingDayDate);
+            // _logger.f('✅ Missing streak day restored: ${missingDayDate}');
+
+            // BADGE CHECK - Check streak badges after restoring missing day
+            final updatedStreak = ref.read(streakControllerProvider);
+            ref
+                .read(badgeControllerProvider.notifier)
+                .onStreakChanged(Get.context!, updatedStreak.current);
+
+            // Reset to normal mode after restoring
+            ref.read(streakModeProvider.notifier).setNormalMode();
+          }
+        }
+
+        // Don't reset metrics here - let the complete page read them first
+        // Reset will happen when user leaves the complete page
+
+        // Navigate based on validation result
+        _navigateToResult(challengePassed);
+        return;
+      } else {
+        // _logger.e('Difficulty criteria not found for ${_difficulty.name}');
+        // Complete without validation if criteria not found
+        await complete();
+        // Don't reset metrics here - let the complete page read them first
+        // Reset will happen when user leaves the complete page
+        _navigateToResult(false);
+        return;
+      }
     }
+
+    // For practice mode or if criteria not found, complete normally
+    await complete();
+    // Don't reset metrics here - let the complete page read them first
+    // Reset will happen when user leaves the complete page
+    _navigateToResult(true);
   }
 }

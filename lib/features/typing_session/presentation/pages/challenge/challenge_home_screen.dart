@@ -239,7 +239,7 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 ),
                                                 SizedBox(height: Gap(context).gap(20)),
                                                 Text(
-                                                    'Type 50 words with 90% + Accuracy',
+                                                    'Type 8 WPM with 85% + Accuracy',
                                                     style: Theme.of(context).textTheme.headlineSmall
                                                         ?.copyWith(
                                                             color: getFigmaColor(
@@ -253,19 +253,19 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 // STATS BADGE
                                                 SlideStatsBadge(
                                                     icon: Icons.text_fields,
-                                                    data: '50',
-                                                    label: 'Words'
+                                                    data: '8',
+                                                    label: 'WPM'
                                                 ),
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
                                                     icon: Icons.my_location,
-                                                    data: '90%',
+                                                    data: '85%',
                                                     label: 'Min. Accuracy'
                                                 ),
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
                                                     icon: Icons.schedule,
-                                                    data: '5:00',
+                                                    data: '2:00',
                                                     label: 'Max. Time'
                                                 )
                                             ]
@@ -293,7 +293,7 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 ),
                                                 SizedBox(height: Gap(context).gap(20)),
                                                 Text(
-                                                    'Type 30 WPM with 95% + Accuracy',
+                                                    'Type 15 WPM with 90% Accuracy',
                                                     style: Theme.of(context).textTheme.headlineSmall
                                                         ?.copyWith(
                                                             color: getFigmaColor(
@@ -307,8 +307,8 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 // STATS BADGE
                                                 SlideStatsBadge(
                                                     icon: Icons.text_fields,
-                                                    data: '45',
-                                                    label: 'Words'
+                                                    data: '15',
+                                                    label: 'WPM'
                                                 ),
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
@@ -319,7 +319,7 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
                                                     icon: Icons.schedule,
-                                                    data: '4:00',
+                                                    data: '2:00',
                                                     label: 'Max. Time'
                                                 )
                                             ]
@@ -347,7 +347,7 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 ),
                                                 SizedBox(height: Gap(context).gap(20)),
                                                 Text(
-                                                    'Type 50 words with 90% + Accuracy',
+                                                    'Type 20 WPM with 95% Accuracy',
                                                     style: Theme.of(context).textTheme.headlineSmall
                                                         ?.copyWith(
                                                             color: getFigmaColor(
@@ -361,19 +361,19 @@ class _State extends ConsumerState<ChallengeHomeScreen> {
                                                 // STATS BADGE
                                                 SlideStatsBadge(
                                                     icon: Icons.text_fields,
-                                                    data: '40',
-                                                    label: 'Words'
+                                                    data: '20',
+                                                    label: 'WPM'
                                                 ),
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
                                                     icon: Icons.my_location,
-                                                    data: '90%',
+                                                    data: '95%',
                                                     label: 'Min. Accuracy'
                                                 ),
                                                 SizedBox(height: Gap(context).gap(8)),
                                                 SlideStatsBadge(
                                                     icon: Icons.schedule,
-                                                    data: '5:00',
+                                                    data: '3:00',
                                                     label: 'Max. Time'
                                                 )
                                             ]

@@ -16,6 +16,10 @@ import 'package:visai/features/typing_session/presentation/riverpod/controllers/
 // import 'package:visai/features/typing_session/presentation/widgets/lottie_player.dart';
 import 'package:visai/features/typing_session/presentation/widgets/star_burst_badge.dart';
 // import 'package:logger/logger.dart';
+import 'package:visai/domain/entities/difficulty_criteria/difficulty_criteria_entity.dart';
+import 'package:visai/features/typing_session/domain/enums/difficulty/difficulty_enum.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_difficulty_provider.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
 
 class ChallengeFailed extends ConsumerStatefulWidget {
   const ChallengeFailed({super.key});
@@ -64,6 +68,40 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
     final sesstionStatusController = ref.read(
       sessionStatusControllerProvider.notifier,
     );
+
+    final gamification = ref.watch(gamificationDataControllerProvider);
+    final selectedDifficulty = ref.watch(challengeDifficultyControllerProvider);
+    final criteria = gamification?.difficultyCriteria
+        .where(
+          (c) =>
+              c.type.toLowerCase() == selectedDifficulty.name.toLowerCase(),
+        )
+        .firstOrNull;
+    final difficultyLabel =
+        _difficultyLabel(selectedDifficulty);
+
+    final failureMessage = criteria == null
+        ? "This challenge wasn’t met. Try again!"
+        : _buildChallengeFailureMessage(
+            criteria: criteria,
+            difficultyLabel: difficultyLabel,
+            wpm: _finalWpm,
+            accuracy: _finalAccuracy,
+            elapsedMs: _finalElapsed.inMilliseconds,
+          );
+
+    // Aligned with [_buildChallengeFailureMessage] / session validation: which bar did not pass.
+    final bool wpmFailed;
+    final bool accFailed;
+    final bool timeFailed;
+    if (criteria == null) {
+      wpmFailed = accFailed = timeFailed = true;
+    } else {
+      final timeLimitMs = _parseChallengeTimeLimitToMs(criteria.timelimit);
+      wpmFailed = _finalWpm < criteria.wpm;
+      accFailed = _finalAccuracy * 100.0 < criteria.accuracy;
+      timeFailed = _finalElapsed.inMilliseconds > timeLimitMs;
+    }
 
     final themeMode = ref.watch(themeProvider);
 
@@ -136,7 +174,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                           horizontal: Gap(context).gap(40),
                         ),
                         child: Text(
-                          'Time limit exceeded! You\'ve completed this easy challenge',
+                          failureMessage,
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 color: getFigmaColor(
@@ -204,6 +242,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               Icons.text_fields,
                               'WPM',
                               _finalWpm.toStringAsFixed(0),
+                              failed: wpmFailed,
                             ),
                           ),
                         ),
@@ -215,6 +254,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               Icons.my_location,
                               'Accuracy',
                               '${(_finalAccuracy * 100).toStringAsFixed(0)}%',
+                              failed: accFailed,
                             ),
                           ),
                         ),
@@ -226,7 +266,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
                               Icons.schedule,
                               'Time Taken',
                               formatDuration(_finalElapsed),
-                              failed: true,
+                              failed: timeFailed,
                             ),
                           ),
                         ),
@@ -386,6 +426,7 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
     );
   }
 
+  // ignore: unused_element
   Widget _customIconButton(
     BuildContext context,
     Widget icon,
@@ -423,4 +464,76 @@ class _ChallengeFailedState extends ConsumerState<ChallengeFailed>
       icon: icon,
     );
   }
+}
+
+// Must stay aligned with [SessionController._validateChallenge] math.
+int _parseChallengeTimeLimitToMs(String timeLimit) {
+  try {
+    if (timeLimit.endsWith('m')) {
+      final minutes = int.parse(timeLimit.substring(0, timeLimit.length - 1));
+      return minutes * 60 * 1000;
+    }
+    final parts = timeLimit.split(':');
+    if (parts.length == 2) {
+      final minutes = int.parse(parts[0]);
+      final seconds = int.parse(parts[1]);
+      return (minutes * 60 + seconds) * 1000;
+    }
+  } catch (_) {}
+  return 5 * 60 * 1000;
+}
+
+String _difficultyLabel(DifficultyEnum d) {
+  return d.name[0].toUpperCase() + d.name.substring(1);
+}
+
+String _andJoinClauses(List<String> clauses) {
+  if (clauses.isEmpty) return '';
+  if (clauses.length == 1) return clauses.first;
+  if (clauses.length == 2) {
+    return '${clauses[0]} and ${clauses[1]}';
+  }
+  return '${clauses.sublist(0, clauses.length - 1).join(', ')}, and ${clauses.last}';
+}
+
+String _buildChallengeFailureMessage({
+  required DifficultyCriteriaEntity criteria,
+  required String difficultyLabel,
+  required double wpm,
+  required double accuracy,
+  required int elapsedMs,
+}) {
+  final timeLimitMs = _parseChallengeTimeLimitToMs(criteria.timelimit);
+  final accuracyPercent = accuracy * 100.0;
+  final wpmFailed = wpm < criteria.wpm;
+  final accFailed = accuracyPercent < criteria.accuracy;
+  final timeFailed = elapsedMs > timeLimitMs;
+
+  if (!wpmFailed && !accFailed && !timeFailed) {
+    return "This $difficultyLabel challenge wasn’t met. Try again!";
+  }
+
+  // One clear line when only a single bar was missed
+  if (wpmFailed && !accFailed && !timeFailed) {
+    return 'WPM is too low! You need at least ${criteria.wpm} for this $difficultyLabel challenge.';
+  }
+  if (accFailed && !wpmFailed && !timeFailed) {
+    return 'Accuracy is too low! You need at least ${criteria.accuracy}% for this $difficultyLabel challenge.';
+  }
+  if (timeFailed && !wpmFailed && !accFailed) {
+    return 'Time limit exceeded! You had to finish within ${criteria.timelimit} for this $difficultyLabel challenge.';
+  }
+
+  // Two or more criteria: same order as validation — WPM, then accuracy, then time
+  final issues = <String>[];
+  if (wpmFailed) {
+    issues.add('WPM is below the required ${criteria.wpm}');
+  }
+  if (accFailed) {
+    issues.add('accuracy is below the required ${criteria.accuracy}%');
+  }
+  if (timeFailed) {
+    issues.add("you’ve exceeded the time limit (${criteria.timelimit})");
+  }
+  return 'This $difficultyLabel challenge was not met: ${_andJoinClauses(issues)}.';
 }

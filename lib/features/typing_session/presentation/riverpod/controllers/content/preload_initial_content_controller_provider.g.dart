@@ -7,7 +7,7 @@ part of 'preload_initial_content_controller_provider.dart';
 // **************************************************************************
 
 String _$preloadPracticeInitialContentControllerHash() =>
-    r'd69d4d2118ba3bf5c49795021667091d43058a9f';
+    r'12d8b3d8ab1919134bdd728613848c0a62027cd0';
 
 /// See also [preloadPracticeInitialContentController].
 @ProviderFor(preloadPracticeInitialContentController)
@@ -27,7 +27,7 @@ final preloadPracticeInitialContentControllerProvider =
 typedef PreloadPracticeInitialContentControllerRef =
     AutoDisposeFutureProviderRef<void>;
 String _$preloadChallengeInitialContentControllerHash() =>
-    r'2f3c81eafb0364a78e9f6650575517079cd4ee3b';
+    r'bf17adb2531551259ff862cca96b00cf8b9439e2';
 
 /// See also [preloadChallengeInitialContentController].
 @ProviderFor(preloadChallengeInitialContentController)

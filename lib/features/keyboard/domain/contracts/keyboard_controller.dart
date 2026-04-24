@@ -7,8 +7,11 @@ abstract class KeyboardController {
 
     void insert(String value);
 
-    void backspace(String value);
+  void backspace(String value);
 
-    // Property to track key press state
-    bool isKeyPressed = false;
+  /// Clear any held Tamil diacritic / composition state (e.g. after session ends).
+  void resetCompositionState() {}
+
+  // Property to track key press state
+  bool isKeyPressed = false;
 }

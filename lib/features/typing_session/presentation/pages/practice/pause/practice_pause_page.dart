@@ -234,7 +234,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                           ),
                           child: Icon(
                             Icons.play_arrow,
-                            color: Colors.white,
+                            color: getFigmaColor(context, 'Schemes/On Primary'),
                             size: KxScale(context).sp(40),
                           ),
                         ),

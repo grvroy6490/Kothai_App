@@ -6,7 +6,7 @@ part of 'typing_progress_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$typingProgressHash() => r'9f712cf7ec2f4ec4e9de41b3883a557661e531c1';
+String _$typingProgressHash() => r'2baf4b09cd162874559105f0839624ad8855f45b';
 
 /// See also [typingProgress].
 @ProviderFor(typingProgress)

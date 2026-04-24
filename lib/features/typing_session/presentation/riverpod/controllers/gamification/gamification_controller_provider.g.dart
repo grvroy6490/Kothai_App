@@ -7,7 +7,7 @@ part of 'gamification_controller_provider.dart';
 // **************************************************************************
 
 String _$preloadGamificationControllerHash() =>
-    r'033b56721e933d74509129bafca66e0a07d65ddb';
+    r'8064438d9dfb3e68609fcb2fab3afcd0daa04465';
 
 /// See also [preloadGamificationController].
 @ProviderFor(preloadGamificationController)

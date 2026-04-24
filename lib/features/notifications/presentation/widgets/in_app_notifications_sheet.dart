@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/features/notifications/domain/in_app_notification.dart';
-import 'package:visai/features/notifications/presentation/notification_navigation.dart';
 import 'package:visai/features/notifications/presentation/riverpod/in_app_notifications_controller.dart';
 
 /// Opens a modal bottom sheet with the in-app notification list.
@@ -104,9 +103,6 @@ class _InAppNotificationsSheet extends ConsumerWidget {
                         notification: n,
                         onTap: () async {
                           await notifier.markRead(n.id);
-                          if (!context.mounted) return;
-                          Navigator.of(context).pop();
-                          navigateFromNotificationPayload(n.routePayload);
                         },
                       );
                     },
@@ -192,10 +188,6 @@ class _NotificationTile extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: getFigmaColor(context, 'Schemes/On Surface Variant'),
               ),
             ],
           ),

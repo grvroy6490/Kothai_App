@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -28,10 +29,13 @@ class LocalNotificationService {
     if (_initialized) return;
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    // Defer the system permission prompt to [requestPermissionsIfNeeded] so
+    // Android 13+ and iOS get one explicit request path (and we can call it
+    // when the user turns reminders on, not only at first [initialize]).
     const darwin = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
 
     await _plugin.initialize(
@@ -64,7 +68,48 @@ class LocalNotificationService {
     }
   }
 
+  /// Requests post-notification permission (Android 13+), and alert/badge/sound
+  /// (iOS/macOS), using the same APIs as [flutter_local_notifications] native
+  /// implementations. Falls back to [Permission.notification] elsewhere.
   Future<void> requestPermissionsIfNeeded() async {
+    if (kIsWeb) return;
+    await init();
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final granted = await android?.requestNotificationsPermission();
+      if (granted == true) return;
+      // Android < 13: plugin is a no-op; optional fallback for OEM quirks.
+      final st = await Permission.notification.status;
+      if (!st.isGranted) {
+        await Permission.notification.request();
+      }
+      return;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      await ios?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      return;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      final mac = _plugin.resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin>();
+      await mac?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      return;
+    }
+
     final status = await Permission.notification.status;
     if (!status.isGranted) {
       await Permission.notification.request();

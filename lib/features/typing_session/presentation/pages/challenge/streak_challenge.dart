@@ -139,7 +139,7 @@ class _StreakChallengeState extends ConsumerState<StreakChallenge> {
                         ),
                         SizedBox(height: Gap(context).gap(20)),
                         Text(
-                          'Type 50 words with 90% + Accuracy',
+                          'Type 10 WPM with 90% Accuracy',
                           style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(
                                 color: getFigmaColor(
@@ -153,19 +153,19 @@ class _StreakChallengeState extends ConsumerState<StreakChallenge> {
                         // STATS BADGE
                         SlideStatsBadge(
                           icon: Icons.text_fields,
-                          data: '40',
-                          label: 'Words',
+                          data: '10',
+                          label: 'WPM',
                         ),
                         SizedBox(height: Gap(context).gap(8)),
                         SlideStatsBadge(
                           icon: Icons.my_location,
-                          data: '98%',
+                          data: '90%',
                           label: 'Min. Accuracy',
                         ),
                         SizedBox(height: Gap(context).gap(8)),
                         SlideStatsBadge(
                           icon: Icons.schedule,
-                          data: '5:00',
+                          data: '2:00',
                           label: 'Max. Time',
                         ),
                       ],

@@ -27,6 +27,7 @@ import 'package:logger/logger.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
 
 class PracticeEditorPage extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -109,6 +110,9 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
             break;
           }
           if (to == from) {
+            // In-place edit: keep [userInput] in sync so
+            // [typingProgressProvider] and session end detection stay aligned.
+            ref.read(userInputProvider.notifier).set(textNow);
             // The keyboard may have done an in-place substitution with the same
             // text length — e.g. replacing "தெ" (U+0BA4+U+0BC6) with "தொ"
             // (U+0BA4+U+0BCA) when ா is pressed after a held left-diacritic.
@@ -119,7 +123,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
               final substituted = textNow[to - 1];
               if (composedVowelForms.contains(substituted)) {
                 final nfcPara =
-                    unorm.nfc(_applyTamilCompositions(paragraph));
+                    unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
                 final expectedCursor =
                     ref.read(sessionStateNotifierProvider).cursor;
                 final expected = (expectedCursor < nfcPara.length)
@@ -127,7 +131,6 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                     : null;
                 final correct = expected != null && substituted == expected;
                 _compositionPending = null;
-                ref.read(userInputProvider.notifier).set(textNow);
                 await ctrl.onKey(correct: correct);
               }
             }
@@ -140,7 +143,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
           // Normalize the paragraph: first apply Tamil-specific vowel compositions
           // (ே+ா→ோ, ெ+ா→ொ, ெ+ௗ→ௌ) then general NFC.  unorm.nfc alone does
           // not reliably compose these Tamil pairs in the Dart runtime.
-          final nfcPara = unorm.nfc(_applyTamilCompositions(paragraph));
+          final nfcPara = unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
 
           // Read cursor AFTER any previous onKey has had a chance to
           // call advanceCursor — safe because we are the only async invocation.
@@ -179,6 +182,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                 // No composition — emit an error for the pending diacritic
                 // then fall through to process `received` normally below.
                 await ctrl.onKey(correct: false);
+                if (!ref.read(sessionStateNotifierProvider).running) break;
                 charToCompare = received;
               }
             } else {
@@ -222,6 +226,10 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
             final correct = expected != null && charToCompare == expected;
             await ctrl.onKey(correct: correct);
             if (correct) expectedCursor++;
+            // Session may have ended (completed) inside onKey. Stop processing
+            // remaining characters — otherwise the next onKey call would see
+            // running=false and restart the session from scratch.
+            if (!ref.read(sessionStateNotifierProvider).running) break;
 
             if (kDebugMode) {
               final m = ref.read(metricsStateControllerProvider);
@@ -243,17 +251,29 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
           }
 
           // If more characters arrived during the awaits above, the while
-          // loop will process them in the next iteration.
+          // loop will process them in the next iteration. Also stop if the
+          // session ended mid-batch (completed inside onKey above).
           if (widget.controller.text.length <= _lastLen) break;
+          if (!ref.read(sessionStateNotifierProvider).running) break;
         }
 
-        if (mounted && ref.read(typingProgressProvider) >= 1.0) {
+        // One more sync: field can differ from [userInput] (e.g. same-length Tamil edits).
+        ref.read(userInputProvider.notifier).set(widget.controller.text);
+        final sessionApi = ref.read(sessionControllerProvider.notifier);
+        await sessionApi.maybeFinishSessionByProgress();
+
+        if (mounted &&
+            sessionApi.isNormalizedTextEqualToSessionTarget(
+                widget.controller.text)) {
           // Reset _lastLen BEFORE clear() so that the clear-triggered listener
           // invocation (rejected by the mutex) leaves _lastLen at 0.  Without
           // this, the next session's first character is skipped because
           // _lastLen still holds the old session's length.
           _lastLen = 0;
           _compositionPending = null;
+          ref.read(userInputProvider.notifier).clear();
+          ref.read(keyboardControllerProvider(widget.controller))
+              .resetCompositionState();
           widget.controller.clear();
         }
       } finally {
@@ -304,18 +324,6 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
         });
       }
     }
-  }
-
-  // Method to play keypress sound if enabled (using fallback sound primarily)
-  /// Applies Tamil vowel-sign compositions that unorm.nfc may miss at runtime.
-  /// Replaces decomposed keyboard pairs (ே+ா, ெ+ா, ெ+ௗ) with their
-  /// precomposed equivalents (ோ, ொ, ௌ) before any further NFC pass.
-  String _applyTamilCompositions(String text) {
-    String result = text;
-    for (final entry in Letters.diacriticCombos.entries) {
-      result = result.replaceAll(entry.key, entry.value);
-    }
-    return result;
   }
 
   void _playKeypressSoundIfEnabled() {

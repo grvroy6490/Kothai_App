@@ -22,6 +22,7 @@ import 'package:visai/features/typing_session/presentation/widgets/typing_progre
 import 'package:logger/logger.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
 
 class ChallengeEditor extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -93,12 +94,13 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
             break;
           }
           if (to == from) {
+            ref.read(userInputProvider.notifier).set(textNow);
             if (_compositionPending != null && to > 0) {
               const composedVowelForms = {'\u0BCA', '\u0BCB', '\u0BCC'};
               final substituted = textNow[to - 1];
               if (composedVowelForms.contains(substituted)) {
                 final nfcPara =
-                    unorm.nfc(_applyTamilCompositions(paragraph));
+                    unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
                 final expectedCursor =
                     ref.read(sessionStateNotifierProvider).cursor;
                 final expected = (expectedCursor < nfcPara.length)
@@ -106,7 +108,6 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                     : null;
                 final correct = expected != null && substituted == expected;
                 _compositionPending = null;
-                ref.read(userInputProvider.notifier).set(textNow);
                 await ctrl.onKey(correct: correct);
               }
             }
@@ -116,7 +117,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
           _lastLen = to;
           ref.read(userInputProvider.notifier).set(textNow);
 
-          final nfcPara = unorm.nfc(_applyTamilCompositions(paragraph));
+          final nfcPara = unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
 
           // Read cursor AFTER any previous onKey has had a chance to
           // call advanceCursor — safe because we are the only async invocation.
@@ -146,6 +147,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                 charToCompare = composed;
               } else {
                 await ctrl.onKey(correct: false);
+                if (!ref.read(sessionStateNotifierProvider).running) break;
                 charToCompare = received;
               }
             } else {
@@ -184,6 +186,10 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
             final correct = expected != null && charToCompare == expected;
             await ctrl.onKey(correct: correct);
             if (correct) expectedCursor++;
+            // Session may have ended (completed) inside onKey. Stop processing
+            // remaining characters — otherwise the next onKey call would see
+            // running=false and restart the session from scratch.
+            if (!ref.read(sessionStateNotifierProvider).running) break;
 
             if (kDebugMode) {
               final m = ref.read(metricsStateControllerProvider);
@@ -204,15 +210,26 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
           }
 
           // If more characters arrived during the awaits above, the while
-          // loop will process them in the next iteration.
+          // loop will process them in the next iteration. Also stop if the
+          // session ended mid-batch (completed inside onKey above).
           if (widget.controller.text.length <= _lastLen) break;
+          if (!ref.read(sessionStateNotifierProvider).running) break;
         }
 
-        if (mounted && ref.read(typingProgressProvider) >= 1.0) {
+        ref.read(userInputProvider.notifier).set(widget.controller.text);
+        final sessionApi = ref.read(sessionControllerProvider.notifier);
+        await sessionApi.maybeFinishSessionByProgress();
+
+        if (mounted &&
+            sessionApi.isNormalizedTextEqualToSessionTarget(
+                widget.controller.text)) {
           // Reset _lastLen BEFORE clear() so that the clear-triggered listener
           // invocation (rejected by the mutex) leaves _lastLen at 0.
           _lastLen = 0;
           _compositionPending = null;
+          ref.read(userInputProvider.notifier).clear();
+          ref.read(keyboardControllerProvider(widget.controller))
+              .resetCompositionState();
           widget.controller.clear();
         }
       } finally {
@@ -223,14 +240,6 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
     };
 
     widget.controller.addListener(_controllerListener);
-  }
-
-  String _applyTamilCompositions(String text) {
-    String result = text;
-    for (final entry in Letters.diacriticCombos.entries) {
-      result = result.replaceAll(entry.key, entry.value);
-    }
-    return result;
   }
 
   void dispose() {
@@ -326,8 +335,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                   Positioned.fill(
                     top: MediaQuery.of(context).size.height * 1.1,
                     child: IgnorePointer(
-                      ignoring:
-                          true, // <- key change: don't intercept taps/scrolls
+                      ignoring: false, // <- key change: don't intercept taps/scrolls
                       child: Opacity(
                         opacity: 0,
                         child: TextFormField(

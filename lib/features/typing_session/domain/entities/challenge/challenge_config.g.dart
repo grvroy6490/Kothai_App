@@ -11,7 +11,7 @@ _ChallengeConfig _$ChallengeConfigFromJson(Map<String, dynamic> json) =>
       soundEnabled: json['soundEnabled'] as bool? ?? false,
       hapticEnabled: json['hapticEnabled'] as bool? ?? false,
       darkMode: json['darkMode'] as bool? ?? true,
-      notificationsEnabled: json['notificationsEnabled'] as bool? ?? false,
+      notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$ChallengeConfigToJson(_ChallengeConfig instance) =>

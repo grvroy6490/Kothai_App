@@ -16,6 +16,12 @@ class TamilKeyboard extends KeyboardController {
     }
 
     @override
+    void resetCompositionState() {
+        _heldLeftDiacritic = null;
+        _ref?.read(holdKeyProvider.notifier).clear();
+    }
+
+    @override
     void backspace(String value) {
         // Backspace should also honor the initial diacritic rule only if text is empty
         // If empty, nothing to delete; just return
@@ -56,15 +62,10 @@ class TamilKeyboard extends KeyboardController {
     void insert(String value) {
         // final practiceConfig = _ref?.watch(practiceConfigurationProvider); // TODO: Check this settings
 
-        // Handle left diacritic hold mechanism
+        // Handle left diacritic hold mechanism.
+        // The hold waits for the NEXT consonant typed (not the previous char), so
+        // we must not block it based on what precedes in the text field.
         if (Letters.leftDiacriticLetters.contains(value)) {
-            // Don't hold if last character is uyir
-            if (text.text.isNotEmpty) {
-                final lastChar = text.text[text.text.length - 1];
-                if (Letters.uyirLetters.contains(lastChar)) {
-                    return; // Don't hold diacritic after uyir
-                }
-            }
             _heldLeftDiacritic = value;
             _ref?.read(holdKeyProvider.notifier).holdFor(value);
             return; // Hold the diacritic, wait for next character

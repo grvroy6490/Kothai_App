@@ -9,6 +9,7 @@ import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
 // import 'package:visai/features/typing_session/presentation/pages/practice/practice_page.dart';
 // import 'package:visai/di/providers/navigation/navigation_provider.dart';
+import 'package:visai/features/keyboard/presentation/providers/keyboard_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/session/session_status_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/typing_progress_provider.dart';
 
@@ -42,6 +43,7 @@ class _SessionStopPageState extends ConsumerState<SessionStopPage> {
         if (args is Map && args['controller'] is TextEditingController) {
           final TextEditingController c =
               args['controller'] as TextEditingController;
+          ref.read(keyboardControllerProvider(c)).resetCompositionState();
           c.clear();
         }
       } catch (_) {}

@@ -91,13 +91,15 @@ class _AppState extends ConsumerState<App> {
             },
         );
 
-        return ScaffoldMessenger(
-            key: _scaffoldMessengerKey,
-            child: ScreenUtilInit(
+        // [scaffoldMessengerKey] must live on [GetMaterialApp], not on a parent
+        // [ScaffoldMessenger]. Otherwise route [Scaffold]s register with the
+        // inner messenger and the key’s messenger has none → showSnackBar asserts.
+        return ScreenUtilInit(
             designSize: const Size(360, 812),
             minTextAdapt: true,
             splitScreenMode: false,
             child: GetMaterialApp(
+                scaffoldMessengerKey: _scaffoldMessengerKey,
                 getPages: routes,
                 debugShowCheckedModeBanner: false,
                 themeMode: themeMode,
@@ -130,7 +132,7 @@ class _AppState extends ConsumerState<App> {
                     error: (e, _) => Default404(error: e.toString()),
                     loading: () => const SplashPage()
                 )
-            )
-        ));
+            ),
+        );
     }
 }

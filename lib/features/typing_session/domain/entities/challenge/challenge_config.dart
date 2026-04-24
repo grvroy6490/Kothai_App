@@ -10,7 +10,7 @@ abstract class ChallengeConfig with _$ChallengeConfig {
         @Default(false) bool soundEnabled,
         @Default(false) bool hapticEnabled,
         @Default(true) bool darkMode,
-        @Default(false) bool notificationsEnabled,
+        @Default(true) bool notificationsEnabled,
     }) = _ChallengeConfig;
 
     factory ChallengeConfig.fromJson(Map<String, dynamic> json) =>

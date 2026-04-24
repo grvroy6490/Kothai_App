@@ -1,4 +1,5 @@
 import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/domain/entities/levels/level_entity.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
 import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
@@ -27,7 +28,7 @@ class ScoreController extends _$ScoreController {
     Future<void> _load() async {
         var totals = await ref.read(scoreLocalRepositoryProvider).loadScores();
         final gamification = ref.read(gamificationDataControllerProvider);
-        final levels = gamification == null ? null : await gamification.levels;
+        final levels = gamification?.levels;
 
         if (levels == null || levels.isEmpty) {
             // _logger.w('No gamification levels available, leaving xpNextLevel unchanged.');
@@ -63,7 +64,7 @@ class ScoreController extends _$ScoreController {
         await ref.read(scoreLocalRepositoryProvider).addEntryToDB(entry);
 
         // 2) update totals & level (linear 200xp/level)
-        final levels = await ref.read(gamificationDataControllerProvider)!.levels;
+        final levels = ref.read(gamificationDataControllerProvider)!.levels;
         final nextTotal = state.totalXp + amount;
         // Find the user's current level based on their new total XP.
         final currentLevel = levels.lastWhere(
@@ -210,7 +211,7 @@ class ScoreController extends _$ScoreController {
 
     ScoreEntity _computeTotalsFromTotalXp(
         int totalXp,
-        List levels,
+        List<LevelEntity> levels,
     ) {
         // `levels` comes from GamificationEntity.levels which are `LevelEntity`.
         final currentLevel = levels.lastWhere(

@@ -518,24 +518,7 @@ class _SessionCompletePageState extends ConsumerState<SessionCompletePage>
                       // ),
                       SizedBox(width: Gap(context).gap(15)),
 
-                      isLoggedIn
-                          ? Expanded(
-                              child: _customIconButton(
-                                context,
-                                Icon(
-                                  Icons.cloud_upload_rounded,
-                                  color: getFigmaColor(
-                                    context,
-                                    'Schemes/On Secondary',
-                                  ),
-                                ),
-                                'Save your results',
-                                handleSave,
-                                Gap(context).gap(12),
-                                getFigmaColor(context, 'Schemes/Tertiary'),
-                              ),
-                            )
-                          : Expanded(
+                      Expanded(
                               child: _customIconButton(
                                 context,
                                 Icon(

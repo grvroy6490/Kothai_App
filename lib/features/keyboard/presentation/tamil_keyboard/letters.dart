@@ -35,6 +35,13 @@ class Letters {
         'ௌ': 'ௌ', // AU
     };
 
-
-
+    /// Decomposed keyboard pairs → precomposed (must match practice/challenge editors).
+    /// Use before NFC so progress length matches [String] code-unit indices.
+    static String applyDiacriticCompositions(String text) {
+        var result = text;
+        for (final entry in diacriticCombos.entries) {
+            result = result.replaceAll(entry.key, entry.value);
+        }
+        return result;
+    }
 }

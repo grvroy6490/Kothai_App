@@ -354,7 +354,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                                             ),
                                             child: Text('Sign Up',
                                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: Color.fromARGB(255, 247, 248, 248),
+                                                    color: getFigmaColor(context, 'Schemes/On Primary'),
                                                     fontWeight: FontWeight.w600
                                                 )
                                             )
