@@ -99,8 +99,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
               const composedVowelForms = {'\u0BCA', '\u0BCB', '\u0BCC'};
               final substituted = textNow[to - 1];
               if (composedVowelForms.contains(substituted)) {
-                final nfcPara =
-                    unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
+                final nfcPara = Letters.normalizeTypingText(paragraph);
                 final expectedCursor =
                     ref.read(sessionStateNotifierProvider).cursor;
                 final expected = (expectedCursor < nfcPara.length)
@@ -110,6 +109,11 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                 _compositionPending = null;
                 await ctrl.onKey(correct: correct);
               }
+            } else {
+              await ctrl.catchUpCursorAfterInPlaceEdit(
+                paragraph: paragraph,
+                typedText: textNow,
+              );
             }
             break;
           }
@@ -185,7 +189,7 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
                 : null;
             final correct = expected != null && charToCompare == expected;
             await ctrl.onKey(correct: correct);
-            if (correct) expectedCursor++;
+            if (correct) expectedCursor += codUnitsConsumed;
             // Session may have ended (completed) inside onKey. Stop processing
             // remaining characters — otherwise the next onKey call would see
             // running=false and restart the session from scratch.
@@ -216,7 +220,8 @@ class _ChallengeEditorState extends ConsumerState<ChallengeEditor> {
           if (!ref.read(sessionStateNotifierProvider).running) break;
         }
 
-        ref.read(userInputProvider.notifier).set(widget.controller.text);
+        final textNow = widget.controller.text;
+        ref.read(userInputProvider.notifier).set(textNow);
         final sessionApi = ref.read(sessionControllerProvider.notifier);
         await sessionApi.maybeFinishSessionByProgress();
 

@@ -102,8 +102,8 @@ class ScoreController extends _$ScoreController {
         // await ref.read(xpLocalRepoProvider).markSynced(pending.map((e) => e.id).toList());
     }
 
-    /// Restore totals + entries from Firebase into local cache, while keeping
-    /// any *pending* local entries that haven't been uploaded yet.
+    /// Restore totals + entries from Firebase into local cache, merging guest/offline
+    /// progress (higher local totals) so login does not wipe device XP.
     Future<void> restoreFirebaseToLocal() async {
         final firebaseUser = ref.read(firebaseAuthProvider).currentUser;
         if (firebaseUser == null) return;
@@ -112,25 +112,33 @@ class ScoreController extends _$ScoreController {
         final localRepo = ref.read(scoreLocalRepositoryProvider);
         final cloudRepo = ref.read(scoreCloudRepositoryProvider);
 
-        // Keep local pending progress so we don't lose offline XP.
+        final localTotals = await localRepo.loadScores();
         final pendingLocal = await localRepo.listEntriesFromDB(onlyPending: true);
         final pendingSum = pendingLocal.fold<int>(0, (sum, e) => sum + e.amount);
 
         final firebaseTotals = await cloudRepo.fetchTotals(uid);
+        final cloudXp = firebaseTotals?.totalXp ?? 0;
+        final mergedTotalXp = _mergeTotalXp(
+            localTotalXp: localTotals.totalXp,
+            cloudTotalXp: cloudXp,
+            pendingUnsyncedXp: pendingSum,
+        );
+
+        await _ensureGamificationLevels();
+        final levels = ref.read(gamificationDataControllerProvider)?.levels;
+        if (levels == null || levels.isEmpty) {
+            await localRepo.saveScore(
+                (firebaseTotals ?? const ScoreEntity()).copyWith(
+                    totalXp: mergedTotalXp,
+                ),
+            );
+        } else {
+            await localRepo.saveScore(
+                _computeTotalsFromTotalXp(mergedTotalXp, levels),
+            );
+        }
+
         if (firebaseTotals != null) {
-            final mergedTotalXp = firebaseTotals.totalXp + pendingSum;
-
-            final gamification = ref.read(gamificationDataControllerProvider);
-            final levels = gamification?.levels;
-            if (levels == null || levels.isEmpty) {
-                await localRepo.saveScore(
-                    firebaseTotals.copyWith(totalXp: mergedTotalXp),
-                );
-            } else {
-                final mergedTotals = _computeTotalsFromTotalXp(mergedTotalXp, levels);
-                await localRepo.saveScore(mergedTotals);
-            }
-
             final firebaseEntries = await cloudRepo.fetchEntries(uid);
             final restoredIds = <String>[];
 
@@ -146,6 +154,27 @@ class ScoreController extends _$ScoreController {
         await _load();
     }
 
+    /// Merges account (Firestore) XP with guest/offline XP on this device.
+    ///
+    /// [localTotalXp] already includes amounts from pending DB entries (see [award]),
+    /// so we must not add [pendingUnsyncedXp] again or XP doubles.
+    static int _mergeTotalXp({
+        required int localTotalXp,
+        required int cloudTotalXp,
+        required int pendingUnsyncedXp,
+    }) {
+        if (localTotalXp > 0) {
+            return localTotalXp > cloudTotalXp ? localTotalXp : cloudTotalXp;
+        }
+        return cloudTotalXp + pendingUnsyncedXp;
+    }
+
+    Future<void> _ensureGamificationLevels() async {
+        final levels = ref.read(gamificationDataControllerProvider)?.levels;
+        if (levels != null && levels.isNotEmpty) return;
+        await ref.read(getGamificationDataControllerProvider.future);
+    }
+
     Future<void> _restoreProfileFromCloud(String uid) async {
         final progress = ref.read(userProgressCloudRepositoryProvider);
         final cloudBadges = await progress.fetchBadges(uid);
@@ -156,8 +185,6 @@ class ScoreController extends _$ScoreController {
         final cloudSessions = await progress.fetchSessions(uid);
         final sessionRepo = ref.read(sessionLocalRepositoryProvider);
         final localSessions = await sessionRepo.list();
-
-        if (cloudSessions.isEmpty) return;
 
         final byId = <String, SessionEntity>{};
         for (final s in cloudSessions) {
@@ -180,10 +207,27 @@ class ScoreController extends _$ScoreController {
         final localRepo = ref.read(scoreLocalRepositoryProvider);
         final cloudRepo = ref.read(scoreCloudRepositoryProvider);
 
-        // Upload totals even when there are no pending entries.
-        await cloudRepo.uploadTotals(uid, state);
-
+        await _load();
+        await _ensureGamificationLevels();
+        final cloudTotals = await cloudRepo.fetchTotals(uid);
         final pending = await localRepo.listEntriesFromDB(onlyPending: true);
+        final pendingSum = pending.fold<int>(0, (sum, e) => sum + e.amount);
+        final mergedXp = _mergeTotalXp(
+            localTotalXp: state.totalXp,
+            cloudTotalXp: cloudTotals?.totalXp ?? 0,
+            pendingUnsyncedXp: pendingSum,
+        );
+        final levels = ref.read(gamificationDataControllerProvider)?.levels;
+        final totalsToUpload = (levels == null || levels.isEmpty)
+            ? state.copyWith(totalXp: mergedXp)
+            : _computeTotalsFromTotalXp(mergedXp, levels);
+        if (mergedXp != state.totalXp) {
+            state = totalsToUpload;
+            await localRepo.saveScore(totalsToUpload);
+        }
+
+        await cloudRepo.uploadTotals(uid, totalsToUpload);
+
         if (pending.isNotEmpty) {
             await cloudRepo.uploadEntries(uid, pending);
             await localRepo.markSynced(pending.map((e) => e.id).toList());
@@ -201,12 +245,18 @@ class ScoreController extends _$ScoreController {
         await progress.uploadSessions(uid, sessions);
     }
 
-    /// Full sync: restore cloud -> local (merge pending local), then upload local -> cloud.
+    /// Full sync: merge guest/device progress with Firestore, then upload.
     Future<void> syncAll() async {
-        // Make sure `state` is initialized from local totals first.
+        final firebaseUser = ref.read(firebaseAuthProvider).currentUser;
+        if (firebaseUser == null) {
+            throw StateError('Cannot sync score without a signed-in user.');
+        }
+
         await _load();
+        await _ensureGamificationLevels();
         await restoreFirebaseToLocal();
         await syncLocalToFirebase();
+        await _load();
     }
 
     ScoreEntity _computeTotalsFromTotalXp(

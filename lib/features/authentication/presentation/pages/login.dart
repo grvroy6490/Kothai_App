@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
+import 'package:visai/core/constants/android_signing_fingerprints.dart';
 import 'package:visai/core/theme/figma_color.dart';
 import 'package:visai/di/providers/auth/auth_provider.dart';
 import 'package:visai/domain/usecases/show_modal.dart';
 import 'package:visai/features/authentication/presentation/pages/signup.dart';
+import 'package:visai/features/authentication/presentation/widgets/auth_provider_alert.dart';
+import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,6 +48,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             });
     }
 
+    Future<void> _syncGuestProgressAfterLogin() async {
+        try {
+            await ref.read(scoreControllerProvider.notifier).syncAll();
+            if (!mounted) return;
+            showAuthModalSnackBar(
+                context,
+                message: 'Logged in — your progress was saved to the cloud.',
+                backgroundColor: Colors.green,
+            );
+        } catch (e) {
+            if (!mounted) return;
+            showAuthModalSnackBar(
+                context,
+                message: 'Logged in, but sync failed: $e. Use Profile → Save progress.',
+                backgroundColor: Colors.orange,
+            );
+        }
+    }
+
     // 👇 HANDLE LOGIN
     Future<void> _loginWithEmailAndPassword() async {
         if (!_formloginKey.currentState!.validate()) return;
@@ -55,7 +77,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         // Show loading while checking the account
         setState(() => _loggingIn = true);
         showDialog(
-            context: context,
+            context: authModalOverlayContext(context),
             barrierDismissible: false,
             useRootNavigator: true,
             builder: (_) => const Center(child: CircularProgressIndicator())
@@ -66,8 +88,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         final password = _passwordController.text;
 
         try {
-            // Capture messenger before popping routes
-            final messenger = ScaffoldMessenger.of(context);
 
             final credential = await ref
                 .read(authServiceProvider)
@@ -105,19 +125,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             if (!mounted) return;
 
-            // The userChanges() stream should automatically emit when user signs in
-            // The stream will update naturally, no need to invalidate or refresh
-
             // Close the login bottom sheet
             Navigator.of(context).pop();
 
-            // Notify success using captured messenger (stable context)
-            messenger.showSnackBar(
-                const SnackBar(
-                    content: Text('You are successfully Logged In!'),
-                    backgroundColor: Colors.green
-                )
-            );
+            try {
+                await ref.read(scoreControllerProvider.notifier).syncAll();
+                if (!mounted) return;
+                showAuthModalSnackBar(
+                    context,
+                    message: 'Logged in — your progress was saved to the cloud.',
+                    backgroundColor: Colors.green,
+                );
+            } catch (e) {
+                if (!mounted) return;
+                showAuthModalSnackBar(
+                    context,
+                    message: 'Logged in, but sync failed: $e. Use Profile → Save progress.',
+                    backgroundColor: Colors.orange,
+                );
+            }
 
             return;
         } catch (e) {
@@ -129,10 +155,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 String? fieldError;
                 String? snack;
                 if (e is FirebaseAuthException) {
+                    if (isAuthProviderConflictCode(e.code)) {
+                        if (!mounted) return;
+                        setState(() => _passwordError = null);
+                        await showAuthProviderConflictAlert(
+                            context,
+                            title: authProviderConflictTitle(e.code),
+                            message: e.message ??
+                                'Please use the sign-in method you originally registered with.',
+                        );
+                    } else {
                     switch (e.code) {
                         case 'wrong-password':
                         case 'invalid-credential':
-                            fieldError = 'Incorrect password. Please try again.';
+                            fieldError = e.message ??
+                                'Incorrect password. Please try again.';
                             break;
                         case 'user-not-found':
                             fieldError = 'Incorrect email or password.';
@@ -162,6 +199,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             snack = e.message ?? 'Sign in failed. Please try again.';
                         }
                     }
+                    }
                 } else {
                     // Handle non-Firebase exceptions
                     final errorStr = e.toString().toLowerCase();
@@ -184,8 +222,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     _passwordFocusNode.requestFocus();
                 }
                 if (snack != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(snack), backgroundColor: Colors.red)
+                    showAuthModalSnackBar(
+                        context,
+                        message: snack,
+                        backgroundColor: Colors.red,
                     );
                 }
             }
@@ -205,7 +245,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         // Show loading while authenticating
         setState(() => _loggingIn = true);
         showDialog(
-            context: context,
+            context: authModalOverlayContext(context),
             barrierDismissible: false,
             useRootNavigator: true,
             builder: (_) => const Center(child: CircularProgressIndicator())
@@ -214,9 +254,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         bool loaderDismissed = false;
 
         try {
-            // Capture messenger before popping routes
-            final messenger = ScaffoldMessenger.of(context);
-
             final credential = await ref.read(authServiceProvider).signInWithGoogle();
 
             if (credential == null) {
@@ -260,17 +297,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             if (!mounted) return;
 
-            // Close the login bottom sheet
             Navigator.of(context).pop();
-
-            // Notify success using captured messenger (stable context)
-            messenger.showSnackBar(
-                const SnackBar(
-                    content: Text('You are successfully Logged In with Google!'),
-                    backgroundColor: Colors.green
-                )
-            );
-
+            await _syncGuestProgressAfterLogin();
             return;
         } catch (e, stackTrace) {
             if (kDebugMode) {
@@ -282,8 +310,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Navigator.of(context, rootNavigator: true).pop();
                     loaderDismissed = true;
                 }
-                String snack = 'Unexpected error. Please try again.';
+                String? snack = 'Unexpected error. Please try again.';
+                var showSnack = true;
                 if (e is FirebaseAuthException) {
+                    if (isAuthProviderConflictCode(e.code)) {
+                        showSnack = false;
+                        if (!mounted) return;
+                        await showAuthProviderConflictAlert(
+                            context,
+                            title: authProviderConflictTitle(e.code),
+                            message: e.message ??
+                                'Please use the sign-in method you originally registered with.',
+                        );
+                    } else {
                     switch (e.code) {
                         case 'account-exists-with-different-credential':
                             snack =
@@ -299,8 +338,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             snack = 'Authentication error. Please try again.';
                             break;
                         case 'google-android-config':
-                            snack =
-                            'Google Sign-In: add this app build\'s SHA-1 in Firebase Console (release keystore for release APKs), then rebuild.';
+                            snack = AndroidSigningFingerprints.googleSignInShaMismatchHint;
                             break;
                         default:
                         // Check if the error message contains network-related keywords
@@ -315,6 +353,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             snack = e.message ?? 'Google sign in failed. Please try again.';
                         }
                     }
+                    }
                 } else if (e is FirebaseException) {
                     // e.g. Firestore write after successful Google auth
                     snack = e.code == 'permission-denied'
@@ -324,8 +363,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     final m = '${e.message ?? ''} ${e.code}'.toLowerCase();
                     if ((m.contains('10') && m.contains('apiexception')) ||
                         m.contains('developer_error')) {
-                        snack =
-                            'Google Sign-In: register this build in Firebase (SHA-1 for the keystore you used).';
+                        snack = AndroidSigningFingerprints.googleSignInShaMismatchHint;
                     } else {
                         snack = e.message ?? 'Google sign in failed. Please try again.';
                     }
@@ -345,9 +383,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     }
                 }
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(snack), backgroundColor: Colors.red)
-                );
+                if (showSnack && mounted) {
+                    showAuthModalSnackBar(
+                        context,
+                        message: snack,
+                        backgroundColor: Colors.red,
+                        duration: snack.length > 120
+                            ? const Duration(seconds: 8)
+                            : const Duration(seconds: 4),
+                    );
+                }
             }
         } finally {
             if (mounted && !loaderDismissed) {

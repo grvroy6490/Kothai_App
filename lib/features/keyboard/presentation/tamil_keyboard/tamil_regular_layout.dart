@@ -167,7 +167,7 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                                     )
                                 );
                             }),
-                        // Expanded(child: Text(' '))
+                        Expanded(child: Text(' '))
                     ]
                 ),
 

@@ -1,128 +1,71 @@
-# Google Sign-In Setup Guide
+# Google Sign-In setup (Visai)
 
-## Issue Fixed
-The Google Sign-In configuration has been updated to use the web client ID from `google-services.json`. However, you need to add SHA certificates to Firebase Console for Google Sign-In to work properly.
+## SHA fingerprints (Android) — start here
 
-## SHA Certificates (Debug Build)
+**All build types (debug, client release, Play Store) need separate SHA-1/SHA-256 entries in Firebase.**
 
-Your debug keystore SHA certificates are:
+| Document | Purpose |
+|----------|---------|
+| **[android/signing/SHA_FINGERPRINTS.md](android/signing/SHA_FINGERPRINTS.md)** | Human guide: which SHA for client APK vs Play Store |
+| **[android/signing/sha_fingerprints.json](android/signing/sha_fingerprints.json)** | Copy-paste values + Play Store placeholder |
+| **[lib/core/constants/android_signing_fingerprints.dart](lib/core/constants/android_signing_fingerprints.dart)** | Same values in Dart (reference / error hint) |
 
-**SHA-1:**
-```
-2F:A4:F9:53:20:53:7A:6A:C0:EC:D6:03:01:D4:D2:2D:F7:9E:BB:8C
-```
+Refresh after keystore change:
 
-**SHA-256:**
-```
-96:1D:7A:C8:6D:FE:F7:BD:39:7F:9F:16:5F:67:35:DA:F1:F6:D4:37:8E:7B:D3:D6:87:A9:43:69:CD:A1:87:D9
-```
-
-## Steps to Add SHA Certificates to Firebase Console
-
-1. **Go to Firebase Console**
-   - Visit: https://console.firebase.google.com/
-   - Select your project: **visai-97c45**
-
-2. **Navigate to Project Settings**
-   - Click the gear icon (⚙️) next to "Project Overview"
-   - Select **Project Settings**
-
-3. **Go to Your Apps Section**
-   - Scroll down to **Your apps** section
-   - Find your Android app: **org.dckap.visai**
-   - Click on it
-
-4. **Add SHA Certificates**
-   - Scroll down to **SHA certificate fingerprints** section
-   - Click **Add fingerprint**
-   - Paste the SHA-1 certificate: `2F:A4:F9:53:20:53:7A:6A:C0:EC:D6:03:01:D4:D2:2D:F7:9E:BB:8C`
-   - Click **Add fingerprint** again
-   - Paste the SHA-256 certificate: `96:1D:7A:C8:6D:FE:F7:BD:39:7F:9F:16:5F:67:35:DA:F1:F6:D4:37:8E:7B:D3:D6:87:A9:43:69:CD:A1:87:D9`
-   - Click **Save**
-
-5. **Download Updated google-services.json** (Optional)
-   - After adding SHA certificates, Firebase may generate a new OAuth client
-   - You can download the updated `google-services.json` if needed
-   - However, the current configuration should work with the web client ID
-
-## Code Changes Made
-
-### Updated `lib/services/authentication/authentication_service.dart`
-
-The `GoogleSignIn` instance now explicitly uses the web client ID:
-
-```dart
-final GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: ['email'],
-  // Use the web client ID from google-services.json for server-side authentication
-  serverClientId: '834995515353-o2str0l8rbpfkf0gmnrejjj0eii4883k.apps.googleusercontent.com',
-);
+```bash
+cd android && ./gradlew signingReport
 ```
 
-This ensures that:
-- Google Sign-In can authenticate with Firebase Auth
-- The ID token is properly validated server-side
-- The authentication flow works correctly
+---
 
-## Testing
+## Firebase project
 
-After adding the SHA certificates:
+- **Project:** `visai-97c45`
+- **Android package:** `org.dckap.visai`
+- **Console:** https://console.firebase.google.com/project/visai-97c45/settings/general
 
-1. **Clean and rebuild the app:**
-   ```bash
-   flutter clean
-   flutter pub get
-   flutter run
-   ```
+### Register in Firebase (all three profiles)
 
-2. **Test Google Sign-In:**
-   - Open the app
-   - Go to Login page
-   - Click "Sign in with Google"
-   - Select a Google account
-   - Verify that sign-in completes successfully
+1. **Debug** — local `flutter run` / USB  
+   - SHA-1: `2F:A4:F9:53:20:53:7A:6A:C0:EC:D6:03:01:D4:D2:2D:F7:9E:BB:8C`
+
+2. **Release upload** — APK/AAB you sign with `upload-keystore.jks` (share with client)  
+   - SHA-1: `B7:39:71:9D:26:ED:9C:7F:5C:8D:8A:0A:A3:D6:10:B3:21:92:8C:6D`
+
+3. **Play Store app signing** — [Play app signing](https://play.google.com/console/developers/app/keymanagement) (select app) or **Test and release → Setup → App signing** → **App signing key certificate**  
+   - Paste into `sha_fingerprints.json` and add to Firebase (required for Play installs)
+
+After adding fingerprints: download **`google-services.json`** → `android/app/google-services.json` → rebuild.
+
+---
+
+## Code configuration
+
+`lib/services/authentication/authentication_service.dart`:
+
+- **Android:** `serverClientId` = web client from `google-services.json`
+- **iOS:** `clientId` = iOS OAuth client (`834995515353-4vv36b5krrkd219ofnj618m9277bmiva.apps.googleusercontent.com`)
+- **iOS URL scheme:** `ios/Runner/Info.plist` → `CFBundleURLSchemes`
+
+---
+
+## Test checklist
+
+- [ ] Google Sign-In on **debug** build (`flutter run`)
+- [ ] Google Sign-In on **release APK** sent to client
+- [ ] Google Sign-In on **Play internal / production** track
+- [ ] Logout → Google Sign-In again (second attempt)
+
+---
 
 ## Troubleshooting
 
-### If Google Sign-In still doesn't work:
+| Symptom | Likely cause |
+|---------|----------------|
+| Red snackbar / SHA-1 message | This APK’s SHA not in Firebase — see [SHA_FINGERPRINTS.md](android/signing/SHA_FINGERPRINTS.md) |
+| Works on dev phone, fails for users | Play Store uses different signing key than your upload key |
+| `ApiException: 10` | Same as SHA mismatch |
 
-1. **Verify SHA certificates are added:**
-   - Check Firebase Console > Project Settings > Your apps > Android app
-   - Ensure both SHA-1 and SHA-256 are listed
+Logcat: `adb logcat | findstr /i "google signin auth"`
 
-2. **Check package name:**
-   - Verify `applicationId` in `android/app/build.gradle.kts` matches Firebase app: `org.dckap.visai`
-
-3. **Verify google-services.json:**
-   - Ensure `google-services.json` is in `android/app/` directory
-   - Check that `package_name` matches: `org.dckap.visai`
-
-4. **Check for errors in logcat:**
-   ```bash
-   adb logcat | grep -i "google\|signin\|auth"
-   ```
-
-5. **Clear app data and retry:**
-   - Uninstall the app
-   - Reinstall and try again
-
-## For Release Build
-
-When you create a release build, you'll need to:
-
-1. **Generate release SHA certificates:**
-   ```bash
-   cd android
-   ./gradlew signingReport
-   ```
-   (Look for the release variant SHA certificates)
-
-2. **Add release SHA certificates to Firebase Console:**
-   - Follow the same steps above
-   - Add both SHA-1 and SHA-256 for the release keystore
-
-## Additional Notes
-
-- The web client ID (`serverClientId`) is required for Firebase Auth to validate the ID token server-side
-- SHA certificates are required for Google Sign-In to work on Android
-- Both debug and release SHA certificates should be added if you plan to test both builds
+See also: [android/get_sha_certificates.md](android/get_sha_certificates.md) (how to run `signingReport`).

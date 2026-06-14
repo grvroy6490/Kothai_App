@@ -37,7 +37,7 @@ class SplashPage extends StatelessWidget {
                         child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 50),
                             child: Text(
-                                "விசை செயலியில் உங்களை வரவேற்கிறோம். நீங்கள் எழுதுவது போல் தட்டச்சு செய்யலாம்.",
+                                "தமிழ் தட்டச்சுத் திறனை ேம்படுத்தலாம் வாங்க!",
                                 style: AppTypography.bodyMedium.copyWith(
                                     color: getFigmaColor(context, 'Schemes/On Surface Variant'),
                                 ),
@@ -52,18 +52,18 @@ class SplashPage extends StatelessWidget {
                             size: 50,
                         ),
                     ),
-                    Flexible(
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                                "உங்கள் தட்டச்சு பயணத்தை தயாரிக்கிறோம்...",
-                                style: AppTypography.bodyMedium.copyWith(
-                                    color: getFigmaColor(context, 'Schemes/On Surface Variant'),
-                                ),
-                                textAlign: TextAlign.center,
-                            ),
-                        ),
-                    ),
+                    // Flexible(
+                    //     child: Padding(
+                    //         padding: const EdgeInsets.symmetric(horizontal: 20),
+                    //         child: Text(
+                    //             "உங்கள் தட்டச்சு பயணத்தை தயாரிக்கிறோம்...",
+                    //             style: AppTypography.bodyMedium.copyWith(
+                    //                 color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                    //             ),
+                    //             textAlign: TextAlign.center,
+                    //         ),
+                    //     ),
+                    // ),
                 ],
             ),
         );

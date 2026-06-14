@@ -116,14 +116,12 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
             // The keyboard may have done an in-place substitution with the same
             // text length — e.g. replacing "தெ" (U+0BA4+U+0BC6) with "தொ"
             // (U+0BA4+U+0BCA) when ா is pressed after a held left-diacritic.
-            // Length didn't change, so the normal append path never runs, but
-            // our pending composition must still be resolved.
+            // Length didn't change, so the normal append path never runs.
             if (_compositionPending != null && to > 0) {
               const composedVowelForms = {'\u0BCA', '\u0BCB', '\u0BCC'};
               final substituted = textNow[to - 1];
               if (composedVowelForms.contains(substituted)) {
-                final nfcPara =
-                    unorm.nfc(Letters.applyDiacriticCompositions(paragraph));
+                final nfcPara = Letters.normalizeTypingText(paragraph);
                 final expectedCursor =
                     ref.read(sessionStateNotifierProvider).cursor;
                 final expected = (expectedCursor < nfcPara.length)
@@ -133,6 +131,11 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                 _compositionPending = null;
                 await ctrl.onKey(correct: correct);
               }
+            } else {
+              await ctrl.catchUpCursorAfterInPlaceEdit(
+                paragraph: paragraph,
+                typedText: textNow,
+              );
             }
             break;
           }
@@ -225,7 +228,7 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
                 : null;
             final correct = expected != null && charToCompare == expected;
             await ctrl.onKey(correct: correct);
-            if (correct) expectedCursor++;
+            if (correct) expectedCursor += codUnitsConsumed;
             // Session may have ended (completed) inside onKey. Stop processing
             // remaining characters — otherwise the next onKey call would see
             // running=false and restart the session from scratch.
@@ -258,7 +261,8 @@ class _PracticeEditorPage extends ConsumerState<PracticeEditorPage> {
         }
 
         // One more sync: field can differ from [userInput] (e.g. same-length Tamil edits).
-        ref.read(userInputProvider.notifier).set(widget.controller.text);
+        final textNow = widget.controller.text;
+        ref.read(userInputProvider.notifier).set(textNow);
         final sessionApi = ref.read(sessionControllerProvider.notifier);
         await sessionApi.maybeFinishSessionByProgress();
 

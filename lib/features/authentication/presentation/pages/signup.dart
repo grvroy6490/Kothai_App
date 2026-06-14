@@ -10,6 +10,7 @@ import 'package:visai/di/providers/auth/auth_provider.dart';
 import 'package:visai/domain/usecases/show_modal.dart';
 import 'package:visai/features/authentication/presentation/pages/login.dart';
 import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart' as auth_stream;
+import 'package:visai/features/authentication/presentation/widgets/auth_provider_alert.dart';
 import 'package:visai/features/authentication/presentation/widgets/form-text-field.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
@@ -57,14 +58,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
         // optional: simple loading overlay
         showDialog(
-            context: context,
+            context: authModalOverlayContext(context),
             barrierDismissible: false,
             useRootNavigator: true,
             builder: (_) => const Center(child: CircularProgressIndicator())
         );
 
         bool loaderDismissed = false;
-        final messenger = ScaffoldMessenger.of(context);
 
         try {
             // Create account (signup), not sign-in
@@ -91,9 +91,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             ref.invalidate(auth_stream.authUserProvider);
             // Close the signup sheet (bottom sheet) after success
             Navigator.of(context).pop();
-            // Notify success via captured messenger to avoid deactivated context
-            messenger.showSnackBar(
-                const SnackBar(content: Text('You are successfully signed up!'), backgroundColor: Colors.green)
+            showAuthModalSnackBar(
+                context,
+                message: 'You are successfully signed up!',
+                backgroundColor: Colors.green,
             );
         } on FirebaseAuthException catch (e) {
             if (mounted) {
@@ -101,17 +102,31 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     Navigator.of(context, rootNavigator: true).pop(); // close loading
                     loaderDismissed = true;
                 }
-                if (e.code == 'email-already-in-use') {
-                    messenger.showSnackBar(
-                        const SnackBar(content: Text('Account exists. Please sign in.'), backgroundColor: Colors.orange)
+                if (isAuthProviderConflictCode(e.code)) {
+                    if (!mounted) return;
+                    await showAuthProviderConflictAlert(
+                        context,
+                        title: authProviderConflictTitle(e.code),
+                        message: e.message ??
+                            'Please use the sign-in method you originally registered with.',
+                    );
+                } else if (e.code == 'email-already-in-use') {
+                    showAuthModalSnackBar(
+                        context,
+                        message: 'Account exists. Please sign in.',
+                        backgroundColor: Colors.orange,
                     );
                     _handleLogin();
                 } else {
                     final msg = switch (e.code) {
                         'weak-password' => 'Password too weak.',
-                        _ => 'Sign up failed: ${e.code}'
+                        _ => e.message ?? 'Sign up failed. Please try again.',
                     };
-                    messenger.showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+                    showAuthModalSnackBar(
+                        context,
+                        message: msg,
+                        backgroundColor: Colors.red,
+                    );
                 }
             }
         } catch (e) {
@@ -120,8 +135,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     Navigator.of(context, rootNavigator: true).pop(); // close loading
                     loaderDismissed = true;
                 }
-                messenger.showSnackBar(
-                    const SnackBar(content: Text('An unexpected error occurred.'), backgroundColor: Colors.red)
+                showAuthModalSnackBar(
+                    context,
+                    message: 'An unexpected error occurred.',
+                    backgroundColor: Colors.red,
                 );
             }
         } finally {

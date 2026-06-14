@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:visai/core/constants/android_signing_fingerprints.dart';
+import 'package:visai/services/authentication/auth_provider_conflict.dart';
 
 /// iOS OAuth client ID (reversed URL scheme in Info.plist is derived from this).
 const String _kGoogleSignInIosClientId =
@@ -63,9 +65,14 @@ class AuthService {
       );
     }
 
+    final normalizedEmail = email.trim().toLowerCase();
+
     try {
+      final methods = await fetchSignInMethodsForEmail(_auth, normalizedEmail);
+      assertEmailPasswordAllowed(methods);
+
       final credential = await _auth.signInWithEmailAndPassword(
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         password: password,
       );
 
@@ -81,11 +88,13 @@ class AuthService {
           );
         case 'wrong-password':
         case 'invalid-credential':
-          // Firebase Auth 5.7.0 uses 'invalid-credential' for wrong password
-          throw FirebaseAuthException(
-            code: 'invalid-credential',
-            message: 'Incorrect password. Please try again.',
-          );
+          final methods =
+              await fetchSignInMethodsForEmail(_auth, normalizedEmail);
+          throw emailPasswordSignInFailureException(methods);
+        case 'account-registered-with-google':
+        case 'account-linked-with-google':
+        case 'sign-in-try-google':
+          rethrow;
         case 'invalid-email':
           throw FirebaseAuthException(
             code: 'invalid-email',
@@ -166,9 +175,14 @@ class AuthService {
       );
     }
 
+    final normalizedEmail = email.trim().toLowerCase();
+
     try {
+      final methods = await fetchSignInMethodsForEmail(_auth, normalizedEmail);
+      assertEmailPasswordAllowed(methods);
+
       final credential = await _auth.createUserWithEmailAndPassword(
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         password: password,
       );
 
@@ -190,11 +204,24 @@ class AuthService {
             message: 'Password must be at least 6 characters long.',
           );
         case 'email-already-in-use':
+          final methods =
+              await fetchSignInMethodsForEmail(_auth, normalizedEmail);
+          if (signInMethodsIncludeGoogle(methods) &&
+              !signInMethodsIncludePassword(methods)) {
+            throw FirebaseAuthException(
+              code: 'account-registered-with-google',
+              message:
+                  'This email is already registered with Google. '
+                  'Please use Continue with Google to sign in.',
+            );
+          }
           throw FirebaseAuthException(
             code: 'email-already-in-use',
             message:
                 'An account already exists with this email address. Please sign in instead.',
           );
+        case 'account-registered-with-google':
+          rethrow;
         case 'invalid-email':
           throw FirebaseAuthException(
             code: 'invalid-email',
@@ -270,6 +297,12 @@ class AuthService {
         );
       }
 
+      final googleEmail = googleUser.email.trim().toLowerCase();
+      if (googleEmail.isNotEmpty) {
+        final methods = await fetchSignInMethodsForEmail(_auth, googleEmail);
+        assertGoogleSignInAllowed(methods);
+      }
+
       // Create Firebase credential using both tokens
       // accessToken is optional but recommended for better security
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -297,11 +330,38 @@ class AuthService {
       // Handle Firebase Auth 5.7.0 error codes
       switch (e.code) {
         case 'account-exists-with-different-credential':
+          final pendingEmail = e.email?.trim().toLowerCase() ?? '';
+          if (pendingEmail.isNotEmpty) {
+            final methods =
+                await fetchSignInMethodsForEmail(_auth, pendingEmail);
+            if (signInMethodsIncludePassword(methods) &&
+                !signInMethodsIncludeGoogle(methods)) {
+              throw FirebaseAuthException(
+                code: 'account-registered-with-email',
+                message:
+                    'This email is already registered with email and password. '
+                    'Please sign in with your email and password instead of Google.',
+              );
+            }
+            if (signInMethodsIncludeGoogle(methods) &&
+                !signInMethodsIncludePassword(methods)) {
+              throw FirebaseAuthException(
+                code: 'account-registered-with-google',
+                message:
+                    'This email is already registered with Google. '
+                    'Please use Continue with Google to sign in.',
+              );
+            }
+          }
           throw FirebaseAuthException(
             code: 'account-exists-with-different-credential',
             message:
-                'An account already exists with the same email address but different sign-in method. Please use email/password to sign in.',
+                'An account already exists with this email using a different sign-in method. '
+                'Please use the method you originally signed up with.',
           );
+        case 'account-registered-with-email':
+        case 'account-registered-with-google':
+          rethrow;
         case 'invalid-credential':
           throw FirebaseAuthException(
             code: 'invalid-credential',
@@ -376,8 +436,7 @@ class AuthService {
             combined.contains('developer_error')) {
           throw FirebaseAuthException(
             code: 'google-android-config',
-            message:
-                'Google Sign-In is not set up for this build. In Firebase Console, add the SHA-1 (and SHA-256) for the keystore used to build this APK—use the release keystore fingerprint for release installs—then download the updated google-services.json and rebuild.',
+            message: AndroidSigningFingerprints.googleSignInShaMismatchHint,
           );
         }
       }

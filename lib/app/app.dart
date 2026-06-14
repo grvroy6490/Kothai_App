@@ -18,6 +18,7 @@ import 'package:visai/di/providers/app_initialilizer/app_initializer.dart';
 import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/splash/splash_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visai/core/ui/app_scaffold_messenger.dart';
 import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
 // import 'package:logger/logger.dart';
@@ -31,11 +32,24 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-    // Prevent multiple restore/sync calls for the same uid.
-    static String? _lastSyncedUid;
-
-    final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
-        GlobalKey<ScaffoldMessengerState>();
+    static Future<void> _syncScoresAfterAuth(WidgetRef ref) async {
+        try {
+            await ref.read(scoreControllerProvider.notifier).syncAll();
+            appScaffoldMessengerKey.currentState?.showSnackBar(
+                const SnackBar(
+                    content: Text('Progress synced successfully.'),
+                    backgroundColor: Colors.green,
+                ),
+            );
+        } catch (e) {
+            appScaffoldMessengerKey.currentState?.showSnackBar(
+                SnackBar(
+                    content: Text('Sync failed: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                ),
+            );
+        }
+    }
 
     void clear() async {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -62,31 +76,13 @@ class _AppState extends ConsumerState<App> {
             (previous, next) {
                 next.whenData((user) {
                     final uid = user?.uid;
-                    if (uid == null) {
-                        _lastSyncedUid = null;
-                        return;
-                    }
-                    if (_lastSyncedUid == uid) return;
+                    if (uid == null) return;
 
-                    _lastSyncedUid = uid;
+                    // Sync on sign-in / account switch — not on token refresh for same user.
+                    final previousUid = previous?.valueOrNull?.uid;
+                    if (previousUid == uid) return;
 
-                    // Show a snackbar for sync success/failure.
-                    unawaited(() async {
-                        try {
-                            await ref.read(scoreControllerProvider.notifier).syncAll();
-                            _scaffoldMessengerKey.currentState?.showSnackBar(
-                                const SnackBar(content: Text('Progress synced successfully.'),
-                                    backgroundColor: Colors.green),
-                            );
-                        } catch (e) {
-                            _scaffoldMessengerKey.currentState?.showSnackBar(
-                                SnackBar(
-                                    content: Text('Sync failed: ${e.toString()}'),
-                                    backgroundColor: Colors.red,
-                                ),
-                            );
-                        }
-                    }());
+                    unawaited(_syncScoresAfterAuth(ref));
                 });
             },
         );
@@ -99,7 +95,7 @@ class _AppState extends ConsumerState<App> {
             minTextAdapt: true,
             splitScreenMode: false,
             child: GetMaterialApp(
-                scaffoldMessengerKey: _scaffoldMessengerKey,
+                scaffoldMessengerKey: appScaffoldMessengerKey,
                 getPages: routes,
                 debugShowCheckedModeBanner: false,
                 themeMode: themeMode,

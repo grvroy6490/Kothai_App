@@ -31,8 +31,8 @@ import 'package:visai/features/typing_session/usecases/score/score_calculation.d
 // import 'package:logger/logger.dart';
 // import 'package:logger/logger.dart';
 import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart';
+import 'package:visai/features/typing_session/domain/typing_cluster_progress.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:unorm_dart/unorm_dart.dart' as unorm;
 import 'package:uuid/uuid.dart';
 
 part 'session_controller_provider.g.dart';
@@ -64,7 +64,9 @@ class SessionController extends _$SessionController {
     ref.read(metricsStateControllerProvider.notifier).reset();
     ref
         .read(metricsStateControllerProvider.notifier)
-        .setTotalChars(paragraph.content.length);
+        .setTotalChars(
+          TypingClusterProgress.assess('', paragraph.content).totalTargetClusters,
+        );
 
     // start engine (same [paragraph.content] the editor uses for nfcPara)
     ref
@@ -229,7 +231,6 @@ class SessionController extends _$SessionController {
               .onChallengeCompleted(Get.context!);
           // _logger.f(challenge);
         }
-
       }
 
       final xp = _mode == SessionMode.practice
@@ -302,7 +303,9 @@ class SessionController extends _$SessionController {
       // Push progress to Firebase when signed in (practice + challenge).
       if (ref.read(firebaseAuthProvider).currentUser != null) {
         try {
-          await ref.read(scoreControllerProvider.notifier).syncLocalToFirebase();
+          await ref
+              .read(scoreControllerProvider.notifier)
+              .syncLocalToFirebase();
         } catch (_) {
           // Network / rules errors must not break completion flow; user can sync manually.
         }
@@ -365,7 +368,29 @@ class SessionController extends _$SessionController {
   /// has been processed. Finishes when [SessionState.cursor] has reached the end
   /// of the typing line (same NFC+diacritic length as the editor), not when raw
   /// [userInput] string-equals the target.
-  Future<void> maybeFinishSessionByProgress() => _completeSessionIfProgressDone();
+  Future<void> maybeFinishSessionByProgress() =>
+      _completeSessionIfProgressDone();
+
+  /// After a same-length in-place keyboard edit (ொ/ோ/ௌ, pulli merge), advance
+  /// the session cursor for every code unit that now matches the target.
+  Future<void> catchUpCursorAfterInPlaceEdit({
+    required String paragraph,
+    required String typedText,
+  }) async {
+    if (!ref.read(sessionStateNotifierProvider).running) return;
+
+    final nfcPara = Letters.normalizeTypingText(paragraph);
+    final nfcIn = Letters.normalizeTypingText(typedText);
+    var cursor = ref.read(sessionStateNotifierProvider).cursor;
+
+    while (cursor < nfcPara.length &&
+        cursor < nfcIn.length &&
+        nfcIn[cursor] == nfcPara[cursor]) {
+      await onKey(correct: true);
+      if (!ref.read(sessionStateNotifierProvider).running) return;
+      cursor = ref.read(sessionStateNotifierProvider).cursor;
+    }
+  }
 
   /// True when the engine is [SessionState.running] and [userInput] has reached
   /// the end of [SessionState.target] (see [_isTargetTextFullyTyped]).
@@ -383,43 +408,12 @@ class SessionController extends _$SessionController {
     return _isLineCompleteByCursorOrBuffer(override: text);
   }
 
-  String _normTypingForProgress(String s) {
-    return unorm.nfc(Letters.applyDiacriticCompositions(s));
-  }
-
-  /// Same as `nfcPara.length` in the editors; **not** raw [String.length] on
-  /// [SessionState.target].
-  int _nfcKeySpaceLength(String target) {
-    if (target.isEmpty) return 0;
-    return _normTypingForProgress(target).length;
-  }
-
   bool _isLineCompleteByCursorOrBuffer({String? override}) {
     final st = ref.read(sessionStateNotifierProvider);
     if (st.target.isEmpty) return false;
-    final nfcLen = _nfcKeySpaceLength(st.target);
-    if (nfcLen == 0) return false;
-
-    // Condition 1: cursor (correct-only) reached end of NFC key-space.
-    if (st.cursor >= nfcLen) return true;
 
     final String buffer = override ?? ref.read(userInputProvider);
-    if (buffer.isEmpty) return false;
-
-    // Condition 2: grapheme-cluster count matches the target - same rule used
-    // by AnimatedContentBoard and typingProgressProvider. Ends the session the
-    // instant the visual overlay shows all characters covered, even when wrong
-    // characters have fewer UTF-16 code units than the expected ones.
-    final targetClusterLen = st.target.characters.length;
-    if (targetClusterLen > 0 && buffer.characters.length >= targetClusterLen) {
-      return true;
-    }
-
-    // Condition 3: NFC code-unit fallback (correct line + optional trailing).
-    final nIn = _normTypingForProgress(buffer);
-    if (nIn.length >= nfcLen) return true;
-    final nT = _normTypingForProgress(st.target);
-    return nT.isNotEmpty && nIn.startsWith(nT);
+    return TypingClusterProgress.assess(buffer, st.target).isComplete;
   }
 
   bool _isTargetTextFullyTyped() {

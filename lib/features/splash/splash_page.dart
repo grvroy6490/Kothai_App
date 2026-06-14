@@ -53,7 +53,7 @@ class SplashPage extends StatelessWidget {
                                 Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 50),
                                     child: Text(
-                                        "விசை செயலியில் உங்களை வரவேற்கிறோம். விரல்களுக்குப் பயிற்சி. தமிழுக்குத் தேர்ச்சி.",
+                                        "தமிழ் தட்டச்சுத் திறனை மேம்படுத்தலாம் வாங்க!",
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                         ),
@@ -67,15 +67,15 @@ class SplashPage extends StatelessWidget {
                                         size: 50
                                     )
                                 ),
-                                Padding(padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(20)),
-                                    child: Text(
-                                        "தட்டச்சு களம் தயாராகிறது...",
-                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                            color: getFigmaColor(context, 'Schemes/On Surface Variant')
-                                        ),
-                                        textAlign: TextAlign.center
-                                    )
-                                ),
+                                // Padding(padding: EdgeInsets.symmetric(horizontal: Gap(context).gap(20)),
+                                //     child: Text(
+                                //         "தட்டச்சு களம் தயாராகிறது...",
+                                //         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                //             color: getFigmaColor(context, 'Schemes/On Surface Variant')
+                                //         ),
+                                //         textAlign: TextAlign.center
+                                //     )
+                                // ),
                                 Expanded(
                                     flex: 1,
                                     child: Container()

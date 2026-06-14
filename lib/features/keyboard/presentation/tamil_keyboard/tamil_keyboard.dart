@@ -12,6 +12,10 @@ import 'package:vibration/vibration.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 class TamilKeyboard extends KeyboardController {
+  /// Tamil AU length mark (U+0BD7). Not on the key row; only used internally so
+  /// [ள] can trigger ெ→ௌ composition without a visible [ௗ] key.
+  static const String _auComposeSentinel = '\u0BD7';
+
   String? _heldLeftDiacritic;
   Ref? _ref;
 
@@ -133,31 +137,68 @@ class TamilKeyboard extends KeyboardController {
       }
     }
 
+    final int cursor = text.selection.baseOffset.clamp(0, text.text.length);
+    final String prefixStr = text.text.substring(0, cursor);
+    final String suffixStr = text.text.substring(cursor);
+
+    // [ள] completes AU (ெ → ௌ) on mei / க்ஷ; stays [ள] after ள-conjugates (ள்…ஒள).
+    if (value == 'ள' &&
+        !_prefixEndsWithLaContext(prefixStr) &&
+        _prefixEndsWithMeiPlusShortE(prefixStr)) {
+      final composed = _composeMeiEWithAalOrDot(prefixStr, _auComposeSentinel);
+      if (composed != null) {
+        final normalized = _normalizeAndInsert(composed + suffixStr);
+        text.value = TextEditingValue(
+          text: normalized,
+          selection: TextSelection.collapsed(offset: composed.length),
+        );
+        for (var ch in 'ௌ'.characters) {
+          _notifyOnKey(ch);
+        }
+        return;
+      }
+    }
+
     if (Letters.rightDiacriticLetters.contains(value)) {
-      if (text.text.isEmpty) return;
-      final lastChar = text.text.characters.last;
+      if (prefixStr.isEmpty) return;
+
+      // ெ+ா→ொ, ே+ா→ோ with full consonant cluster (க்ஷெ, கெ, …).
+      if (value == 'ா') {
+        final composed = _composeMeiEWithAalOrDot(prefixStr, value);
+        if (composed != null) {
+          final normalized = _normalizeAndInsert(composed + suffixStr);
+          text.value = TextEditingValue(
+            text: normalized,
+            selection: TextSelection.collapsed(offset: composed.length),
+          );
+          for (var ch in value.characters) {
+            _notifyOnKey(ch);
+          }
+          return;
+        }
+      }
+
+      final lastChar = prefixStr.characters.last;
       if (Letters.uyirLetters.contains(lastChar) && lastChar != 'ஒ') return;
 
-      // Check for multi-character sequences first (like 'க்ஷ', 'ஸ்ரீ')
       final multiCharSequences = ['க்ஷ', 'ஸ்ரீ'];
       String? matchingSequence;
       for (final seq in multiCharSequences) {
-        if (text.text.endsWith(seq)) {
+        if (prefixStr.endsWith(seq)) {
           matchingSequence = seq;
           break;
         }
       }
 
-      // Allow right diacritics on mei letters AND special consonants
       if (!Letters.uyirLetters.contains(lastChar) || matchingSequence != null) {
         final base = matchingSequence ?? lastChar;
         final combinedValue = base + value;
-        final prefix = text.text.substring(0, text.text.length - base.length);
-        final newText = _normalizeAndInsert(prefix + combinedValue);
+        final before = prefixStr.substring(0, prefixStr.length - base.length);
+        final newText = _normalizeAndInsert(before + combinedValue + suffixStr);
 
         text.value = TextEditingValue(
           text: newText,
-          selection: TextSelection.collapsed(offset: newText.length),
+          selection: TextSelection.collapsed(offset: before.length + combinedValue.length),
         );
 
         for (var ch in combinedValue.characters) {
@@ -167,18 +208,14 @@ class TamilKeyboard extends KeyboardController {
       }
     }
 
-    // Handle special diacritic combos (like ெ + ா = ொ)
-    final cursorPosition = text.selection.baseOffset;
-    final prefix = text.text.characters.take(cursorPosition).string;
-    final suffix = text.text.characters.skip(cursorPosition).string;
-
-    if (prefix.isNotEmpty) {
-      final lastCluster = prefix.characters.last;
+    // NFC-style pairs (e.g. bare ெ+ா) when not handled above.
+    if (prefixStr.isNotEmpty) {
+      final lastCluster = prefixStr.characters.last;
       final comboKey = lastCluster + value;
       if (Letters.diacriticCombos.containsKey(comboKey)) {
         final combined = Letters.diacriticCombos[comboKey]!;
-        final newPrefix = prefix.characters.skipLast(1).string + combined;
-        final normalized = _normalizeAndInsert(newPrefix + suffix);
+        final newPrefix = prefixStr.characters.skipLast(1).string + combined;
+        final normalized = _normalizeAndInsert(newPrefix + suffixStr);
 
         text.value = TextEditingValue(
           text: normalized,
@@ -186,41 +223,10 @@ class TamilKeyboard extends KeyboardController {
         );
         return;
       }
-      // Multi-char base: cluster ending with ெ/ே/ை + ா/ௗ → ொ/ோ/ௌ (e.g. க்ஷெ + ா → க்ஷொ)
-      if (Letters.rightDiacriticLetters.contains(value) &&
-          (value == 'ா' || value == 'ௗ') &&
-          lastCluster.runes.isNotEmpty) {
-        const int leftShort = 0x0BC6; // ெ
-        const int leftLong = 0x0BC7;  // ே
-        const int comboShortO = 0x0BCA; // ொ
-        const int comboLongO = 0x0BCB;  // ோ
-        const int comboAu = 0x0BCC;    // ௌ
-        final runes = lastCluster.runes.toList();
-        final lastRune = runes.last;
-        int? replacement;
-        if (value == 'ா') {
-          if (lastRune == leftShort) replacement = comboShortO;
-          if (lastRune == leftLong) replacement = comboLongO;
-        } else if (value == 'ௗ') {
-          if (lastRune == leftShort) replacement = comboAu;
-        }
-        if (replacement != null) {
-          final newRunes = runes.sublist(0, runes.length - 1)..add(replacement);
-          final newLastCluster = String.fromCharCodes(newRunes);
-          final newPrefix = prefix.characters.skipLast(1).string + newLastCluster;
-          final normalized = _normalizeAndInsert(newPrefix + suffix);
-          text.value = TextEditingValue(
-            text: normalized,
-            selection: TextSelection.collapsed(offset: newPrefix.length),
-          );
-          return;
-        }
-      }
     }
 
-    // Default insert
-    final newPrefix = prefix + value;
-    final normalized = _normalizeAndInsert(newPrefix + suffix);
+    final newPrefix = prefixStr + value;
+    final normalized = _normalizeAndInsert(newPrefix + suffixStr);
 
     text.value = TextEditingValue(
       text: normalized,
@@ -230,6 +236,46 @@ class TamilKeyboard extends KeyboardController {
     for (var ch in value.characters) {
       _notifyOnKey(ch);
     }
+  }
+
+  /// True when [prefix] ends with `…<mei>ெ` and `<mei>` is in [Letters.auBasesLongestFirst].
+  bool _prefixEndsWithMeiPlusShortE(String prefix) {
+    if (!prefix.endsWith('ெ')) return false;
+    final withoutE = prefix.substring(0, prefix.length - 'ெ'.length);
+    for (final base in Letters.auBasesLongestFirst) {
+      if (withoutE.endsWith(base)) return true;
+    }
+    return false;
+  }
+
+  bool _prefixEndsWithLaContext(String prefix) {
+    for (final s in Letters.laContextSuffixesLongestFirst) {
+      if (prefix.endsWith(s)) return true;
+    }
+    return false;
+  }
+
+  /// ெ+ா→ொ, ே+ா→ோ, or ெ+[_auComposeSentinel]→ௌ while keeping the consonant cluster.
+  String? _composeMeiEWithAalOrDot(String prefix, String value) {
+    if (value != 'ா' && value != _auComposeSentinel) return null;
+    const e = 'ெ';
+    const ee = 'ே';
+    const o = 'ொ';
+    const oo = 'ோ';
+    const au = 'ௌ';
+    for (final base in Letters.auBasesLongestFirst) {
+      if (value == 'ா') {
+        if (prefix.endsWith(base + e)) {
+          return prefix.substring(0, prefix.length - (base + e).length) + base + o;
+        }
+        if (prefix.endsWith(base + ee)) {
+          return prefix.substring(0, prefix.length - (base + ee).length) + base + oo;
+        }
+      } else if (value == _auComposeSentinel && prefix.endsWith(base + e)) {
+        return prefix.substring(0, prefix.length - (base + e).length) + base + au;
+      }
+    }
+    return null;
   }
 
   void _insertText(String value) {
@@ -266,6 +312,6 @@ class TamilKeyboard extends KeyboardController {
   }
 
   String _normalizeAndInsert(String text) {
-    return unorm.nfc(text);
+    return Letters.normalizeTypingText(text);
   }
 }

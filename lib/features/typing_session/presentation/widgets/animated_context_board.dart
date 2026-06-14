@@ -402,6 +402,9 @@ class _TypingAreaState extends ConsumerState<TypingArea>
     // all per-character "waiting"/error logic to avoid false negatives due
     // to grapheme cluster differences (e.g. க + ள் vs கள்).
     final bool isExactMatch = normalizedPara == normalizedInput;
+    // Do not force-prefix-correct while the line has any mistake (avoids false
+    // greens on later words when an earlier character was wrong).
+    final bool allowPrefixForceCorrect = isExactMatch;
     if (isExactMatch) {
       for (final paraChar in paraClusters) {
         spans.add(
@@ -442,7 +445,8 @@ class _TypingAreaState extends ConsumerState<TypingArea>
 
       // If the prefix up to this position matches, forcibly treat this visual
       // position as correct and skip "waiting" logic.
-      final bool forceCorrectHere = isPrefixExactlyCorrect;
+      final bool forceCorrectHere =
+          allowPrefixForceCorrect && isPrefixExactlyCorrect;
       if (forceCorrectHere) {
         typed = paraChar;
         isInWaitingState = false;

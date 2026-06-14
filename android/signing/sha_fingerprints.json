@@ -1,0 +1,51 @@
+{
+  "packageName": "org.dckap.visai",
+  "firebaseProjectId": "visai-97c45",
+  "firebaseConsole": "https://console.firebase.google.com/project/visai-97c45/settings/general",
+  "playConsole": "https://play.google.com/console",
+  "lastUpdated": "2026-05-12",
+  "note": "Register EVERY profile's SHA-1 and SHA-256 in Firebase (same Android app). Play Store profile must be filled from Play Console after you enable App Signing.",
+  "profiles": {
+    "debug": {
+      "label": "Local dev (flutter run, USB testing)",
+      "buildCommands": ["flutter run", "flutter build apk --debug"],
+      "keystore": "~/.android/debug.keystore",
+      "alias": "AndroidDebugKey",
+      "sha1": "2F:A4:F9:53:20:53:7A:6A:C0:EC:D6:03:01:D4:D2:2D:F7:9E:BB:8C",
+      "sha1FirebaseFormat": "2fa4f95320537a6ac0ecd60301d4d22df79ebb8c",
+      "sha256": "96:1D:7A:C8:6D:FE:F7:BD:39:7F:9F:16:5F:67:35:DA:F1:F6:D4:37:8E:7B:D3:D6:87:A9:43:69:CD:A1:87:D9",
+      "inRepoGoogleServicesJson": false
+    },
+    "releaseUpload": {
+      "label": "Client APK/AAB (release build you sign locally)",
+      "buildCommands": [
+        "flutter build apk --release",
+        "flutter build appbundle --release"
+      ],
+      "keystore": "android/upload-keystore.jks",
+      "alias": "upload",
+      "sha1": "B7:39:71:9D:26:ED:9C:7F:5C:8D:8A:0A:A3:D6:10:B3:21:92:8C:6D",
+      "sha1FirebaseFormat": "b739719d26ed9c7f5c8d8a0aa3d610b321928c6d",
+      "sha256": "AC:C2:94:C0:1F:D2:EE:2F:2F:A2:9B:E5:25:B1:E7:2A:CE:93:00:02:E5:90:8F:0B:B0:E1:68:9D:CA:13:0D:C7",
+      "inRepoGoogleServicesJson": true
+    },
+    "playStoreAppSigning": {
+      "label": "Play Store installs (Google re-signs the app)",
+      "buildCommands": ["Published via Google Play Console"],
+      "keystore": "Play Console → Test and release → Setup → App signing (or https://play.google.com/console/developers/app/keymanagement)",
+      "playConsoleDirectUrl": "https://play.google.com/console/developers/app/keymanagement",
+      "alias": "N/A (managed by Google Play)",
+      "sha1": "74:6E:25:DF:FD:2A:2F:4A:D9:45:87:81:F4:E5:B6:3B:84:1A:B6:33",
+      "sha1FirebaseFormat": "paste_lowercase_no_colons",
+      "sha256": "9C:DD:3C:53:8C:F5:09:4E:79:54:E9:84:B0:4F:F4:92:75:6E:0D:18:01:6D:A3:86:13:E5:DF:F2:B7:F7:9D:C3",
+      "inRepoGoogleServicesJson": false,
+      "playConsoleNavigation": [
+        "Play Console → select Visai",
+        "Open https://play.google.com/console/developers/app/keymanagement OR Test and release → Setup → App signing",
+        "Copy SHA-1 and SHA-256 under App signing key certificate",
+        "Also add Upload key certificate SHAs to Firebase if not already registered"
+      ],
+      "instructions": "App integrity Services row is often not clickable. Use Setup → App signing or the direct URL. Register App signing key + Upload key in Firebase."
+    }
+  }
+}

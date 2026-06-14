@@ -4,13 +4,12 @@ import 'package:visai/features/keyboard/presentation/tamil_keyboard/letters.dart
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/metrics/metrics_state_controller_provider.dart';
 // import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:unorm_dart/unorm_dart.dart' as unorm;
-
 part 'session_state_provider.g.dart';
 
 class SessionState {
   final bool running;
   final String target;
+  /// Correct keystrokes only (NFC code-unit index in target).
   final int cursor;
   final Duration elapsed;
   const SessionState({
@@ -148,11 +147,14 @@ class SessionStateNotifier extends _$SessionStateNotifier {
   /// Max position must use the same NFC + diacritic pass as
   /// [ChallengeEditor] / [PracticeEditorPage] (`nfcPara` length), not
   /// [String.length] on raw [SessionState.target] (UTF-16 can differ after NFC).
+  int get _nfcTargetLength {
+    if (state.target.isEmpty) return 0;
+    return Letters.normalizeTypingText(state.target).length;
+  }
+
   void advanceCursor() {
     if (state.target.isEmpty) return;
-    final nfcLen = unorm.nfc(
-      Letters.applyDiacriticCompositions(state.target),
-    ).length;
+    final nfcLen = _nfcTargetLength;
     if (state.cursor < nfcLen) {
       state = state.copyWith(cursor: state.cursor + 1);
     }
@@ -163,4 +165,5 @@ class SessionStateNotifier extends _$SessionStateNotifier {
       state = state.copyWith(cursor: state.cursor - 1);
     }
   }
+
 }

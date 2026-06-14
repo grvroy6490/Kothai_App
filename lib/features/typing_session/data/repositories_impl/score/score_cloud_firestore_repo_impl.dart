@@ -29,7 +29,8 @@ class ScoreCloudFirestoreRepositoryImpl implements XpCloudRepository {
     // match /users/{userId}/score/{scoreId}
     final ref = _db.collection('users').doc(uid).collection('score').doc(_v1TotalsDocId);
 
-    await ref.set(totals.toJson(), SetOptions(merge: true));
+    // Full write so merged guest XP replaces stale cloud totals (not field-wise merge).
+    await ref.set(totals.toJson());
   }
 
   @override

@@ -1,94 +1,32 @@
-# How to Generate SHA Certificates for Google Sign-In
+# Generate SHA certificates
 
-You need SHA-1 and SHA-256 certificates to register in Firebase Console for Google Sign-In to work.
+**Full guide (debug / client / Play Store):** [signing/SHA_FINGERPRINTS.md](signing/SHA_FINGERPRINTS.md)
 
-## Method 1: Using Gradle (Easiest - Recommended)
+## Quick command
 
-Run this command from the project root:
+From project root:
 
 ```bash
 cd android
 ./gradlew signingReport
 ```
 
-Or on Windows:
-```bash
+Windows:
+
+```cmd
 cd android
 gradlew.bat signingReport
 ```
 
-This will show SHA-1 and SHA-256 for both debug and release builds.
+Under **`:app:signingReport`**, read:
 
-## Method 2: Using keytool (Manual)
+- **`Variant: debug`** → register in Firebase for local dev
+- **`Variant: release`** → register for client release APK/AAB
 
-### For Debug Keystore (Development)
+Play Store installs need the **App signing key** SHA from Play Console (not from Gradle). See [signing/SHA_FINGERPRINTS.md](signing/SHA_FINGERPRINTS.md#3-play-store-app-signing-end-users-from-play).
 
-**Windows:**
-```bash
-keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
-```
+## Register in Firebase
 
-**Mac/Linux:**
-```bash
-keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
-```
-
-### For Release Keystore (Production)
-
-If you have a release keystore file:
-
-```bash
-keytool -list -v -keystore path/to/your/keystore.jks -alias your-key-alias
-```
-
-You'll be prompted for the keystore password.
-
-## Method 3: Using Flutter Command
-
-From the project root:
-
-```bash
-flutter build apk --debug
-```
-
-Then check the build output or use:
-```bash
-cd android
-./gradlew signingReport
-```
-
-## What to Look For
-
-After running any of the above commands, look for output like:
-
-```
-Certificate fingerprints:
-     SHA1: AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD
-     SHA256: 11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00
-```
-
-## Register in Firebase Console
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project (kothai-2425)
-3. Go to **Project Settings** (gear icon) > **Your apps**
-4. Click on your Android app
-5. Scroll down to **SHA certificate fingerprints**
-6. Click **Add fingerprint**
-7. Paste your SHA-1 and SHA-256 certificates
-8. Click **Save**
-
-**Important:** You need to add BOTH:
-- Debug SHA-1 and SHA-256 (for development/testing)
-- Release SHA-1 and SHA-256 (for production builds)
-
-## Quick Windows Command
-
-If you're on Windows and want a quick copy-paste command:
-
-```cmd
-cd android && gradlew.bat signingReport
-```
-
-Look for the output section that shows SHA-1 and SHA-256 fingerprints.
-
+1. [Firebase Console](https://console.firebase.google.com/) → project **visai-97c45**
+2. Project settings → Android app **org.dckap.visai**
+3. **SHA certificate fingerprints** → Add fingerprint (SHA-1 and SHA-256 for each profile)
