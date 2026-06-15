@@ -156,7 +156,7 @@ class _PracticeSettingsWidgetState extends ConsumerState<PracticeSettingsWidget>
                         12
                     ),
                     _customIconButton(
-                        Icon(FontAwesomeIcons.chevronUp, size: 16,),
+                        Icon(Icons.keyboard_arrow_up, size: 16,),
                         () {
                             ref.read(practiceSettingsVisibilityProvider.notifier).showSettings();
                         },

@@ -74,7 +74,7 @@ class _MoreSettingsPageState extends ConsumerState<MoreSettingsPage> {
                   child: Row(
                     children: [
                       Icon(
-                        FontAwesomeIcons.trophy,
+                        Icons.emoji_events,
                         size: Gap(context).gap(20),
                         color: getFigmaColor(context, 'Schemes/On Surface'),
                       ),

@@ -53,19 +53,19 @@ class _FooterNavigationBarState extends State<FooterNavigationBar> {
                         ).withAlpha(153),
                         items: const [
                             BottomNavigationBarItem(
-                                icon: FaIcon(FontAwesomeIcons.solidKeyboard),
+                                icon: Icon(Icons.keyboard),
                                 label: 'Practice',
                             ),
                             BottomNavigationBarItem(
-                                icon: Icon(FontAwesomeIcons.trophy),
+                                icon: Icon(Icons.emoji_events),
                                 label: 'Challenge',
                             ),
                             BottomNavigationBarItem(
-                                icon: Icon(FontAwesomeIcons.circleUser),
+                                icon: Icon(Icons.account_circle),
                                 label: 'Profile',
                             ),
                             BottomNavigationBarItem(
-                                icon: Icon(FontAwesomeIcons.grip),
+                                icon: Icon(Icons.grid_view),
                                 label: 'More',
                             ),
                         ],

@@ -34,7 +34,7 @@ class PracticeResetPauseSettings extends ConsumerWidget {
                 children: [
                     _buildResetPauseButtons(
                         context,
-                        icon: FontAwesomeIcons.clockRotateLeft,
+                        icon: Icons.restore,
                         label: 'Reset',
                         handlePressed: () => {
                             //TODO: Reset the practice session
@@ -43,7 +43,7 @@ class PracticeResetPauseSettings extends ConsumerWidget {
                     ),
                     _buildResetPauseButtons(
                         context,
-                        icon: FontAwesomeIcons.circlePause,
+                        icon: Icons.pause_circle,
                         label: 'Pause',
                         ref: ref,
                         flip: true,

@@ -50,7 +50,7 @@ class PracticeSettingButtons extends ConsumerWidget {
                 Flexible(
                     child: _customIconButton(
                         context,
-                        Icon(FontAwesomeIcons.chevronUp, size: Gap(context).gap(16)),
+                        Icon(Icons.keyboard_arrow_up, size: Gap(context).gap(16)),
                         () {
                             showModalBottomSheet(
                                 context: context,

@@ -199,7 +199,7 @@ class TamilRegularKeyboardLayout extends ConsumerWidget {
                         Expanded(
                             flex: 1,
                             child: KeyButton(
-                                keyModel: KeyModel(id: 'language', type: KeyType.functional, label: '', icon: FontAwesomeIcons.globe, onTap: (ctrl) => {},),
+                                keyModel: KeyModel(id: 'language', type: KeyType.functional, label: '', icon: Icons.language, onTap: (ctrl) => {},),
                                 controller: controller,
                             )
                         ),

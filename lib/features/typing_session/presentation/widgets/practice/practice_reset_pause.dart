@@ -49,7 +49,7 @@ class PracticeResetPause extends ConsumerWidget {
                         flex: 2,
                         child: _buildResetPauseButtons(
                             context,
-                            icon: FontAwesomeIcons.clockRotateLeft,
+                            icon: Icons.restore,
                             label: 'Reset',
                             handlePressed: () => handleReset(controller)
                         )
@@ -65,7 +65,7 @@ class PracticeResetPause extends ConsumerWidget {
                         child: practiceConfig.allowPauses // 👈 ALLOW PAUSES SETTINGS
                             ? _buildResetPauseButtons(
                                 context,
-                                icon: FontAwesomeIcons.circlePause,
+                                icon: Icons.pause_circle,
                                 label: 'Pause',
                                 flip: true,
                                 handlePressed: () => handlePause(controller)

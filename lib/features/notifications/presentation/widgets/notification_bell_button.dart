@@ -30,7 +30,7 @@ class NotificationBellIconButton extends ConsumerWidget {
           ),
           onPressed: () => showInAppNotificationsPanel(context, ref),
           icon: Icon(
-            FontAwesomeIcons.bell,
+            Icons.notifications,
             size: KxScale(context).sp(18),
             color: getFigmaColor(context, 'Schemes/On Surface Variant'),
           ),

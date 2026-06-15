@@ -167,7 +167,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                   context,
                                   'State Layers/Background/Opacity-60',
                                 ),
-                                icon: FontAwesomeIcons.clock,
+                                icon: Icons.access_time,
                                 label: 'Time',
                                 value: practiceConfig.timerEnabled
                                     ? formatDuration(
@@ -294,7 +294,7 @@ class _PracticePausePageState extends ConsumerState<PracticePausePage> {
                                 'Schemes/Secondary',
                               ),
                               label: 'Reset Progress',
-                              icon: FontAwesomeIcons.clockRotateLeft,
+                              icon: Icons.restore,
                               tapBehavior: () =>
                                   handlePracticeResetConfirmation(),
                             ),

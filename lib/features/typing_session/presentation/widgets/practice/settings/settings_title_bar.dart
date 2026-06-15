@@ -23,7 +23,7 @@ class SettingsTitleBar extends StatelessWidget {
                         child: Row(
                             children: [
                                 Icon(
-                                    FontAwesomeIcons.gear,
+                                    Icons.settings,
                                     color: getFigmaColor(context, 'Schemes/On Surface'),
                                     size: Gap(context).gap(18)
                                 ),
@@ -46,7 +46,7 @@ class SettingsTitleBar extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             visualDensity: VisualDensity.compact,
                             icon: Icon(
-                                FontAwesomeIcons.chevronDown,
+                                Icons.keyboard_arrow_down,
                                 color: getFigmaColor(context, 'Schemes/On Surface'),
                                 size: Gap(context).gap(15)
                             )

@@ -39,7 +39,7 @@ class PracticeStopFilledButton extends ConsumerWidget {
                     color: getFigmaColor(context, 'Schemes/Error')
                 )
             ),
-            icon: Icon(FontAwesomeIcons.solidCircleStop, size: Gap(context).gap(16)),
+            icon: Icon(Icons.stop_circle, size: Gap(context).gap(16)),
             style: ButtonStyle(
                 iconColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'Schemes/Error')),
                 backgroundColor: WidgetStateProperty.all<Color>(getFigmaColor(context, 'State Layers/Error/Opacity-08'))
