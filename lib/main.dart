@@ -9,6 +9,7 @@ import 'package:visai/di/providers/db/db_provider.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/services/firebase/firebase_options.dart';
 import 'package:visai/services/notifications/local_notification_service.dart';
+import 'package:visai/services/notifications/push_notification_service.dart';
 import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 void main() async {
@@ -23,7 +24,13 @@ void main() async {
   if (!kIsWeb) {
     await LocalNotificationService.instance.init();
     await LocalNotificationService.instance.configureTimeZone();
-    await LocalNotificationService.instance.syncFromPrefs(service);
+    // Schedule without prompting here — permission dialogs need an Activity.
+    // [App] re-syncs after the first frame (and Settings toggles also re-sync).
+    await LocalNotificationService.instance.syncFromPrefs(
+      service,
+      requestPermission: false,
+    );
+    await PushNotificationService.instance.init(service);
   }
 
   final container = ProviderContainer(

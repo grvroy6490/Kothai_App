@@ -12,6 +12,11 @@ _ChallengeConfig _$ChallengeConfigFromJson(Map<String, dynamic> json) =>
       hapticEnabled: json['hapticEnabled'] as bool? ?? false,
       darkMode: json['darkMode'] as bool? ?? true,
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+      dailyRemindersEnabled: json['dailyRemindersEnabled'] as bool? ?? true,
+      streakAlertsEnabled: json['streakAlertsEnabled'] as bool? ?? true,
+      achievementAlertsEnabled:
+          json['achievementAlertsEnabled'] as bool? ?? true,
+      productUpdatesEnabled: json['productUpdatesEnabled'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$ChallengeConfigToJson(_ChallengeConfig instance) =>
@@ -20,4 +25,8 @@ Map<String, dynamic> _$ChallengeConfigToJson(_ChallengeConfig instance) =>
       'hapticEnabled': instance.hapticEnabled,
       'darkMode': instance.darkMode,
       'notificationsEnabled': instance.notificationsEnabled,
+      'dailyRemindersEnabled': instance.dailyRemindersEnabled,
+      'streakAlertsEnabled': instance.streakAlertsEnabled,
+      'achievementAlertsEnabled': instance.achievementAlertsEnabled,
+      'productUpdatesEnabled': instance.productUpdatesEnabled,
     };

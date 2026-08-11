@@ -8,6 +8,7 @@ import 'package:visai/features/badges/data/repositories_impl/badge_repository.da
 import 'package:visai/features/badges/presentation/pages/badge_popup.dart';
 import 'package:visai/features/notifications/presentation/riverpod/in_app_notifications_controller.dart';
 import 'package:visai/features/typing_session/domain/enums/session_mode.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
 import 'package:visai/services/shared_preferences/shared_prefs_service.dart';
 
 class BadgeController extends Notifier<Set<String>> {
@@ -50,6 +51,12 @@ class BadgeController extends Notifier<Set<String>> {
     ref
         .read(inAppNotificationsControllerProvider.notifier)
         .tryAddBadgeUnlocked(badge);
+
+    LocalNotificationService.instance.showBadgeUnlocked(
+      prefs: _prefs,
+      badgeName: badge.name,
+      body: badge.toastMessage.isNotEmpty ? badge.toastMessage : badge.condition,
+    );
   }
 
   void _showBadgeFloatingPopup(BuildContext context, BadgeEntity badge) {

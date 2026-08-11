@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:logger/logger.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
 
 class StreakCompleted {
   final int streak;
@@ -235,6 +236,7 @@ class StreakController extends Notifier<StreakState> {
 
     state = next;
     await _persist(next);
+    await LocalNotificationService.instance.onPracticedToday(_prefs);
     // _logger.f('Persisted streak: $next');
   }
 

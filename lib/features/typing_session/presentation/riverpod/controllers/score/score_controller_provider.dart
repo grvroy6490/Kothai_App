@@ -1,6 +1,8 @@
 import 'package:visai/di/providers/auth/auth_provider.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/domain/entities/levels/level_entity.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
+import 'package:visai/features/notifications/presentation/riverpod/in_app_notifications_controller.dart';
 import 'package:visai/features/typing_session/domain/entities/score/score_entity.dart';
 import 'package:visai/features/typing_session/domain/entities/session/session_entity.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/gamification/gamification_controller_provider.dart';
@@ -10,6 +12,7 @@ import 'package:visai/features/user_profile/presentation/riverpod/providers/user
 // import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
 
 
 part 'score_controller_provider.g.dart';
@@ -65,6 +68,7 @@ class ScoreController extends _$ScoreController {
 
         // 2) update totals & level (linear 200xp/level)
         final levels = ref.read(gamificationDataControllerProvider)!.levels;
+        final previousLevel = state.level;
         final nextTotal = state.totalXp + amount;
         // Find the user's current level based on their new total XP.
         final currentLevel = levels.lastWhere(
@@ -78,15 +82,26 @@ class ScoreController extends _$ScoreController {
         );
 
         final into = nextLevel.totalXp - currentLevel.totalXp;
+        final newLevel = int.parse(currentLevel.level);
         final updated = state.copyWith(
             totalXp: nextTotal,
-            level: int.parse(currentLevel.level),
+            level: newLevel,
             xpIntoLevel: into,
             xpNextLevel: nextLevel.totalXp
         );
 
         state = updated;
         await ref.read(scoreLocalRepositoryProvider).saveScore(updated);
+
+        if (newLevel > previousLevel) {
+            await ref
+                .read(inAppNotificationsControllerProvider.notifier)
+                .tryAddLevelUp(newLevel);
+            await LocalNotificationService.instance.showLevelUp(
+                prefs: ref.read(sharedPrefsServiceProvider),
+                level: newLevel,
+            );
+        }
     }
 
     /// Upload pending entries if logged in; mark as synced on success.

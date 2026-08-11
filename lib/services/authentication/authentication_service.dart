@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform, TargetPlatform, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:visai/core/constants/android_signing_fingerprints.dart';
 import 'package:visai/services/authentication/auth_provider_conflict.dart';
+import 'package:visai/services/notifications/push_notification_service.dart';
 
 /// iOS OAuth client ID (reversed URL scheme in Info.plist is derived from this).
 const String _kGoogleSignInIosClientId =
@@ -468,6 +469,10 @@ class AuthService {
 
     final db = _db ?? FirebaseFirestore.instance;
     await db.collection('users').doc(uid).set(data, SetOptions(merge: true));
+
+    if (!kIsWeb) {
+      await PushNotificationService.instance.onUserSignedIn();
+    }
 
     if (kDebugMode) {
       print('User document written for $uid');

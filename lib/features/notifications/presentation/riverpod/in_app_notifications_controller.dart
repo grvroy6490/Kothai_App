@@ -16,17 +16,22 @@ const int _kMaxNotifications = 100;
 class InAppNotificationsController extends Notifier<List<InAppNotification>> {
   SharedPrefsService get _prefs => ref.read(sharedPrefsServiceProvider);
 
-  bool get notificationsEnabled {
+  ChallengeConfig get _config {
     final raw = _prefs.getString(kChallengeSettingsPrefsKey);
-    if (raw == null) return false;
+    if (raw == null) return const ChallengeConfig();
     try {
       return ChallengeConfig.fromJson(
         jsonDecode(raw) as Map<String, dynamic>,
-      ).notificationsEnabled;
+      );
     } catch (_) {
-      return false;
+      return const ChallengeConfig();
     }
   }
+
+  bool get notificationsEnabled => _config.notificationsEnabled;
+
+  bool get achievementAlertsEnabled =>
+      _config.notificationsEnabled && _config.achievementAlertsEnabled;
 
   @override
   List<InAppNotification> build() => _load();
@@ -59,7 +64,7 @@ class InAppNotificationsController extends Notifier<List<InAppNotification>> {
 
   /// Badge unlocked — idempotent per [badgeId] (same day could still add once).
   Future<void> tryAddBadgeUnlocked(BadgeEntity badge) async {
-    if (!notificationsEnabled) return;
+    if (!achievementAlertsEnabled) return;
 
     final dedupeId = 'badge_${badge.id}';
     if (state.any((e) => e.id == dedupeId)) return;
@@ -83,7 +88,7 @@ class InAppNotificationsController extends Notifier<List<InAppNotification>> {
     required double wpm,
     required double accuracy,
   }) async {
-    if (!notificationsEnabled) return;
+    if (!achievementAlertsEnabled) return;
     final dedupeId = 'session_$sessionId';
     if (state.any((e) => e.id == dedupeId)) return;
 
@@ -96,6 +101,25 @@ class InAppNotificationsController extends Notifier<List<InAppNotification>> {
       createdAt: DateTime.now(),
       read: false,
       routePayload: kNotificationPayloadPractice,
+    );
+    _prepend(n);
+    await _persist();
+  }
+
+  /// Level-up — one row per level number.
+  Future<void> tryAddLevelUp(int level) async {
+    if (!achievementAlertsEnabled) return;
+    final dedupeId = 'level_$level';
+    if (state.any((e) => e.id == dedupeId)) return;
+
+    final n = InAppNotification(
+      id: dedupeId,
+      kind: 'level',
+      title: 'Level up!',
+      body: 'You reached level $level. Keep practicing!',
+      createdAt: DateTime.now(),
+      read: false,
+      routePayload: kNotificationPayloadXpMilestones,
     );
     _prepend(n);
     await _persist();

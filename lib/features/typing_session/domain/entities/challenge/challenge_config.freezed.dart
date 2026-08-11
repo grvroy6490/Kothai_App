@@ -15,7 +15,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChallengeConfig {
 
- bool get soundEnabled; bool get hapticEnabled; bool get darkMode; bool get notificationsEnabled;
+ bool get soundEnabled; bool get hapticEnabled; bool get darkMode;/// Master switch — gates all OS + in-app notification surfaces.
+ bool get notificationsEnabled;/// Daily practice reminder at the configured time.
+ bool get dailyRemindersEnabled;/// Evening streak-at-risk + comeback win-back reminders.
+ bool get streakAlertsEnabled;/// Badge unlock + level-up local notifications (and in-app feed rows).
+ bool get achievementAlertsEnabled;/// Remote FCM product / content announcements.
+ bool get productUpdatesEnabled;
 /// Create a copy of ChallengeConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +33,16 @@ $ChallengeConfigCopyWith<ChallengeConfig> get copyWith => _$ChallengeConfigCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChallengeConfig&&(identical(other.soundEnabled, soundEnabled) || other.soundEnabled == soundEnabled)&&(identical(other.hapticEnabled, hapticEnabled) || other.hapticEnabled == hapticEnabled)&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.notificationsEnabled, notificationsEnabled) || other.notificationsEnabled == notificationsEnabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChallengeConfig&&(identical(other.soundEnabled, soundEnabled) || other.soundEnabled == soundEnabled)&&(identical(other.hapticEnabled, hapticEnabled) || other.hapticEnabled == hapticEnabled)&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.notificationsEnabled, notificationsEnabled) || other.notificationsEnabled == notificationsEnabled)&&(identical(other.dailyRemindersEnabled, dailyRemindersEnabled) || other.dailyRemindersEnabled == dailyRemindersEnabled)&&(identical(other.streakAlertsEnabled, streakAlertsEnabled) || other.streakAlertsEnabled == streakAlertsEnabled)&&(identical(other.achievementAlertsEnabled, achievementAlertsEnabled) || other.achievementAlertsEnabled == achievementAlertsEnabled)&&(identical(other.productUpdatesEnabled, productUpdatesEnabled) || other.productUpdatesEnabled == productUpdatesEnabled));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,soundEnabled,hapticEnabled,darkMode,notificationsEnabled);
+int get hashCode => Object.hash(runtimeType,soundEnabled,hapticEnabled,darkMode,notificationsEnabled,dailyRemindersEnabled,streakAlertsEnabled,achievementAlertsEnabled,productUpdatesEnabled);
 
 @override
 String toString() {
-  return 'ChallengeConfig(soundEnabled: $soundEnabled, hapticEnabled: $hapticEnabled, darkMode: $darkMode, notificationsEnabled: $notificationsEnabled)';
+  return 'ChallengeConfig(soundEnabled: $soundEnabled, hapticEnabled: $hapticEnabled, darkMode: $darkMode, notificationsEnabled: $notificationsEnabled, dailyRemindersEnabled: $dailyRemindersEnabled, streakAlertsEnabled: $streakAlertsEnabled, achievementAlertsEnabled: $achievementAlertsEnabled, productUpdatesEnabled: $productUpdatesEnabled)';
 }
 
 
@@ -48,7 +53,7 @@ abstract mixin class $ChallengeConfigCopyWith<$Res>  {
   factory $ChallengeConfigCopyWith(ChallengeConfig value, $Res Function(ChallengeConfig) _then) = _$ChallengeConfigCopyWithImpl;
 @useResult
 $Res call({
- bool soundEnabled, bool hapticEnabled, bool darkMode, bool notificationsEnabled
+ bool soundEnabled, bool hapticEnabled, bool darkMode, bool notificationsEnabled, bool dailyRemindersEnabled, bool streakAlertsEnabled, bool achievementAlertsEnabled, bool productUpdatesEnabled
 });
 
 
@@ -65,12 +70,16 @@ class _$ChallengeConfigCopyWithImpl<$Res>
 
 /// Create a copy of ChallengeConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? soundEnabled = null,Object? hapticEnabled = null,Object? darkMode = null,Object? notificationsEnabled = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? soundEnabled = null,Object? hapticEnabled = null,Object? darkMode = null,Object? notificationsEnabled = null,Object? dailyRemindersEnabled = null,Object? streakAlertsEnabled = null,Object? achievementAlertsEnabled = null,Object? productUpdatesEnabled = null,}) {
   return _then(_self.copyWith(
 soundEnabled: null == soundEnabled ? _self.soundEnabled : soundEnabled // ignore: cast_nullable_to_non_nullable
 as bool,hapticEnabled: null == hapticEnabled ? _self.hapticEnabled : hapticEnabled // ignore: cast_nullable_to_non_nullable
 as bool,darkMode: null == darkMode ? _self.darkMode : darkMode // ignore: cast_nullable_to_non_nullable
 as bool,notificationsEnabled: null == notificationsEnabled ? _self.notificationsEnabled : notificationsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,dailyRemindersEnabled: null == dailyRemindersEnabled ? _self.dailyRemindersEnabled : dailyRemindersEnabled // ignore: cast_nullable_to_non_nullable
+as bool,streakAlertsEnabled: null == streakAlertsEnabled ? _self.streakAlertsEnabled : streakAlertsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,achievementAlertsEnabled: null == achievementAlertsEnabled ? _self.achievementAlertsEnabled : achievementAlertsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,productUpdatesEnabled: null == productUpdatesEnabled ? _self.productUpdatesEnabled : productUpdatesEnabled // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -156,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled,  bool dailyRemindersEnabled,  bool streakAlertsEnabled,  bool achievementAlertsEnabled,  bool productUpdatesEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChallengeConfig() when $default != null:
-return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled);case _:
+return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled,_that.dailyRemindersEnabled,_that.streakAlertsEnabled,_that.achievementAlertsEnabled,_that.productUpdatesEnabled);case _:
   return orElse();
 
 }
@@ -177,10 +186,10 @@ return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.noti
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled,  bool dailyRemindersEnabled,  bool streakAlertsEnabled,  bool achievementAlertsEnabled,  bool productUpdatesEnabled)  $default,) {final _that = this;
 switch (_that) {
 case _ChallengeConfig():
-return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled);case _:
+return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled,_that.dailyRemindersEnabled,_that.streakAlertsEnabled,_that.achievementAlertsEnabled,_that.productUpdatesEnabled);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +206,10 @@ return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.noti
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool soundEnabled,  bool hapticEnabled,  bool darkMode,  bool notificationsEnabled,  bool dailyRemindersEnabled,  bool streakAlertsEnabled,  bool achievementAlertsEnabled,  bool productUpdatesEnabled)?  $default,) {final _that = this;
 switch (_that) {
 case _ChallengeConfig() when $default != null:
-return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled);case _:
+return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.notificationsEnabled,_that.dailyRemindersEnabled,_that.streakAlertsEnabled,_that.achievementAlertsEnabled,_that.productUpdatesEnabled);case _:
   return null;
 
 }
@@ -212,13 +221,22 @@ return $default(_that.soundEnabled,_that.hapticEnabled,_that.darkMode,_that.noti
 @JsonSerializable()
 
 class _ChallengeConfig implements ChallengeConfig {
-  const _ChallengeConfig({this.soundEnabled = false, this.hapticEnabled = false, this.darkMode = true, this.notificationsEnabled = true});
+  const _ChallengeConfig({this.soundEnabled = false, this.hapticEnabled = false, this.darkMode = true, this.notificationsEnabled = true, this.dailyRemindersEnabled = true, this.streakAlertsEnabled = true, this.achievementAlertsEnabled = true, this.productUpdatesEnabled = true});
   factory _ChallengeConfig.fromJson(Map<String, dynamic> json) => _$ChallengeConfigFromJson(json);
 
 @override@JsonKey() final  bool soundEnabled;
 @override@JsonKey() final  bool hapticEnabled;
 @override@JsonKey() final  bool darkMode;
+/// Master switch — gates all OS + in-app notification surfaces.
 @override@JsonKey() final  bool notificationsEnabled;
+/// Daily practice reminder at the configured time.
+@override@JsonKey() final  bool dailyRemindersEnabled;
+/// Evening streak-at-risk + comeback win-back reminders.
+@override@JsonKey() final  bool streakAlertsEnabled;
+/// Badge unlock + level-up local notifications (and in-app feed rows).
+@override@JsonKey() final  bool achievementAlertsEnabled;
+/// Remote FCM product / content announcements.
+@override@JsonKey() final  bool productUpdatesEnabled;
 
 /// Create a copy of ChallengeConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +251,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChallengeConfig&&(identical(other.soundEnabled, soundEnabled) || other.soundEnabled == soundEnabled)&&(identical(other.hapticEnabled, hapticEnabled) || other.hapticEnabled == hapticEnabled)&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.notificationsEnabled, notificationsEnabled) || other.notificationsEnabled == notificationsEnabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChallengeConfig&&(identical(other.soundEnabled, soundEnabled) || other.soundEnabled == soundEnabled)&&(identical(other.hapticEnabled, hapticEnabled) || other.hapticEnabled == hapticEnabled)&&(identical(other.darkMode, darkMode) || other.darkMode == darkMode)&&(identical(other.notificationsEnabled, notificationsEnabled) || other.notificationsEnabled == notificationsEnabled)&&(identical(other.dailyRemindersEnabled, dailyRemindersEnabled) || other.dailyRemindersEnabled == dailyRemindersEnabled)&&(identical(other.streakAlertsEnabled, streakAlertsEnabled) || other.streakAlertsEnabled == streakAlertsEnabled)&&(identical(other.achievementAlertsEnabled, achievementAlertsEnabled) || other.achievementAlertsEnabled == achievementAlertsEnabled)&&(identical(other.productUpdatesEnabled, productUpdatesEnabled) || other.productUpdatesEnabled == productUpdatesEnabled));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,soundEnabled,hapticEnabled,darkMode,notificationsEnabled);
+int get hashCode => Object.hash(runtimeType,soundEnabled,hapticEnabled,darkMode,notificationsEnabled,dailyRemindersEnabled,streakAlertsEnabled,achievementAlertsEnabled,productUpdatesEnabled);
 
 @override
 String toString() {
-  return 'ChallengeConfig(soundEnabled: $soundEnabled, hapticEnabled: $hapticEnabled, darkMode: $darkMode, notificationsEnabled: $notificationsEnabled)';
+  return 'ChallengeConfig(soundEnabled: $soundEnabled, hapticEnabled: $hapticEnabled, darkMode: $darkMode, notificationsEnabled: $notificationsEnabled, dailyRemindersEnabled: $dailyRemindersEnabled, streakAlertsEnabled: $streakAlertsEnabled, achievementAlertsEnabled: $achievementAlertsEnabled, productUpdatesEnabled: $productUpdatesEnabled)';
 }
 
 
@@ -253,7 +271,7 @@ abstract mixin class _$ChallengeConfigCopyWith<$Res> implements $ChallengeConfig
   factory _$ChallengeConfigCopyWith(_ChallengeConfig value, $Res Function(_ChallengeConfig) _then) = __$ChallengeConfigCopyWithImpl;
 @override @useResult
 $Res call({
- bool soundEnabled, bool hapticEnabled, bool darkMode, bool notificationsEnabled
+ bool soundEnabled, bool hapticEnabled, bool darkMode, bool notificationsEnabled, bool dailyRemindersEnabled, bool streakAlertsEnabled, bool achievementAlertsEnabled, bool productUpdatesEnabled
 });
 
 
@@ -270,12 +288,16 @@ class __$ChallengeConfigCopyWithImpl<$Res>
 
 /// Create a copy of ChallengeConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? soundEnabled = null,Object? hapticEnabled = null,Object? darkMode = null,Object? notificationsEnabled = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? soundEnabled = null,Object? hapticEnabled = null,Object? darkMode = null,Object? notificationsEnabled = null,Object? dailyRemindersEnabled = null,Object? streakAlertsEnabled = null,Object? achievementAlertsEnabled = null,Object? productUpdatesEnabled = null,}) {
   return _then(_ChallengeConfig(
 soundEnabled: null == soundEnabled ? _self.soundEnabled : soundEnabled // ignore: cast_nullable_to_non_nullable
 as bool,hapticEnabled: null == hapticEnabled ? _self.hapticEnabled : hapticEnabled // ignore: cast_nullable_to_non_nullable
 as bool,darkMode: null == darkMode ? _self.darkMode : darkMode // ignore: cast_nullable_to_non_nullable
 as bool,notificationsEnabled: null == notificationsEnabled ? _self.notificationsEnabled : notificationsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,dailyRemindersEnabled: null == dailyRemindersEnabled ? _self.dailyRemindersEnabled : dailyRemindersEnabled // ignore: cast_nullable_to_non_nullable
+as bool,streakAlertsEnabled: null == streakAlertsEnabled ? _self.streakAlertsEnabled : streakAlertsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,achievementAlertsEnabled: null == achievementAlertsEnabled ? _self.achievementAlertsEnabled : achievementAlertsEnabled // ignore: cast_nullable_to_non_nullable
+as bool,productUpdatesEnabled: null == productUpdatesEnabled ? _self.productUpdatesEnabled : productUpdatesEnabled // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

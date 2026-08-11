@@ -10,6 +10,7 @@ import 'package:visai/core/constants/typing_session_constants.dart';
 import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/challenge/challenge_config.dart';
 import 'package:visai/services/notifications/local_notification_service.dart';
+import 'package:visai/services/notifications/push_notification_service.dart';
 
 class ChallengeConfigController extends Notifier<ChallengeConfig>{
     @override
@@ -54,6 +55,12 @@ class ChallengeConfigController extends Notifier<ChallengeConfig>{
         await _save(updated);
     }
 
+    Future<void> _resyncNotifications() async {
+        final prefs = ref.read(sharedPrefsServiceProvider);
+        await LocalNotificationService.instance.syncFromPrefs(prefs);
+        await PushNotificationService.instance.syncPreferences(prefs);
+    }
+
     // ---------- setters / toggles ----------
 
     Future<void> toggleSound() =>
@@ -67,9 +74,27 @@ class ChallengeConfigController extends Notifier<ChallengeConfig>{
 
     Future<void> toggleNotifications() async {
         await _update((s) => s.copyWith(notificationsEnabled: !s.notificationsEnabled));
-        await LocalNotificationService.instance.syncFromPrefs(
-            ref.read(sharedPrefsServiceProvider),
-        );
+        await _resyncNotifications();
+    }
+
+    Future<void> toggleDailyReminders() async {
+        await _update((s) => s.copyWith(dailyRemindersEnabled: !s.dailyRemindersEnabled));
+        await _resyncNotifications();
+    }
+
+    Future<void> toggleStreakAlerts() async {
+        await _update((s) => s.copyWith(streakAlertsEnabled: !s.streakAlertsEnabled));
+        await _resyncNotifications();
+    }
+
+    Future<void> toggleAchievementAlerts() async {
+        await _update((s) => s.copyWith(achievementAlertsEnabled: !s.achievementAlertsEnabled));
+        await _resyncNotifications();
+    }
+
+    Future<void> toggleProductUpdates() async {
+        await _update((s) => s.copyWith(productUpdatesEnabled: !s.productUpdatesEnabled));
+        await _resyncNotifications();
     }
 
     /// Persists daily reminder time (local notification) and reschedules.

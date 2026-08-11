@@ -19,8 +19,11 @@ import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/splash/splash_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visai/core/ui/app_scaffold_messenger.dart';
+import 'package:visai/di/providers/shared_preferences/shared_prefs_provider.dart';
 import 'package:visai/features/authentication/presentation/providers/auth_service_provider.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/score/score_controller_provider.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
+import 'package:visai/services/notifications/push_notification_service.dart';
 // import 'package:logger/logger.dart';
 
 
@@ -31,7 +34,7 @@ class App extends ConsumerStatefulWidget {
     ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends ConsumerState<App> {
+class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     static Future<void> _syncScoresAfterAuth(WidgetRef ref) async {
         try {
             await ref.read(scoreControllerProvider.notifier).syncAll();
@@ -55,6 +58,41 @@ class _AppState extends ConsumerState<App> {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         print('worked');
         prefs.clear();
+    }
+
+    @override
+    void initState() {
+        super.initState();
+        WidgetsBinding.instance.addObserver(this);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+            unawaited(_resyncNotifications(requestPermission: true));
+        });
+    }
+
+    @override
+    void dispose() {
+        WidgetsBinding.instance.removeObserver(this);
+        super.dispose();
+    }
+
+    @override
+    void didChangeAppLifecycleState(AppLifecycleState state) {
+        if (state == AppLifecycleState.resumed) {
+            unawaited(_resyncNotifications(requestPermission: false));
+        }
+    }
+
+    Future<void> _resyncNotifications({required bool requestPermission}) async {
+        try {
+            final prefs = ref.read(sharedPrefsServiceProvider);
+            await LocalNotificationService.instance.syncFromPrefs(
+                prefs,
+                requestPermission: requestPermission,
+            );
+            if (requestPermission) {
+                await PushNotificationService.instance.syncPreferences(prefs);
+            }
+        } catch (_) {}
     }
 
     @override

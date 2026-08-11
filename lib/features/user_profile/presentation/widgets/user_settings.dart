@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visai/core/config/ui/scale.dart';
 import 'package:visai/core/constants/notifications_constants.dart';
@@ -9,6 +11,8 @@ import 'package:visai/di/providers/theme/theme_provider.dart';
 import 'package:visai/features/badges/presentation/riverpod/controllers/badge_controller_provider.dart';
 import 'package:visai/features/typing_session/domain/entities/challenge/challenge_config.dart';
 import 'package:visai/features/typing_session/presentation/riverpod/controllers/challenge/challenge_config_provider.dart';
+import 'package:visai/services/notifications/local_notification_service.dart';
+import 'package:visai/services/notifications/push_notification_service.dart';
 
 class UserSettings extends ConsumerStatefulWidget {
     const UserSettings({super.key});
@@ -30,12 +34,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                 MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
         // 📃 DECLARATION ----------------------------
-        final ChallengeConfig configuration = ChallengeConfig(
-            soundEnabled: config.soundEnabled,
-            hapticEnabled: config.hapticEnabled,
-            darkMode: config.darkMode,
-            notificationsEnabled: config.notificationsEnabled
-        );
+        final ChallengeConfig configuration = config;
 
         // 🚀 METHODS --------------------------------
         void toggleSound(val){
@@ -205,7 +204,7 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                                     fontWeight: FontWeight.w600
                                                 )
                                             ),
-                                            Text('Daily remainders and updates',
+                                            Text('Reminders, streaks, and updates',
                                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                     color: getFigmaColor(context, 'Schemes/On Surface Variant')
                                                 )
@@ -223,92 +222,138 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
 
                     if (configuration.notificationsEnabled) ...[
                         SizedBox(height: Gap(context).gap(10)),
-                        Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                                borderRadius: BorderRadius.circular(24),
-                                onTap: () async {
-                                    final prefs = ref.read(sharedPrefsServiceProvider);
-                                    final h = prefs.getInt(kDailyReminderHourKey) ?? 9;
-                                    final m = prefs.getInt(kDailyReminderMinuteKey) ?? 0;
-                                    final picked = await showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay(hour: h, minute: m),
-                                    );
-                                    if (picked != null && context.mounted) {
-                                        await ref
-                                            .read(challengeConfigurationProvider.notifier)
-                                            .setDailyReminderTime(picked.hour, picked.minute);
-                                        setState(() {});
-                                    }
-                                },
-                                child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: Gap(context).gap(13),
-                                        vertical: Gap(context).gap(10),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(24),
-                                        color: getFigmaColor(
-                                            context,
-                                            'Schemes/Surface Container Lowest',
+                        _notificationSubToggle(
+                            context: context,
+                            icon: Icons.alarm,
+                            title: 'Daily practice reminder',
+                            subtitle: 'A nudge at your chosen time',
+                            value: config.dailyRemindersEnabled,
+                            onChanged: (_) => ref
+                                .read(challengeConfigurationProvider.notifier)
+                                .toggleDailyReminders(),
+                        ),
+                        if (config.dailyRemindersEnabled) ...[
+                            SizedBox(height: Gap(context).gap(10)),
+                            Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                    borderRadius: BorderRadius.circular(24),
+                                    onTap: () async {
+                                        final prefs = ref.read(sharedPrefsServiceProvider);
+                                        final h = prefs.getInt(kDailyReminderHourKey) ?? 9;
+                                        final m = prefs.getInt(kDailyReminderMinuteKey) ?? 0;
+                                        final picked = await showTimePicker(
+                                            context: context,
+                                            initialTime: TimeOfDay(hour: h, minute: m),
+                                        );
+                                        if (picked != null && context.mounted) {
+                                            await ref
+                                                .read(challengeConfigurationProvider.notifier)
+                                                .setDailyReminderTime(picked.hour, picked.minute);
+                                            setState(() {});
+                                        }
+                                    },
+                                    child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: Gap(context).gap(13),
+                                            vertical: Gap(context).gap(10),
                                         ),
-                                    ),
-                                    child: Row(
-                                        children: [
-                                            Icon(
-                                                Icons.schedule,
-                                                size: Gap(context).gap(23),
-                                                color: getFigmaColor(
-                                                    context,
-                                                    'Schemes/On Surface',
-                                                ),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(24),
+                                            color: getFigmaColor(
+                                                context,
+                                                'Schemes/Surface Container Lowest',
                                             ),
-                                            SizedBox(width: 15),
-                                            Expanded(
-                                                child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                        Text(
-                                                            'Daily reminder time',
-                                                            style: Theme.of(context)
-                                                                .textTheme
-                                                                .titleMedium
-                                                                ?.copyWith(
-                                                                    color: getFigmaColor(
-                                                                        context,
-                                                                        'Schemes/On Surface',
+                                        ),
+                                        child: Row(
+                                            children: [
+                                                Icon(
+                                                    Icons.schedule,
+                                                    size: Gap(context).gap(23),
+                                                    color: getFigmaColor(
+                                                        context,
+                                                        'Schemes/On Surface',
+                                                    ),
+                                                ),
+                                                SizedBox(width: 15),
+                                                Expanded(
+                                                    child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                            Text(
+                                                                'Reminder time',
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .titleMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(
+                                                                            context,
+                                                                            'Schemes/On Surface',
+                                                                        ),
+                                                                        fontWeight: FontWeight.w600,
                                                                     ),
-                                                                    fontWeight: FontWeight.w600,
-                                                                ),
-                                                        ),
-                                                        Text(
-                                                            _reminderTimeLabel(context),
-                                                            style: Theme.of(context)
-                                                                .textTheme
-                                                                .bodyMedium
-                                                                ?.copyWith(
-                                                                    color: getFigmaColor(
-                                                                        context,
-                                                                        'Schemes/On Surface Variant',
+                                                            ),
+                                                            Text(
+                                                                _reminderTimeLabel(context),
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.copyWith(
+                                                                        color: getFigmaColor(
+                                                                            context,
+                                                                            'Schemes/On Surface Variant',
+                                                                        ),
                                                                     ),
-                                                                ),
-                                                        ),
-                                                    ],
+                                                            ),
+                                                        ],
+                                                    ),
                                                 ),
-                                            ),
-                                            Icon(
-                                                Icons.chevron_right,
-                                                size: KxScale(context).sp(30),
-                                                color: getFigmaColor(
-                                                    context,
-                                                    'Schemes/On Surface',
+                                                Icon(
+                                                    Icons.chevron_right,
+                                                    size: KxScale(context).sp(30),
+                                                    color: getFigmaColor(
+                                                        context,
+                                                        'Schemes/On Surface',
+                                                    ),
                                                 ),
-                                            ),
-                                        ],
+                                            ],
+                                        ),
                                     ),
                                 ),
                             ),
+                        ],
+                        SizedBox(height: Gap(context).gap(10)),
+                        _notificationSubToggle(
+                            context: context,
+                            icon: Icons.local_fire_department,
+                            title: 'Streak alerts',
+                            subtitle: 'Evening nudge and win-back reminders',
+                            value: config.streakAlertsEnabled,
+                            onChanged: (_) => ref
+                                .read(challengeConfigurationProvider.notifier)
+                                .toggleStreakAlerts(),
+                        ),
+                        SizedBox(height: Gap(context).gap(10)),
+                        _notificationSubToggle(
+                            context: context,
+                            icon: Icons.emoji_events,
+                            title: 'Achievement alerts',
+                            subtitle: 'Badges, level-ups, and session summaries',
+                            value: config.achievementAlertsEnabled,
+                            onChanged: (_) => ref
+                                .read(challengeConfigurationProvider.notifier)
+                                .toggleAchievementAlerts(),
+                        ),
+                        SizedBox(height: Gap(context).gap(10)),
+                        _notificationSubToggle(
+                            context: context,
+                            icon: Icons.campaign,
+                            title: 'Product updates',
+                            subtitle: 'News and announcements from Visai',
+                            value: config.productUpdatesEnabled,
+                            onChanged: (_) => ref
+                                .read(challengeConfigurationProvider.notifier)
+                                .toggleProductUpdates(),
                         ),
                     ],
 
@@ -372,6 +417,110 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                     Text(
+                                        'Debug - Notifications',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface'),
+                                            fontWeight: FontWeight.w700,
+                                        ),
+                                    ),
+                                    SizedBox(height: Gap(context).gap(8)),
+                                    Text(
+                                        '1) Turn on Notifications + Product updates above\n'
+                                        '2) Tap Copy FCM token\n'
+                                        '3) Firebase Console → Messaging → Send test message → paste token',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                        ),
+                                    ),
+                                    SizedBox(height: Gap(context).gap(8)),
+                                    Row(
+                                        children: [
+                                            Expanded(
+                                                child: OutlinedButton(
+                                                    onPressed: () async {
+                                                        await LocalNotificationService.instance
+                                                            .requestPermissionsIfNeeded();
+                                                        await LocalNotificationService.instance
+                                                            .showRemoteMessage(
+                                                          title: 'Test notification',
+                                                          body: 'Local notification works on this device.',
+                                                          payload: kNotificationPayloadPractice,
+                                                        );
+                                                        if (!context.mounted) return;
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text('Test local notification sent.'),
+                                                            ),
+                                                        );
+                                                    },
+                                                    child: const Text('Test local push'),
+                                                ),
+                                            ),
+                                            SizedBox(width: Gap(context).gap(8)),
+                                            Expanded(
+                                                child: FilledButton(
+                                                    onPressed: () async {
+                                                        await LocalNotificationService.instance
+                                                            .scheduleDebugInMinutes(1);
+                                                        if (!context.mounted) return;
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text(
+                                                                  'Scheduled in ~1 min. Leave the app in background.',
+                                                                ),
+                                                            ),
+                                                        );
+                                                    },
+                                                    child: const Text('Fire in 1 min'),
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                    SizedBox(height: Gap(context).gap(8)),
+                                    Row(
+                                        children: [
+                                            Expanded(
+                                                child: FilledButton(
+                                                    onPressed: () async {
+                                                        await LocalNotificationService.instance
+                                                            .requestPermissionsIfNeeded();
+                                                        await PushNotificationService.instance
+                                                            .syncPreferences(
+                                                          ref.read(sharedPrefsServiceProvider),
+                                                        );
+                                                        final token = await FirebaseMessaging.instance
+                                                            .getToken();
+                                                        if (!context.mounted) return;
+                                                        if (token == null || token.isEmpty) {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                const SnackBar(
+                                                                    content: Text(
+                                                                      'No FCM token yet. Enable Product updates, grant permission, and try again (iOS needs a real device + APNs).',
+                                                                    ),
+                                                                ),
+                                                            );
+                                                            return;
+                                                        }
+                                                        await Clipboard.setData(
+                                                            ClipboardData(text: token),
+                                                        );
+                                                        debugPrint('FCM TOKEN: $token');
+                                                        if (!context.mounted) return;
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(
+                                                                content: Text(
+                                                                  'FCM token copied (${token.length} chars). Also printed in console.',
+                                                                ),
+                                                            ),
+                                                        );
+                                                    },
+                                                    child: const Text('Copy FCM token'),
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                    SizedBox(height: Gap(context).gap(12)),
+                                    Text(
                                         'Debug - Badge Testing',
                                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: getFigmaColor(context, 'Schemes/On Surface'),
@@ -433,6 +582,67 @@ class _UserSettingsState extends ConsumerState<UserSettings> {
         final h = prefs.getInt(kDailyReminderHourKey) ?? 9;
         final m = prefs.getInt(kDailyReminderMinuteKey) ?? 0;
         return TimeOfDay(hour: h, minute: m).format(context);
+    }
+
+    Widget _notificationSubToggle({
+        required BuildContext context,
+        required IconData icon,
+        required String title,
+        required String subtitle,
+        required bool value,
+        required ValueChanged<bool> onChanged,
+    }) {
+        return Container(
+            padding: EdgeInsets.symmetric(
+                horizontal: Gap(context).gap(13),
+                vertical: Gap(context).gap(10),
+            ),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                color: value
+                    ? getFigmaColor(context, 'Schemes/Surface Container Lowest')
+                    : getFigmaColor(context, 'Schemes/Surface Container High'),
+            ),
+            child: Row(
+                children: [
+                    Icon(
+                        icon,
+                        size: Gap(context).gap(23),
+                        color: value
+                            ? getFigmaColor(context, 'Schemes/Primary')
+                            : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                    ),
+                    SizedBox(width: 15),
+                    Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                Text(
+                                    title,
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        color: value
+                                            ? getFigmaColor(context, 'Schemes/Primary')
+                                            : getFigmaColor(context, 'Schemes/On Surface Variant'),
+                                        fontWeight: FontWeight.w600,
+                                    ),
+                                ),
+                                Text(
+                                    subtitle,
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: getFigmaColor(
+                                            context,
+                                            'Schemes/On Surface Variant',
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                    SizedBox(width: 10),
+                    _switchButton(context, value, onChanged),
+                ],
+            ),
+        );
     }
 
     Widget _switchButton(
